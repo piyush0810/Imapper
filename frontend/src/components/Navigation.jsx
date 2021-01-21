@@ -13,7 +13,7 @@ import {
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from "reactstrap";
 
 class Navigation extends Component {
@@ -22,12 +22,12 @@ class Navigation extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
     };
   }
   toggle() {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
     });
   }
 
@@ -70,7 +70,7 @@ class Navigation extends Component {
               </NavLink>
             </DropdownItem>
           </DropdownMenu>
-        </UncontrolledDropdown>
+        </UncontrolledDropdown>,
       ];
     }
   }
@@ -108,7 +108,7 @@ class Navigation extends Component {
               </NavLink>
             </DropdownItem>
           </DropdownMenu>
-        </UncontrolledDropdown>
+        </UncontrolledDropdown>,
       ];
     }
   }
@@ -135,6 +135,19 @@ class Navigation extends Component {
                   Home
                 </NavLink>
               </NavItem>
+              {this.props.authenticated && (
+                <NavItem>
+                  <NavLink
+                    tag={Link}
+                    to="/addimage"
+                    activeClassName="active"
+                    exact
+                    onClick={this.toggleNavbarOnClick}
+                  >
+                    AddImage
+                  </NavLink>
+                </NavItem>
+              )}
               {this.userIsNotAuthenticated()}
               {this.userIsAuthenticatedEmail()}
             </Nav>

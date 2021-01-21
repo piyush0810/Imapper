@@ -27,3 +27,28 @@
   background-color: #000000b3;
   display: block;
 }
+
+.react-image-dot__wrapper {
+  background-size: cover;
+  position: relative;
+  background-color: gray;
+}
+
+.react-image-dot {
+  background-color: red;
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  border-radius: 5px;
+  transform: translate(-5px, -5px);
+  cursor: move; /* Fallback for older browsers */
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
+  cursor: grab;
+}
+
+.react-image-dot__grabbing {
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+  cursor: grabbing;
+}
