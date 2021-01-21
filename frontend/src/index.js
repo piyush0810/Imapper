@@ -29,7 +29,7 @@ ReactDOM.render(
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
           <Route exact path="/addimage" component={AddImage} />
-          <Route exact path="/image/:id">
+          <Route exact path="/image/:imageID" component={Image}>
             <Image></Image>
           </Route>
         </Switch>
