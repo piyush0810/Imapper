@@ -14,12 +14,15 @@ import Login from "./containers/auth/LoginContainer";
 import Register from "./containers/auth/RegisterContainer";
 import ChangePassword from "./containers/auth/ChangePasswordContainer";
 
+
+import App from "./App"
 export const history = createHistory();
 
 ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
       <div>
+      <App/>
         <Navigation />
         <Switch>
           <Route exact path="/" component={HomePage} />
@@ -30,6 +33,8 @@ ReactDOM.render(
         </Switch>
       </div>
     </Router>
+    
   </Provider>,
+  
   document.getElementById("root")
 );

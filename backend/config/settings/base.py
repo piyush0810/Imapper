@@ -8,6 +8,7 @@ SECRET_KEY = '$5pan&)k_caa*a=y_i&4zoz)9gzyl4h=-9g%3mc+g6-au*g&ak'
 INSTALLED_APPS = [
     # Personal,
     'custom_user',
+    'image',
 
     #BASE
     'django.contrib.admin',
@@ -16,7 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    "django_jsonfield_backport",
     # Requirements
     'corsheaders',
     'rest_framework',
@@ -115,3 +116,5 @@ SWAGGER_SETTINGS = {
 DJOSER = {
     'SET_PASSWORD_RETYPE': True,
 }
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
