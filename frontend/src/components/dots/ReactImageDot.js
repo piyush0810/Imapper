@@ -86,6 +86,7 @@ export default class ReactImageDot extends React.Component {
       dotRadius,
       backgroundSize,
     } = this.props;
+    console.log("URL in ReactImageDot->", backgroundImageUrl);
     const grabClass = grabbing ? "react-image-dot__grabbing" : "";
 
     return (
@@ -95,9 +96,7 @@ export default class ReactImageDot extends React.Component {
           onMouseUp={this.onMouseUp}
           style={{
             ...styles,
-            background:
-              backgroundColor ||
-              `url('${backgroundImageUrl}') no-repeat center center`,
+            background: `url({'${backgroundImageUrl}') no-repeat center center`,
             width,
             height,
             backgroundSize,

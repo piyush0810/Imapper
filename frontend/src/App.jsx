@@ -1,47 +1,47 @@
-import React, { Component } from 'react';
-import axios from 'axios';
+import React, { Component } from "react";
+import axios from "axios";
 
 class App extends Component {
-
   state = {
-    title: '',
-    content: '',
-    image: null
+    title: "",
+    content: "",
+    image: null,
   };
 
   handleChange = (e) => {
     this.setState({
-      [e.target.id]: e.target.value
-    })
+      [e.target.id]: e.target.value,
+    });
   };
 
   handleImageChange = (e) => {
     this.setState({
-      image: e.target.files[0]
-
-    })
-    console.log(e.target.files[0])
+      image: e.target.files[0],
+    });
+    console.log(e.target.files[0]);
   };
 
   handleSubmit = (e) => {
     e.preventDefault();
     console.log(this.state);
     let form_data = new FormData();
-    form_data.append('image', this.state.image, this.state.image.name);
-    form_data.append('title', this.state.title);
-    form_data.append('content', this.state.content);
-    let url = 'http://localhost:8000/image/images/';
-    axios.post(url, form_data, {
-      headers: {
-        'content-type': 'multipart/form-data',
-        'Authorization': ''
-
-      }
-    })
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => console.log(err))
+    form_data.append("image", this.state.image, this.state.image.name);
+    form_data.append("title", this.state.title);
+    form_data.append("content", this.state.content);
+    form_data.append("info", {});
+    form_data.append("image_id", "gid");
+    let url = "http://localhost:8000/image/images/";
+    axios
+      .post(url, form_data, {
+        headers: {
+          "content-type": "multipart/form-data",
+          Authorization: "",
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
   render() {
@@ -49,18 +49,35 @@ class App extends Component {
       <div className="App">
         <form onSubmit={this.handleSubmit}>
           <p>
-            <input type="text" placeholder='Title' id='title' value={this.state.title} onChange={this.handleChange} required/>
+            <input
+              type="text"
+              placeholder="Title"
+              id="title"
+              value={this.state.title}
+              onChange={this.handleChange}
+              required
+            />
           </p>
           <p>
-            <input type="text" placeholder='Content' id='content' value={this.state.content} onChange={this.handleChange} required/>
-
+            <input
+              type="text"
+              placeholder="Content"
+              id="content"
+              value={this.state.content}
+              onChange={this.handleChange}
+              required
+            />
           </p>
           <p>
-            <input type="file"
-                   id="image"
-                   accept="image/png, image/jpeg"  onChange={this.handleImageChange} required/>
+            <input
+              type="file"
+              id="image"
+              accept="image/png, image/jpeg"
+              onChange={this.handleImageChange}
+              required
+            />
           </p>
-          <input type="submit"/>
+          <input type="submit" />
         </form>
       </div>
     );

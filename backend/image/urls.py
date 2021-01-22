@@ -7,4 +7,3 @@ urlpatterns = [
     re_path('^(?P<image_id>.+)/$', views.imagev.as_view()),
     # path('^purchases/(?P<username>.+)/$', PurchaseList.as_view()),
 ]
-abc
