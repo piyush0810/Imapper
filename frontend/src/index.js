@@ -17,8 +17,6 @@ import ChangePassword from "./containers/auth/ChangePasswordContainer";
 import Image from "./components/image/Image";
 import AddImage from "./components/addImage/addImage";
 
-import App from "./App";
-
 export const history = createHistory();
 
 ReactDOM.render(
