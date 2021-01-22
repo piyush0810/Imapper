@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function DotsInfo({ dots, height, width, deleteDot, pid }) {
+export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
+  console.log("Image Add request from", pid);
   return (
     <ul>
       {dots.map((dot, i) => {
@@ -15,7 +16,7 @@ export default function DotsInfo({ dots, height, width, deleteDot, pid }) {
                 Coordinates: x: {dot.x}, y: {dot.y}
               </p>
               <button>Add Sensor</button>
-              <Link to={`/image/${pid}`}>
+              <Link to={`/addimage/${pid}`}>
                 <button>Add Image</button>
               </Link>
             </li>

@@ -9,6 +9,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
 
 # Create your views here.
+
+
 @permission_classes((AllowAny, ))
 class imageview(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -16,14 +18,13 @@ class imageview(APIView):
     def get(self, request, *args, **kwargs):
         images = Image.objects.all()
         serializer = PostSerializer(images, many=True)
-        
+
         return Response(serializer.data)
 
-
     def post(self, request, *args, **kwargs):
-        
+
         posts_serializer = PostSerializer(data=request.data)
-        
+
         if posts_serializer.is_valid():
             posts_serializer.save()
             return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
@@ -35,22 +36,21 @@ class imageview(APIView):
 @permission_classes((AllowAny, ))
 class imagev(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    
+
     def get(self, request, *args, **kwargs):
-        # print("hi")
+        print("hi")
         image_id = self.kwargs['image_id']
         # print("hi")
         images = Image.objects.filter(image_id=image_id)
-        
+        print(type(images[0].image))
         serializer = PostSerializer(images, many=True)
-        
+
         return Response(serializer.data)
 
-
     def post(self, request, *args, **kwargs):
-        
+
         posts_serializer = PostSerializer(data=request.data)
-        
+
         if posts_serializer.is_valid():
             posts_serializer.save()
             return Response(posts_serializer.data, status=status.HTTP_201_CREATED)

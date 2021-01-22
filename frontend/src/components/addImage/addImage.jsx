@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 
 function AddImage() {
-  const history = useHistory();
   console.log("New AddImage Created");
+  //states
   const imageRef = useRef(null);
   const [image, setImage] = useState({
     title: "",
@@ -14,6 +14,13 @@ function AddImage() {
     content: "",
   });
   const [isUpload, setIsUpload] = useState(false);
+
+  const { pid } = useParams();
+  const history = useHistory();
+  if (pid) {
+    console.log("Type 2 Request: From", pid);
+  }
+
   const handleChange = (e) => {
     const gid = (
       Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
@@ -22,17 +29,14 @@ function AddImage() {
   };
   const handleUpload = async (e) => {
     e.preventDefault();
-
     if (image.image) {
-      // console.log(gid);
       const formData = new FormData();
       formData.append("image", image.image);
-
       formData.append("title", "IIT Mumbai");
-
       formData.append("info", image.info);
       formData.append("image_id", image.image_id);
       formData.append("content", image.content);
+
       let url = "http://localhost:8000/image/images/";
       axios
         .post(url, formData, {
