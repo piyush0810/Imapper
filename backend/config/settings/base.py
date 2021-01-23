@@ -9,7 +9,6 @@ INSTALLED_APPS = [
     # Personal,
     'custom_user',
     'image',
-    'sensor',
 
     #BASE
     'django.contrib.admin',
