@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .serializers import PostSerializer
-from .models import Image
+from .models import Sensor
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -15,13 +15,13 @@ import json
 
 # Create your views here.
 @permission_classes((AllowAny, ))
-class imageview(APIView):
+class sensorview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
-        images = Image.objects.all()
+        sensors = Sensor.objects.all()
         # print(images[0][image])
-        serializer = PostSerializer(images, many=True)
+        serializer = PostSerializer(sensors, many=True)
         
         return Response(serializer.data)
 
@@ -33,8 +33,8 @@ class imageview(APIView):
 
     def post(self, request, *args, **kwargs):
         # print(type(request.data["image"]))
-        print("hi")
-        print(request.data)
+        # print("hi")
+        # print(request.data)
         # a= request.data["image"].file.read()
         # print(type(a))
         
@@ -66,16 +66,16 @@ class imageview(APIView):
 
 
 @permission_classes((AllowAny, ))
-class imagev(APIView):
+class sensorv(APIView):
     parser_classes = (MultiPartParser, FormParser)
     
     def get(self, request, *args, **kwargs):
         
-        image_id = self.kwargs['image_id']
+        sensor_id = self.kwargs['sensor_id']
         # print("hi")
-        images = Image.objects.filter(image_id=image_id)
+        sensors = Sensor.objects.filter(sensor_id=sensor_id)
         
-        serializer = PostSerializer(images, many=True)
+        serializer = PostSerializer(sensors, many=True)
         # print(serializer[0][image])
 
         return Response(serializer.data)
