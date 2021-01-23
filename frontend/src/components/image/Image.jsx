@@ -40,7 +40,7 @@ function Image(props) {
     axios({
       method: "get",
       url,
-      auth: { username: "as10071999", password: "Aryan123" },
+      auth: { username: "brownie", password: "piyush0810" },
     })
       .then((response) => {
         console.log(response.data[0]);

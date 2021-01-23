@@ -7,7 +7,14 @@ class Sensor(models.Model):
     sensor_name=models.CharField(max_length=50)
     unit=models.CharField(max_length=50) 
     dimensions = models.TextField()
-    value = models.IntegerField() 
+    value =  JSONField()
     
     def __str__(self):
-        return self.Sensor_name
+        return self.sensor_name
+
+class Value(models.Model):
+    sensor_id = models.CharField(max_length=100)
+    value=models.IntegerField()
+        
+    def __str__(self):
+        return self.sensor_id
