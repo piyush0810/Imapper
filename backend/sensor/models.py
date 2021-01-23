@@ -3,6 +3,7 @@ from django_jsonfield_backport.models import JSONField
 
 # Create your models here.
 class Sensor(models.Model):
+    p_id = models.CharField(max_length=100)
     sensor_id = models.CharField(max_length=100)
     sensor_name=models.CharField(max_length=50)
     unit=models.CharField(max_length=50) 
