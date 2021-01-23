@@ -42,7 +42,7 @@ function Image(props) {
     axios({
       method: "get",
       url,
-      auth: { username: "brownie", password: "piyush0810" },
+      auth: { username: "as10071999", password: "Aryan123" },
     })
       .then((response) => {
         console.log("Printing Fetched");
