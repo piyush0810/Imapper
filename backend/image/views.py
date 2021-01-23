@@ -14,6 +14,8 @@ import json
 
 
 # Create your views here.
+
+
 @permission_classes((AllowAny, ))
 class imageview(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -22,8 +24,7 @@ class imageview(APIView):
         images = Image.objects.all()
         # print(images[0][image])
         serializer = PostSerializer(images, many=True)
-        
-        return Response(serializer.data)
+
 
     
     
@@ -54,32 +55,22 @@ class imageview(APIView):
 
 
 
-        posts_serializer = PostSerializer(data=request.data)
-        
-        if posts_serializer.is_valid():
-            posts_serializer.save()
-            
-            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            print('error', posts_serializer.errors)
-            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes((AllowAny, ))
 class imagev(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    
+
     def get(self, request, *args, **kwargs):
-        
+
         image_id = self.kwargs['image_id']
         # print("hi")
         images = Image.objects.filter(image_id=image_id)
-        
+         #         print(type(images[0].image))
         serializer = PostSerializer(images, many=True)
-        # print(serializer[0][image])
+
 
         return Response(serializer.data)
-
 
     # def save(self):
     #     encodedString = base64.b64encode(self.item_image.file.read())
@@ -95,9 +86,9 @@ class imagev(APIView):
 
 
     def post(self, request, *args, **kwargs):
-        
+
         posts_serializer = PostSerializer(data=request.data)
-        # print(request.data)        
+
         if posts_serializer.is_valid():
             posts_serializer.save()
             

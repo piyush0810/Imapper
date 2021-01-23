@@ -96,7 +96,7 @@ export default class ReactImageDot extends React.Component {
           onMouseUp={this.onMouseUp}
           style={{
             ...styles,
-            background: `url({'${backgroundImageUrl}') no-repeat center center`,
+            backgroundImage: `url(${backgroundImageUrl})`,
             width,
             height,
             backgroundSize,

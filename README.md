@@ -22,7 +22,7 @@
 #### Backend
 
 1. cd backend
-2. virtual
+2. virtualenv env
 3. env\scripts\activate.bat
 4. pip install -r requirements/local.txt
 5. python manage.py makemigrations custom_user image

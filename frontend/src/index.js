@@ -15,10 +15,8 @@ import Register from "./containers/auth/RegisterContainer";
 import ChangePassword from "./containers/auth/ChangePasswordContainer";
 
 import Image from "./components/image/Image";
-import AddImage from "./components/addImage/addImage";
-
-import App from "./App";
-
+import AddImage from "./components/addImage/AddImage";
+import "./index.css";
 export const history = createHistory();
 
 ReactDOM.render(
@@ -33,6 +31,7 @@ ReactDOM.render(
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
           <Route exact path="/addimage" component={AddImage} />
+          <Route exact path="/addimage/:pid" component={AddImage} />
           <Route exact path="/image/:imageID" component={Image}>
             <Image></Image>
           </Route>
