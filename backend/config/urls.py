@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^auth/', include('djoser.urls')),
     url(r'^auth/', include('djoser.urls.jwt')),
     url(r'^image/', include('image.urls')),
+    url(r'^sensor/', include('sensor.urls')),
     
 ]
 

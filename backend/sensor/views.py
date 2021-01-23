@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from .serializers import PostSerializer
-from .models import Image
+from .serializers import PostSerializer,ValueSerializer,sensSerializer
+from .models import Sensor,Value
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -14,17 +14,17 @@ import json
 
 
 # Create your views here.
-
-
 @permission_classes((AllowAny, ))
-class imageview(APIView):
+class sensorview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
-        images = Image.objects.all()
+        sensors = Sensor.objects.all()
+        
         # print(images[0][image])
-        serializer = PostSerializer(images, many=True)
-
+        serializer = PostSerializer(sensors, many=True)
+        
+        return Response(serializer.data)
 
     
     
@@ -34,8 +34,8 @@ class imageview(APIView):
 
     def post(self, request, *args, **kwargs):
         # print(type(request.data["image"]))
-        print("hi")
-        print(request.data)
+        # print("hi")
+        # print(request.data)
         # a= request.data["image"].file.read()
         # print(type(a))
         
@@ -55,22 +55,38 @@ class imageview(APIView):
 
 
 
+        posts_serializer = PostSerializer(data=request.data)
+        
+        if posts_serializer.is_valid():
+            posts_serializer.save()
+            
+            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', posts_serializer.errors)
+            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @permission_classes((AllowAny, ))
-class imagev(APIView):
+class sensorv(APIView):
     parser_classes = (MultiPartParser, FormParser)
-
+    
     def get(self, request, *args, **kwargs):
-
-        image_id = self.kwargs['image_id']
+        print("asdas")
+        sensor_id = self.kwargs['sensor_id']
         # print("hi")
-        images = Image.objects.filter(image_id=image_id)
-         #         print(type(images[0].image))
-        serializer = PostSerializer(images, many=True)
+        sensors = Sensor.objects.filter(sensor_id=sensor_id)
+        for sensor in sensors:
+            values =  Value.objects.filter(sensor_id=sensor_id)
+            data=[]
+            for value in values:
+                data.append(value.value)
+            sensor.value=json.dumps(data)
 
+        serializer = PostSerializer(sensors, many=True)
+        # print(serializer[0][image])
 
         return Response(serializer.data)
+
 
     # def save(self):
     #     encodedString = base64.b64encode(self.item_image.file.read())
@@ -86,9 +102,40 @@ class imagev(APIView):
 
 
     def post(self, request, *args, **kwargs):
-
+        
         posts_serializer = PostSerializer(data=request.data)
+        # print(request.data)        
+        if posts_serializer.is_valid():
+            posts_serializer.save()
+            
+            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', posts_serializer.errors)
+            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+@permission_classes((AllowAny, ))
+class sensorvalue(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    
+    def get(self, request, *args, **kwargs):
+        
+
+        sensor_id = self.kwargs['sensor_id']
+       
+        values = Value.objects.filter(sensor_id=sensor_id)
+        
+        serializer = ValueSerializer(values, many=True)
+        # print(serializer[0][image])
+
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        
+        posts_serializer = ValueSerializer(data=request.data)
+        # print(request.data)        
         if posts_serializer.is_valid():
             posts_serializer.save()
             
