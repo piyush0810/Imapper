@@ -17,17 +17,12 @@ import ChangePassword from "./containers/auth/ChangePasswordContainer";
 import Image from "./components/image/Image";
 import AddImage from "./components/addImage/addImage";
 
-
-
-import App from "./App"
-
 export const history = createHistory();
 
 ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>
       <div>
-      <App/>
         <Navigation />
         <Switch>
           <Route exact path="/" component={HomePage} />
@@ -36,14 +31,14 @@ ReactDOM.render(
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
           <Route exact path="/addimage" component={AddImage} />
+          <Route exact path="/addimage/:pid" component={AddImage} />
           <Route exact path="/image/:imageID" component={Image}>
             <Image></Image>
           </Route>
         </Switch>
       </div>
     </Router>
-    
   </Provider>,
-  
+
   document.getElementById("root")
 );
