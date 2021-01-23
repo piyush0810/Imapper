@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactImageDot from "../dots/ReactImageDot";
 import DotsInfo from "../dots/DotsInfo";
 import { useHistory, useParams } from "react-router-dom";
+
 import axios from "axios";
 // {
 //   Post: "/image/:id", { id: ""<string>, preview: ""<string>, raw: ""<binary>, sensors: []<array of string>, images: []<array of string> };

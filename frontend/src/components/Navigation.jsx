@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { NavLink as Link } from "react-router-dom";
 
-import "../index.css";
+// import "../index.css";
 
 import {
   Collapse,
