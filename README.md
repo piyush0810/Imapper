@@ -22,10 +22,10 @@
 #### Backend
 
 1. cd backend
-2. virtualenv env
-3. env\scripts\activate.bat
+2. virtualenv env || python3 -m venv env
+3. env\scripts\activate.bat || source env/bin/activate
 4. pip install -r requirements/local.txt
-5. python manage.py makemigrations custom_user image
+5. python manage.py makemigrations custom_user image sensor
 6. python manage.py migrate
 7. python manage.py createsuperuser
 8. python manage.py runserver
