@@ -6,6 +6,7 @@ import { Button, Modal } from "react-bootstrap";
 export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
   console.log("Image Add request from", pid);
   const [modalShow, setModalShow] = React.useState(false);
+
   return (
     <>
       <ul>
@@ -14,7 +15,15 @@ export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
             <>
               <li>
                 <p>
-                  Dot {i} <button onClick={() => deleteDot(i)}>Remove</button>
+                  Dot {i}{" "}
+                  <button
+                    onClick={() => {
+                      deleteDot(i);
+                      //removing Sensor boolean also
+                    }}
+                  >
+                    Remove
+                  </button>
                 </p>
                 <p>
                   Coordinates: x: {dot.x}, y: {dot.y}
@@ -32,6 +41,7 @@ export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
         show={modalShow}
         onHide={() => setModalShow(false)}
       />
+      ;
     </>
   );
 }
@@ -48,7 +58,7 @@ function MyVerticallyCenteredModal(props) {
         <Modal.Title id="contained-modal-title-vcenter">Add Sensor</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <AddSensor />
+        <AddSensor onHide={props.onHide} />
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={props.onHide}>Close</Button>
