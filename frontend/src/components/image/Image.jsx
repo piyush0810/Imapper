@@ -16,20 +16,21 @@ function Image(props) {
     image_id: "",
     content: "",
   });
-  const [dots, setdots] = useState([]);
+
+  // const [dots, setdots] = useState([]);
   const [dataFetched, setdataFetched] = useState(false);
-  const addDot = (dot) => {
-    setdots((prev) => {
-      return [...prev, dot];
-    });
-  };
-  const deleteDot = (index) => {
-    setdots((prev) => {
-      return prev.filter((e, i) => {
-        return i != index;
-      });
-    });
-  };
+  // const addDot = (dot) => {
+  //   setdots((prev) => {
+  //     return [...prev, dot];
+  //   });
+  // };
+  // const deleteDot = (index) => {
+  //   setdots((prev) => {
+  //     return prev.filter((e, i) => {
+  //       return i != index;
+  //     });
+  //   });
+  // };
   useEffect(() => {
     //fetching Image Data from DB
 
@@ -65,9 +66,6 @@ function Image(props) {
         backgroundImageUrl={"http://localhost:8000" + image.image}
         width={480}
         height={480}
-        dots={dots}
-        deleteDot={deleteDot}
-        addDot={addDot}
         dotRadius={6}
         dotStyles={{
           backgroundColor: "red",
@@ -76,13 +74,7 @@ function Image(props) {
         backgroundSize={"cover"}
       />
       {dataFetched && (
-        <DotsInfo
-          height={480}
-          width={480}
-          dots={dots}
-          deleteDot={deleteDot}
-          pid={image.image_id}
-        />
+        <DotsInfo height={480} width={480} pid={image.image_id} />
       )}
     </div>
   );

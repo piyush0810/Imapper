@@ -1,11 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
-
+import { useSelector, useDispatch } from "react-redux";
 import Dot from "./Dot";
+
 const propTypes = {
   // Required functions to handle parent-level state management
-  deleteDot: PropTypes.func.isRequired,
-  addDot: PropTypes.func.isRequired,
 
   resetDots: PropTypes.func,
   key: PropTypes.string,
@@ -48,6 +47,8 @@ export default class ReactImageDot extends React.Component {
     this.state = {
       grabbing: false,
     };
+    const dots = useSelector((state) => state.dots);
+    const dispatch = useDispatch();
   }
 
   onMouseUp = (e) => {
