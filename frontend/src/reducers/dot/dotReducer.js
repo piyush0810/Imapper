@@ -4,15 +4,17 @@ const initialState = {
 };
 
 function dotReducer(state = initialState, action) {
-  switch (action.type) {
-    case types.ADD_DOT:
-      return [...state.dots, action.payload];
-    case types.DELETE_DOT:
-      return state.filter((e, i) => {
-        return i != action.payload;
-      });
-    default:
-      return state;
+  if (action.type === "ADD_DOT") {
+    return { ...state, dots: [...state.dots, action.payload] };
   }
+  if (action.type === "DELETE_DOT") {
+    return {
+      ...state,
+      dots: state.dots.filter((e, i) => {
+        return i != action.payload;
+      }),
+    };
+  }
+  return state;
 }
 export default dotReducer;

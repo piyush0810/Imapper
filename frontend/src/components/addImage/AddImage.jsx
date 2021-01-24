@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 
 function AddImage() {
-  console.log("New AddImage Created");
+  console.log("AddImage Component Rendered");
   //states
   const imageRef = useRef(null);
   const [image, setImage] = useState({
@@ -18,7 +18,7 @@ function AddImage() {
   const { pid } = useParams();
   const history = useHistory();
   if (pid) {
-    console.log("Type 2 Request: From", pid);
+    // console.log("Type 2 Request: From", pid);
   }
 
   const handleChange = (e) => {
@@ -46,14 +46,14 @@ function AddImage() {
           },
         })
         .then((res) => {
-          console.log(res.data);
-          console.log("Hello");
+          // console.log(res.data);
+          // console.log("Hello");
         })
         .catch((err) => console.log(err));
       setIsUpload(true);
 
       history.push(`/image/${image.image_id}`);
-      console.log("Added History");
+      // console.log("Added History");
     }
   };
   const handleDelete = (e) => {

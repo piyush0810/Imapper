@@ -2,11 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import AddSensor from "../addSensor/AddSensor";
 import { Button, Modal } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 
-export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
+export default function DotsInfo({ height, width, pid }) {
+  console.log("Dotsinfo Component Rendered");
   console.log("Image Add request from", pid);
   const [modalShow, setModalShow] = React.useState(false);
+  const dots = useSelector((state) => state.dot.dots);
+  const dispatch = useDispatch();
 
+  function deleteDot(index) {
+    dispatch(DeleteDot(index));
+  }
   return (
     <>
       <ul>
@@ -19,7 +27,6 @@ export default function DotsInfo({ height, width, dots, deleteDot, pid }) {
                   <button
                     onClick={() => {
                       deleteDot(i);
-                      //removing Sensor boolean also
                     }}
                   >
                     Remove

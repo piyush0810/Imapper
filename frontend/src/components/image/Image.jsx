@@ -6,9 +6,9 @@ import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 
 function Image(props) {
-  console.log("rerendering Image");
+  console.log("Image Component Rendered");
   const { imageID } = useParams();
-  console.log(`Image ${imageID} Recieved in Image`);
+  //console.log(`Image ${imageID} Recieved in Image`);
   const [image, setImage] = useState({
     title: "",
     image: null,
@@ -35,15 +35,15 @@ function Image(props) {
     //fetching Image Data from DB
 
     let url = `http://localhost:8000/image/${imageID}`;
-    console.log(`sending GET req to ${url}`);
+    // console.log(`sending GET req to ${url}`);
     axios({
       method: "get",
       url,
       auth: { username: "as10071999", password: "Aryan123" },
     })
       .then((response) => {
-        console.log("Printing Fetched");
-        console.log(response.data[0]);
+        // console.log("Printing Fetched");
+        // console.log(response.data[0]);
         setImage({
           info: response.data[0].info,
           content: response.data[0].content,
@@ -51,8 +51,8 @@ function Image(props) {
           image: response.data[0].image,
           image_id: response.data[0].image_id,
         });
-        console.log("Image Date Set:", image);
-        console.log("Done Fetching");
+        // console.log("Image Date Set:", image);
+        // console.log("Done Fetching");
         setdataFetched(true);
       })
       .catch((error) => {

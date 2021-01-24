@@ -1,9 +1,10 @@
 import * as types from "../../types/actionTypes";
 
-function addDot(dot) {
+function AddDot(dot) {
   return { type: types.ADD_DOT, payload: dot };
 }
-function deleteDot(index) {
-  return { type: types.ADD_DOT, payload: index };
+function DeleteDot(index) {
+  return { type: types.DELETE_DOT, payload: index };
 }
-export { addDot, deleteDot };
+
+export { AddDot, DeleteDot };
