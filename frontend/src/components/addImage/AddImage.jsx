@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
-
+import { useSelector, useDispatch } from "react-redux";
 function AddImage() {
   console.log("AddImage Component Rendered");
   //states
@@ -14,6 +14,7 @@ function AddImage() {
     content: "",
   });
   const [isUpload, setIsUpload] = useState(false);
+  const dispatch = useDispatch();
 
   const { pid } = useParams();
   const history = useHistory();
@@ -36,7 +37,6 @@ function AddImage() {
       formData.append("info", image.info);
       formData.append("image_id", image.image_id);
       formData.append("content", image.content);
-
       let url = "http://localhost:8000/image/images/";
       axios
         .post(url, formData, {
@@ -51,7 +51,7 @@ function AddImage() {
         })
         .catch((err) => console.log(err));
       setIsUpload(true);
-
+      dispatch({ type: "CALL_FETCH" });
       history.push(`/image/${image.image_id}`);
       // console.log("Added History");
     }

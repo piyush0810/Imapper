@@ -13,3 +13,5 @@ export const CHANGE_PASSWORD_FAILURE = "CHANGE_PASSWORD_FAILURE";
 
 export const ADD_DOT = "ADD_DOT";
 export const DELETE_DOT = "DELETE_DOT";
+
+//IMAGE

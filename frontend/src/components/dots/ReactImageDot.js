@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import Dot from "./Dot";
 import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
-import { compose } from "redux";
+
 const propTypes = {
   // Required functions to handle parent-level state management
 
