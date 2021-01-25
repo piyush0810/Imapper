@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-
+import { useSelector, useDispatch } from "react-redux";
 import Dot from "./Dot";
+import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
+import { compose } from "redux";
 const propTypes = {
   // Required functions to handle parent-level state management
-  deleteDot: PropTypes.func.isRequired,
-  addDot: PropTypes.func.isRequired,
 
   resetDots: PropTypes.func,
   key: PropTypes.string,
@@ -42,84 +42,83 @@ const defaultProps = {
   backgroundSize: "cover",
 };
 
-export default class ReactImageDot extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      grabbing: false,
-    };
-  }
+function ReactImageDot(props) {
+  console.log("ReactImageDot Component Rendered");
+  const [grabbing, setgrabbing] = useState(false);
+  const {
+    width,
+    height,
+    styles,
+    dotStyles,
+    backgroundColor,
+    backgroundImageUrl,
+    dotRadius,
+    backgroundSize,
+  } = props;
+  const dots = useSelector((state) => {
+    console.log("State: ", state);
+    return state.dot.dots;
+  });
+  const dispatch = useDispatch();
 
-  onMouseUp = (e) => {
+  function addDot(dot) {
+    console.log("Dispatching addDot function");
+    dispatch(AddDot(dot));
+  }
+  function deleteDot(index) {
+    dispatch(DeleteDot(index));
+  }
+  const onMouseUp = (e) => {
     const bounds = e.target.getBoundingClientRect();
-    this.setState({
-      grabbing: true,
-    });
-    this.props.addDot({
+    setgrabbing(true);
+    addDot({
       x: e.clientX - bounds.left,
       y: e.clientY - bounds.top,
     });
   };
 
-  moveDot = (index) => {
-    this.setState({
-      grabbing: false,
-    });
-    this.props.deleteDot(index);
+  const moveDot = (index) => {
+    setgrabbing(false);
+    deleteDot(index);
   };
 
-  resetDots = () => {
-    this.props.resetDots();
+  const resetDots = () => {
+    props.resetDots();
   };
 
-  render() {
-    const { grabbing } = this.state;
+  const grabClass = grabbing ? "react-image-dot__grabbing" : "";
 
-    const {
-      dots,
-      width,
-      height,
-      styles,
-      dotStyles,
-      backgroundColor,
-      backgroundImageUrl,
-      dotRadius,
-      backgroundSize,
-    } = this.props;
-    console.log("URL in ReactImageDot->", backgroundImageUrl);
-    const grabClass = grabbing ? "react-image-dot__grabbing" : "";
-
-    return (
-      <div className="react-image-dot__container">
-        <div
-          className={`react-image-dot__wrapper ${grabClass}`}
-          onMouseUp={this.onMouseUp}
-          style={{
-            ...styles,
-            backgroundImage: `url(${backgroundImageUrl})`,
-            width,
-            height,
-            backgroundSize,
-          }}
-        >
-          {dots.map((dot, i) => (
-            <Dot
-              x={dot.x}
-              y={dot.y}
-              i={i}
-              styles={dotStyles}
-              moveDot={this.moveDot}
-              dotRadius={dotRadius}
-            />
-          ))}
-        </div>
-        {this.props.resetDots && (
-          <button onClick={this.resetDots}>Reset</button>
-        )}
+  console.log("URL in ReactImageDot->", backgroundImageUrl);
+  console.log(dots);
+  return (
+    <div className="react-image-dot__container">
+      <div
+        className={`react-image-dot__wrapper ${grabClass}`}
+        onMouseUp={onMouseUp}
+        style={{
+          ...styles,
+          backgroundImage: `url(${backgroundImageUrl})`,
+          width,
+          height,
+          backgroundSize,
+        }}
+      >
+        {dots.map((dot, i) => (
+          <Dot
+            x={dot.x}
+            y={dot.y}
+            i={i}
+            styles={dotStyles}
+            moveDot={moveDot}
+            dotRadius={dotRadius}
+          />
+        ))}
       </div>
-    );
-  }
+      {props.resetDots && <button onClick={resetDots}>Reset</button>}
+    </div>
+  );
 }
 
 ReactImageDot.propTypes = propTypes;
 ReactImageDot.defaultProps = defaultProps;
+export default ReactImageDot;

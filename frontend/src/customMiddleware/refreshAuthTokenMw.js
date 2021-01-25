@@ -8,7 +8,7 @@ import { history } from "../index.js";
 let url = process.env.REACT_APP_DEV_URL || backendUrl;
 
 function refreshAuthToken({ dispatch, getState }) {
-  return next => action => {
+  return (next) => (action) => {
     if (typeof action === "function") {
       if (localStorage.getItem("ecom_token") && localStorage.length > 0) {
         const tokenExpiration = jwtDecode(localStorage.getItem("ecom_token"))
@@ -28,12 +28,12 @@ function refreshAuthToken({ dispatch, getState }) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: loginToken
+              Authorization: loginToken,
             },
-            body: JSON.stringify({ token: loginToken })
+            body: JSON.stringify({ token: loginToken }),
           })
-            .then(response => response.json())
-            .then(json => localStorage.setItem("ecom_token", json.token))
+            .then((response) => response.json())
+            .then((json) => localStorage.setItem("ecom_token", json.token))
             .then(() => next(action));
         }
         return next(action);

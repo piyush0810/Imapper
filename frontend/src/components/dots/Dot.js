@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 const propTypes = {
   x: PropTypes.number.isRequired,
@@ -9,36 +9,36 @@ const propTypes = {
   dotRadius: PropTypes.number,
 
   styles: PropTypes.object,
-}
+};
 
 const defaultProps = {
   dotRadius: 5,
 };
 
-export default class Dot extends React.Component {
-  onMouseDown = () => {
-    this.props.moveDot(this.props.i);
-  }
-
-  render() {
-    const { x, y, styles, dotRadius } = this.props;
-    return (
-      <div
-        className="react-image-dot"
-        onMouseDown={this.onMouseDown}
-        style={{
-          ...styles,
-          height: dotRadius * 2,
-          width: dotRadius * 2,
-          borderRadius: dotRadius,
-          transform: `translate(${-dotRadius}, ${-dotRadius})`,
-          top: y,
-          left: x
-        }}
-      />
-    );
-  }
-}
-
 Dot.propTypes = propTypes;
 Dot.defaultProps = defaultProps;
+
+function Dot(props) {
+  console.log("Dots Component rendered");
+  const { x, y, styles, dotRadius } = props;
+  const onMouseDown = () => {
+    props.moveDot(props.i);
+  };
+  return (
+    <div
+      className="react-image-dot"
+      onMouseDown={onMouseDown}
+      style={{
+        ...styles,
+        height: dotRadius * 2,
+        width: dotRadius * 2,
+        borderRadius: dotRadius,
+        transform: `translate(${-dotRadius}, ${-dotRadius})`,
+        top: y,
+        left: x,
+      }}
+    />
+  );
+}
+
+export default Dot;
