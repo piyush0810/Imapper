@@ -6,7 +6,7 @@ function AddSensor({ onHide }) {
   const [unit, setunit] = useState("1"); //insert default value of unit
   function handleSubmit(e) {
     e.preventDefault();
-    console.log("Submiting Sensor request");
+    // console.log("Submiting Sensor request");
     onHide();
   }
   return (
@@ -17,14 +17,14 @@ function AddSensor({ onHide }) {
           required
           as="select"
           onChange={(e) => {
-            console.log("Value Changed", e.target.value);
+            // console.log("Value Changed", e.target.value);
             if (e.target.value === "1") {
               setIsTemp(true);
               setisPres(false);
             } else if (e.target.value === "2") {
               setisPres(true);
               setIsTemp(false);
-              console.log("Is Pressure Changed", isTemp, isPres);
+              // console.log("Is Pressure Changed", isTemp, isPres);
             }
           }}
         >
@@ -39,7 +39,7 @@ function AddSensor({ onHide }) {
             required
             as="select"
             onChange={(e) => {
-              console.log("Temperature Unit Selected", e.target.value);
+              // console.log("Temperature Unit Selected", e.target.value);
               setunit(e.target.value);
             }}
           >
@@ -53,7 +53,7 @@ function AddSensor({ onHide }) {
             required
             as="select"
             onChange={(e) => {
-              console.log("Pressure Unit Selected", e.target.value);
+              // console.log("Pressure Unit Selected", e.target.value);
               setunit(e.target.value);
             }}
           >

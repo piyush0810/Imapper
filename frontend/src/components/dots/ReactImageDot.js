@@ -56,13 +56,13 @@ function ReactImageDot(props) {
     backgroundSize,
   } = props;
   const dots = useSelector((state) => {
-    console.log("State: ", state);
+    // console.log("State: ", state);
     return state.dot.dots;
   });
   const dispatch = useDispatch();
 
   function addDot(dot) {
-    console.log("Dispatching addDot function");
+    // console.log("Dispatching addDot function");
     dispatch(AddDot(dot));
   }
   function deleteDot(index) {
@@ -88,8 +88,8 @@ function ReactImageDot(props) {
 
   const grabClass = grabbing ? "react-image-dot__grabbing" : "";
 
-  console.log("URL in ReactImageDot->", backgroundImageUrl);
-  console.log(dots);
+  // console.log("URL in ReactImageDot->", backgroundImageUrl);
+  // console.log(dots);
   return (
     <div className="react-image-dot__container">
       <div

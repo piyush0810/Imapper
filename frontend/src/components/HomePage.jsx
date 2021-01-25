@@ -6,21 +6,19 @@ import { useSelector, useDispatch } from "react-redux";
 const HomePage = ({ registration_message }) => {
   console.log("HomePage Component gets rendered");
   const dispatch = useDispatch();
-  const fetchImages = useSelector((state) => state.img.fetchImageCall);
-  console.log(fetchImages);
+
   function changeToStoreData(object) {
     var newObject = {};
     for (const [key, value] of Object.entries(object)) {
       // console.log(key, value);
       newObject[value.image_id] = { ...value };
     }
-    // console.log(newObject);
     return newObject;
   }
   function getData() {
     return (dispatch) => {
       axios.get("http://localhost:8000/image/images/").then((res) => {
-        console.log("Fetched Images Data", res.data);
+        // console.log("Fetched Images Data", res.data);
         var modifiedImagesData = changeToStoreData(res.data);
         dispatch({
           type: "FETCH_IMAGES",
@@ -30,8 +28,9 @@ const HomePage = ({ registration_message }) => {
     };
   }
   useEffect(() => {
+    console.log("UseEFFECt called");
     dispatch(getData());
-  }, [fetchImages]);
+  }, []);
 
   return (
     <div className="container">

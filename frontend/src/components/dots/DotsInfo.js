@@ -7,7 +7,7 @@ import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 
 export default function DotsInfo({ height, width, pid }) {
   console.log("Dotsinfo Component Rendered");
-  console.log("Image Add request from", pid);
+  // console.log("Image Add request from", pid);
   const [modalShow, setModalShow] = React.useState(false);
   const dots = useSelector((state) => state.dot.dots);
   const dispatch = useDispatch();
