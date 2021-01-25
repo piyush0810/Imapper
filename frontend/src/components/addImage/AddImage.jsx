@@ -7,11 +7,10 @@ function AddImage() {
   //states
   const imageRef = useRef(null);
   const [image, setImage] = useState({
-    title: "",
+    dots: null,
     image: null,
-    info: null,
     image_id: "",
-    content: "",
+    pid: "",
   });
   const [isUpload, setIsUpload] = useState(false);
   const dispatch = useDispatch();
@@ -19,7 +18,7 @@ function AddImage() {
   const { pid } = useParams();
   const history = useHistory();
   if (pid) {
-    // console.log("Type 2 Request: From", pid);
+    console.log("Type 2 Request: From", pid);
   }
   function changeToStoreData(object) {
     var newObject = {};
@@ -52,10 +51,9 @@ function AddImage() {
     if (image.image) {
       const formData = new FormData();
       formData.append("image", image.image);
-      formData.append("title", "IIT Mumbai");
-      formData.append("info", image.info);
+      formData.append("dots", image.dots);
       formData.append("image_id", image.image_id);
-      formData.append("content", image.content);
+      formData.append("pid", image.pid);
       let url = "http://localhost:8000/image/images/";
       axios
         .post(url, formData, {
