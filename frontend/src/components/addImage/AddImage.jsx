@@ -19,6 +19,9 @@ function AddImage() {
   const history = useHistory();
   if (pid) {
     console.log("Type 2 Request: From", pid);
+    setImage((prev) => {
+      return { ...prev, pid: pid };
+    });
   }
   function changeToStoreData(object) {
     var newObject = {};
