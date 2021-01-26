@@ -16,6 +16,7 @@ import ChangePassword from "./containers/auth/ChangePasswordContainer";
 
 import Image from "./components/image/Image";
 import AddImage from "./components/addImage/AddImage";
+import ViewImage from "./components/viewImage/ViewImage";
 import "./index.css";
 export const history = createHistory();
 
@@ -35,6 +36,7 @@ ReactDOM.render(
           <Route exact path="/image/:imageID" component={Image}>
             <Image></Image>
           </Route>
+          <Route exact path="/viewimage" component={ViewImage} />
         </Switch>
       </div>
     </Router>
