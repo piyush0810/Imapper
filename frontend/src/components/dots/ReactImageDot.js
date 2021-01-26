@@ -110,6 +110,8 @@ function ReactImageDot(props) {
         style={{
           ...styles,
           backgroundImage: `url(${backgroundImageUrl})`,
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           width,
           height,
           backgroundSize,

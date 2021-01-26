@@ -5,33 +5,6 @@ import { useSelector, useDispatch } from "react-redux";
 
 const HomePage = ({ registration_message }) => {
   console.log("HomePage Component gets rendered");
-  const dispatch = useDispatch();
-
-  function changeToStoreData(object) {
-    var newObject = {};
-    for (const [key, value] of Object.entries(object)) {
-      // console.log(key, value);
-      newObject[value.image_id] = { ...value };
-    }
-    return newObject;
-  }
-  function getData() {
-    return (dispatch) => {
-      axios.get("http://localhost:8000/image/images/").then((res) => {
-        // console.log("Fetched Images Data", res.data);
-        var modifiedImagesData = changeToStoreData(res.data);
-        dispatch({
-          type: "FETCH_IMAGES",
-          payload: modifiedImagesData,
-        });
-      });
-    };
-  }
-  useEffect(() => {
-    console.log("UseEFFECt called");
-    dispatch(getData());
-  }, []);
-
   return (
     <div className="container">
       {registration_message && (
