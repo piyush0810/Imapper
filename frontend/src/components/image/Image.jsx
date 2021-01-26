@@ -12,7 +12,6 @@ function Image(props) {
   //console.log(`Image ${imageID} Recieved in Image`);
 
   const [dataFetched, setdataFetched] = useState(false);
-  const imageData = useSelector((state) => state.img);
 
   // console.log("Image Data fetched from Store", imageData);
   const [image, setImage] = useState({
