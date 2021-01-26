@@ -18,6 +18,8 @@ const propTypes = {
   // The background color to use
   backgroundColor: PropTypes.string,
 
+  // Parent Image Id
+  pid: PropTypes.string,
   // The background image url to use
   backgroundImageUrl: PropTypes.string,
 
@@ -54,15 +56,16 @@ function ReactImageDot(props) {
     backgroundImageUrl,
     dotRadius,
     backgroundSize,
+    pid,
   } = props;
   const dots = useSelector((state) => {
-    console.log("State: ", state);
+    // console.log("State: ", state);
     return state.dot.dots;
   });
   const dispatch = useDispatch();
 
   function addDot(dot) {
-    console.log("Dispatching addDot function");
+    // console.log("Dispatching addDot function");
     dispatch(AddDot(dot));
   }
   function deleteDot(index) {
@@ -71,9 +74,17 @@ function ReactImageDot(props) {
   const onMouseUp = (e) => {
     const bounds = e.target.getBoundingClientRect();
     setgrabbing(true);
+    const gid = (
+      Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+    ).toUpperCase();
     addDot({
+      dot_id: gid,
       x: e.clientX - bounds.left,
       y: e.clientY - bounds.top,
+      parent_id: pid,
+      is_sensor: 0,
+      is_image: 0,
+      child_id: "",
     });
   };
 
@@ -88,8 +99,8 @@ function ReactImageDot(props) {
 
   const grabClass = grabbing ? "react-image-dot__grabbing" : "";
 
-  console.log("URL in ReactImageDot->", backgroundImageUrl);
-  console.log(dots);
+  // console.log("URL in ReactImageDot->", backgroundImageUrl);
+  // console.log(dots);
   return (
     <div className="react-image-dot__container">
       <div
