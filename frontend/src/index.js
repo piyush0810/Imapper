@@ -37,6 +37,7 @@ ReactDOM.render(
             <Image></Image>
           </Route>
           <Route exact path="/viewimage" component={ViewImage} />
+          <Route exact path="/viewimage/:imageID" component={ViewImage} />
         </Switch>
       </div>
     </Router>

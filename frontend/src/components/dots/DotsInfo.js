@@ -4,6 +4,7 @@ import AddSensor from "../addSensor/AddSensor";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 import AddImage from "../addImage/AddImage";
+import { Container, Row, Col, Card, Alert, Button } from "react-bootstrap";
 
 export default function DotsInfo({ height, width, pid, Dots }) {
   console.log("Dotsinfo Component Rendered");
@@ -54,52 +55,66 @@ export default function DotsInfo({ height, width, pid, Dots }) {
 
   return (
     <>
-      <ul>
-        {dots.map((dot, i) => {
-          return (
-            <>
-              <li>
-                <p>
-                  Dot {i}{" "}
-                  <button
-                    onClick={() => {
-                      deleteDot(i);
-                    }}
-                  >
-                    Remove
-                  </button>
-                </p>
-                <p>
-                  Coordinates: x: {dot.x}, y: {dot.y}
-                </p>
-                {!dot.is_sensor && (
-                  <button
-                    onClick={() => {
-                      setIsAddSensorClicked(true);
-                      handleAddSensor(i - Dots.length);
-                    }}
-                  >
-                    Add Sensor
-                  </button>
-                )}
-                {/* <Link to={`/addimage/${pid}/${i}`}>
-                      <button>Add Image</button>
-                    </Link> */}
-                {!dot.is_image && (
-                  <button
-                    onClick={() => {
-                      setIsAddImageClicked(true);
-                      handleAddImage(i - Dots.length);
-                    }}
-                  >
-                    Add Image
-                  </button>
-                )}
-              </li>
-            </>
-          );
-        })}
-      </ul>
+      <Container>
+        <Row xs={4} md={3} noGutters>
+          {dots.map((dot, i) => {
+            return (
+              <>
+                <Col>
+                  <Card style={{ width: "18rem" }}>
+                    <Card.Body>
+                      <Card.Title>
+                        Dot [{i}]........................
+                        <Button
+                          onClick={() => {
+                            deleteDot(i - Dots.length);
+                          }}
+                          variant="danger"
+                        >
+                          Remove
+                        </Button>
+                      </Card.Title>
+
+                      <Card.Text>
+                        Coordinates: x: {dot.x}, y: {dot.y}
+                      </Card.Text>
+
+                      <Row>
+                        {!dot.is_sensor && (
+                          <Col>
+                            <Button
+                              onClick={() => {
+                                setIsAddSensorClicked(true);
+                                handleAddSensor(i - Dots.length);
+                              }}
+                              variant="outline-primary"
+                            >
+                              Add Sensor
+                            </Button>
+                          </Col>
+                        )}
+                        {!dot.is_image && (
+                          <Col>
+                            <Button
+                              onClick={() => {
+                                setIsAddImageClicked(true);
+                                handleAddImage(i - Dots.length);
+                              }}
+                              variant="outline-success"
+                            >
+                              Add Image
+                            </Button>
+                          </Col>
+                        )}
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </>
+            );
+          })}
+        </Row>
+      </Container>
 
       {isAddSensorClicked && (
         <AddSensor

@@ -63,8 +63,8 @@ function Image(props) {
     <div>
       <ReactImageDot
         backgroundImageUrl={"http://localhost:8000" + image.image}
-        width={480}
-        height={480}
+        width="100%"
+        height={640}
         dotRadius={6}
         dotStyles={{
           backgroundColor: "red",

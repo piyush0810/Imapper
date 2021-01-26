@@ -18,7 +18,7 @@ function AddSensor(props) {
     return dots[index].dot_id;
   }
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     // console.log("Submiting Sensor request", index);
     // console.log(dots);
     let dotID = getDotID(index);

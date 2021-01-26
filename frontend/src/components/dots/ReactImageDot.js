@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import Dot from "./Dot";
 import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
+import { Container, Row, Col, Card, Alert } from "react-bootstrap";
 
 const propTypes = {
   // Required functions to handle parent-level state management
@@ -91,7 +92,7 @@ function ReactImageDot(props) {
     ).toUpperCase();
     addDot({
       dot_id: gid,
-      x: e.clientX - bounds.left,
+      x: Math.round(e.clientX - bounds.left),
       y: e.clientY - bounds.top,
       parent_id: pid,
       is_sensor: 0,
@@ -114,33 +115,35 @@ function ReactImageDot(props) {
   // console.log("URL in ReactImageDot->", backgroundImageUrl);
   // console.log(dots);
   return (
-    <div className="react-image-dot__container">
-      <div
-        className={`react-image-dot__wrapper ${grabClass}`}
-        onMouseUp={onMouseUp}
-        style={{
-          ...styles,
-          backgroundImage: `url(${backgroundImageUrl})`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          width,
-          height,
-          backgroundSize,
-        }}
-      >
-        {dots.map((dot, i) => (
-          <Dot
-            x={dot.x}
-            y={dot.y}
-            i={i}
-            styles={dotStyles}
-            moveDot={moveDot}
-            dotRadius={dotRadius}
-          />
-        ))}
-      </div>
-      {props.resetDots && <button onClick={resetDots}>Reset</button>}
-    </div>
+    <>
+      <Container className="react-image-dot__container">
+        <Card
+          className="bg-dark text-white `react-image-dot__wrapper ${grabClass}`"
+          onMouseUp={onMouseUp}
+          style={{
+            ...styles,
+            backgroundImage: `url(${backgroundImageUrl})`,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            width,
+            height,
+            backgroundSize,
+          }}
+        >
+          {dots.map((dot, i) => (
+            <Dot
+              x={dot.x}
+              y={dot.y}
+              i={i}
+              styles={dotStyles}
+              moveDot={moveDot}
+              dotRadius={dotRadius}
+            />
+          ))}
+        </Card>
+        {props.resetDots && <button onClick={resetDots}>Reset</button>}
+      </Container>
+    </>
   );
 }
 

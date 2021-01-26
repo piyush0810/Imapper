@@ -12,7 +12,7 @@ const HomePage = ({ registration_message }) => {
           <strong>{registration_message}</strong>
         </div>
       )}
-      <h3 className="text-center mt-4">Hello world.</h3>
+      <h3 className="text-center mt-4">Imapper</h3>
     </div>
   );
 };

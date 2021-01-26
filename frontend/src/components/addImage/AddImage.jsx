@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Alert,
+  Form,
+  Button,
+} from "react-bootstrap";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+
 function AddImage({ pid, index, hideButton }) {
   console.log("AddImage Component Rendered");
-  //states
   const imageRef = useRef(null);
-
-  //const { pid, index } = useParams();
   const dots = useSelector((state) => state.dot.dots);
 
   const [image, setImage] = useState({
@@ -16,7 +23,7 @@ function AddImage({ pid, index, hideButton }) {
     image_id: "",
     pid: pid ? pid : "-1",
   });
-  // console.log("Initilized Data", image);
+  console.log("Initilized Data", image);
   const [isUpload, setIsUpload] = useState(false);
   const history = useHistory();
 
@@ -30,7 +37,8 @@ function AddImage({ pid, index, hideButton }) {
     e.preventDefault();
     if (image.image) {
       //console.log("Index in AddImage", index);
-      if (index) {
+      if (index >= 0) {
+        console.log("inside Index if");
         const formDotData = new FormData();
         formDotData.append("dot_id", dots[index].dot_id);
         formDotData.append("parent_id", dots[index].parent_id);
@@ -49,8 +57,8 @@ function AddImage({ pid, index, hideButton }) {
             },
           })
           .catch((err) => console.log(err));
-        // console.log("Response", resp);
-        // console.log("Sent Dot POST Req");
+        console.log("Response", resp);
+        console.log("Sent Dot POST Req");
       }
       const formData = new FormData();
       formData.append("image", image.image);
@@ -93,22 +101,26 @@ function AddImage({ pid, index, hideButton }) {
   return (
     <div>
       {!isUpload && (
-        <div>
-          <input
-            type="file"
-            accept="image/png, image/jpeg"
-            id="upload-button"
-            onChange={handleChange}
-            ref={imageRef}
-          />
-          <br />
-          <section>
-            <button onClick={handleDelete}>Close</button>
-            <button onClick={handleUpload} type="submit">
-              Upload
-            </button>
-          </section>
-        </div>
+        <>
+          <Container>
+            <Form>
+              <Form.Group>
+                <Form.File
+                  label="Upload Image"
+                  onChange={handleChange}
+                  ref={imageRef}
+                />
+                <br />
+                <Button onClick={handleDelete} variant="danger">
+                  Delete
+                </Button>
+                <Button variant="success" type="submit" onClick={handleUpload}>
+                  Upload
+                </Button>
+              </Form.Group>
+            </Form>
+          </Container>
+        </>
       )}
     </div>
   );
