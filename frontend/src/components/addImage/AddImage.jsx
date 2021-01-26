@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 
 function AddImage() {
   console.log("AddImage Component Rendered");
   //states
   const imageRef = useRef(null);
-  const { pid } = useParams();
+  const { pid, index } = useParams();
+  const dots = useSelector((state) => state.dot.dots);
 
   const [image, setImage] = useState({
     dots: null,
@@ -26,6 +28,28 @@ function AddImage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (image.image) {
+      if (index) {
+        const formDotData = new FormData();
+        formDotData.append("dot_id", dots[index].dot_id);
+        formDotData.append("parent_id", dots[index].parent_id);
+        formDotData.append("x", dots[index].x);
+        formDotData.append("y", dots[index].y);
+        formDotData.append("is_sensor", false);
+        //action for bool
+        formDotData.append("is_image", true);
+        formDotData.append("child_id", image.image_id);
+        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+        const resp = await axios
+          .post(url, formDotData, {
+            headers: {
+              "content-type": "multipart/form-data",
+              Authorization: "",
+            },
+          })
+          .catch((err) => console.log(err));
+        console.log("Response", resp);
+        console.log("Sent Dot POST Req");
+      }
       const formData = new FormData();
       formData.append("image", image.image);
       formData.append("dots", image.dots);
