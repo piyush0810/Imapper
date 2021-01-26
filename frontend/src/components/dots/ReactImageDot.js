@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import Dot from "./Dot";
 import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 
@@ -57,12 +57,23 @@ function ReactImageDot(props) {
     dotRadius,
     backgroundSize,
     pid,
-    dots,
+    Dots,
   } = props;
-  // const dots = useSelector((state) => {
-  //   // console.log("State: ", state);
-  //   return state.dot.dots;
-  // });
+  console.log("Dots Recieved From Param in ReactImageDot", Dots);
+  var dots = useSelector((state) => {
+    // console.log("inside useSelector", state.dot.dots);
+    return state.dot.dots;
+  });
+  // console.log("Returned State", dots);
+  var myDots = [];
+  dots.forEach(function (dot) {
+    console.log(dot);
+    if (dot.parent_id == pid) {
+      myDots.push(dot);
+    }
+  });
+  dots = [...Dots, ...myDots];
+  // console.log("Final Dots", dots);
   const dispatch = useDispatch();
 
   function addDot(dot) {

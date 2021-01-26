@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import ReactImageDot from "../dots/ReactImageDot";
 import DotsInfo from "../dots/DotsInfo";
 import { useHistory, useParams } from "react-router-dom";
@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 
 function Image(props) {
+  const [isEditing, setEditing] = useState(false);
+
   console.log("Image Component Rendered");
   const { imageID } = useParams();
   //console.log(`Image ${imageID} Recieved in Image`);
@@ -19,10 +21,9 @@ function Image(props) {
     image_id: "",
     pid: "",
   });
-  useEffect(() => {
-    console.log("Image Data changed", image);
-  }, [image]);
+
   useEffect(async () => {
+    console.log("Fetiching useEffect called");
     let urll = `http://localhost:8000/image/dot/${imageID}/`;
     console.log(`sending GET req to ${urll}`);
     const resp = await axios.get(urll);
@@ -71,14 +72,14 @@ function Image(props) {
         }}
         backgroundSize={"cover"}
         pid={image.image_id}
-        dots={image.dots}
+        Dots={image.dots}
       />
       {dataFetched && (
         <DotsInfo
           height={480}
           width={480}
           pid={image.image_id}
-          dots={image.dots}
+          Dots={image.dots}
         />
       )}
     </div>

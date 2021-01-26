@@ -2,13 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-
-function AddImage() {
+function AddImage({ pid, index, hideButton }) {
   console.log("AddImage Component Rendered");
   //states
   const imageRef = useRef(null);
 
-  const { pid, index } = useParams();
+  //const { pid, index } = useParams();
   const dots = useSelector((state) => state.dot.dots);
 
   const [image, setImage] = useState({
@@ -17,7 +16,7 @@ function AddImage() {
     image_id: "",
     pid: pid ? pid : "-1",
   });
-  console.log("Initilized Data", image);
+  // console.log("Initilized Data", image);
   const [isUpload, setIsUpload] = useState(false);
   const history = useHistory();
 
@@ -30,6 +29,7 @@ function AddImage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (image.image) {
+      //console.log("Index in AddImage", index);
       if (index) {
         const formDotData = new FormData();
         formDotData.append("dot_id", dots[index].dot_id);
@@ -49,15 +49,15 @@ function AddImage() {
             },
           })
           .catch((err) => console.log(err));
-        console.log("Response", resp);
-        console.log("Sent Dot POST Req");
+        // console.log("Response", resp);
+        // console.log("Sent Dot POST Req");
       }
       const formData = new FormData();
       formData.append("image", image.image);
       formData.append("dots", image.dots);
       formData.append("image_id", image.image_id);
       formData.append("pid", image.pid);
-      console.log("PId in FromData", image.pid);
+      // console.log("PId in FromData", image.pid);
       let url = "http://localhost:8000/image/images/";
       axios
         .post(url, formData, {
@@ -70,7 +70,12 @@ function AddImage() {
           // console.log(res.data);
           // console.log("Hello");
           setIsUpload(true);
-          history.push(`/image/${image.image_id}`);
+          if (pid) {
+            hideButton(true);
+          }
+          //history.push();
+          history.push("/");
+          history.replace(`/image/${image.image_id}`);
         })
         .catch((err) => console.log(err));
 

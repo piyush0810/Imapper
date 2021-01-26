@@ -6,26 +6,27 @@ import axios from "axios";
 
 function AddSensor(props) {
   console.log("addSensor Componen t Rendered");
-  const { onHide, pid, index, show } = props;
+  const { onHide, pid, index, show, hideButton } = props;
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
   const [volume, setVolume] = useState(0);
   const [unit, setunit] = useState("1"); //insert default value of unit
   const dots = useSelector((state) => state.dot.dots);
-  // console.log("\\\\\\\\\\\\\\\\", dots);
+  console.log("Printing Dots from Param in AddSensor", dots);
   //console.log("Index", dots, typeof dots);
   function getDotID(index) {
     return dots[index].dot_id;
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Submiting Sensor request");
+    // console.log("Submiting Sensor request", index);
+    // console.log(dots);
     let dotID = getDotID(index);
     const gid = (
       Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
     ).toUpperCase();
     // console.log("------------------------", dotID);
-    console.log(dots[index]);
+    // console.log(dots[index]);
     const formDotData = new FormData();
     formDotData.append("dot_id", dots[index].dot_id);
     formDotData.append("parent_id", dots[index].parent_id);
@@ -44,8 +45,8 @@ function AddSensor(props) {
         },
       })
       .catch((err) => console.log(err));
-    console.log("Response", resp);
-    console.log("Sent Dot POST Req");
+    // console.log("Response", resp);
+    // console.log("Sent Dot POST Req");
 
     const formData = new FormData();
 
@@ -71,8 +72,9 @@ function AddSensor(props) {
         },
       })
       .catch((err) => console.log(err));
-    console.log("Response", res);
+    // console.log("Response", res);
     onHide();
+    hideButton(true);
   };
   return (
     <Modal
