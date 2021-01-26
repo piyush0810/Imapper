@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+
 import { Container, Row, Col, Card } from "react-bootstrap";
 
 function ViewImage(params) {
@@ -24,6 +25,7 @@ function ViewImage(params) {
     console.log("Fetching Data Action called");
     dispatch(getData());
   }, []);
+
   return (
     <>
       <Container>
