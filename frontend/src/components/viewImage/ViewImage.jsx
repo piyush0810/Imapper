@@ -2,25 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+import { Container, Row, Col, Card } from "react-bootstrap";
 
 function ViewImage(params) {
   const dispatch = useDispatch();
-  function changeToStoreData(object) {
-    var newObject = {};
-    for (const [key, value] of Object.entries(object)) {
-      // console.log(key, value);
-      newObject[value.image_id] = { ...value };
-    }
-    return newObject;
-  }
+
+  const [parentImg, setparentImg] = useState("");
+
   function getData() {
     return (dispatch) => {
       axios.get("http://localhost:8000/image/images/").then((res) => {
         // console.log("Fetched Images Data", res.data);
-        var modifiedImagesData = changeToStoreData(res.data);
         dispatch({
           type: "FETCH_IMAGES",
-          payload: modifiedImagesData,
+          payload: res.data,
         });
       });
     };
@@ -29,6 +24,28 @@ function ViewImage(params) {
     console.log("Fetching Data Action called");
     dispatch(getData());
   }, []);
-  return <>view Component</>;
+  return (
+    <>
+      <Container>
+        <Row>
+          <Card className="bg-dark text-white">
+            <Card.Img
+              src={"http://localhost:8000" + parentImg}
+              alt="Card image"
+            />
+            <Card.ImgOverlay>
+              <Card.Title>Card title</Card.Title>
+              <Card.Text>
+                This is a wider card with supporting text below as a natural
+                lead-in to additional content. This content is a little bit
+                longer.
+              </Card.Text>
+              <Card.Text>Last updated 3 mins ago</Card.Text>
+            </Card.ImgOverlay>
+          </Card>
+        </Row>
+      </Container>
+    </>
+  );
 }
 export default ViewImage;
