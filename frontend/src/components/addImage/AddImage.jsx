@@ -1,28 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+
 function AddImage() {
   console.log("AddImage Component Rendered");
   //states
   const imageRef = useRef(null);
+  const { pid } = useParams();
+
   const [image, setImage] = useState({
     dots: null,
     image: null,
     image_id: "",
-    pid: "",
+    pid: pid,
   });
   const [isUpload, setIsUpload] = useState(false);
-  const dispatch = useDispatch();
-
-  const { pid } = useParams();
   const history = useHistory();
-  if (pid) {
-    console.log("Type 2 Request: From", pid);
-    setImage((prev) => {
-      return { ...prev, pid: pid };
-    });
-  }
+
   const handleChange = (e) => {
     const gid = (
       Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
