@@ -39,7 +39,7 @@ function Image(props) {
           image: response.data[0].image,
           image_id: response.data[0].image_id,
         });
-        console.log("Image Date Set:", image);
+        console.log("Image Data Set:", image);
         console.log("Done Fetching");
         setdataFetched(true);
       })
