@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import AddSensor from "../addSensor/AddSensor";
-
 import { useSelector, useDispatch } from "react-redux";
 import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 
-export default function DotsInfo({ height, width, pid }) {
+export default function DotsInfo({ height, width, pid, dots }) {
   console.log("Dotsinfo Component Rendered");
+  console.log(dots);
   // console.log("Image Add request from", pid);
   const [modalShow, setModalShow] = React.useState(false);
   const [isAddSensorClicked, setisAddSensorClicked] = useState(false);
   const [index, setIndex] = useState(-1);
-  const dots = useSelector((state) => state.dot.dots);
   const dispatch = useDispatch();
   function handleAddSensor(i) {
     setModalShow(true);
@@ -20,6 +19,7 @@ export default function DotsInfo({ height, width, pid }) {
   function deleteDot(index) {
     dispatch(DeleteDot(index));
   }
+
   return (
     <>
       <ul>
@@ -49,7 +49,7 @@ export default function DotsInfo({ height, width, pid }) {
                   Add Sensor
                 </button>
 
-                <Link to={`/addimage/${pid}`}>
+                <Link to={`/addimage/${pid}/${i}`}>
                   <button>Add Image</button>
                 </Link>
               </li>

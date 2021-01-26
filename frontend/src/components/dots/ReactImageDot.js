@@ -57,11 +57,12 @@ function ReactImageDot(props) {
     dotRadius,
     backgroundSize,
     pid,
+    dots,
   } = props;
-  const dots = useSelector((state) => {
-    // console.log("State: ", state);
-    return state.dot.dots;
-  });
+  // const dots = useSelector((state) => {
+  //   // console.log("State: ", state);
+  //   return state.dot.dots;
+  // });
   const dispatch = useDispatch();
 
   function addDot(dot) {

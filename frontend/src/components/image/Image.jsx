@@ -13,14 +13,22 @@ function Image(props) {
 
   const [dataFetched, setdataFetched] = useState(false);
 
-  // console.log("Image Data fetched from Store", imageData);
   const [image, setImage] = useState({
-    dots: null,
+    dots: [],
     image: null,
     image_id: "",
     pid: "",
   });
+  useEffect(() => {
+    console.log("Image Data changed", image);
+  }, [image]);
   useEffect(async () => {
+    let urll = `http://localhost:8000/image/dot/${imageID}/`;
+    console.log(`sending GET req to ${urll}`);
+    const resp = await axios.get(urll);
+    console.log(resp.data);
+
+    console.log("DOTS recieved", image.dots);
     console.log("Image recieved from GET req");
     //fetching Image Data from DB
     let url = `http://localhost:8000/image/${imageID}`;
@@ -28,18 +36,20 @@ function Image(props) {
     axios({
       method: "get",
       url,
-      auth: { username: "as10071999", password: "Aryan123" },
     })
-      .then((response) => {
-        // console.log("Printing Fetched");
-        // console.log(response.data[0]);
+      .then(async (response) => {
+        console.log("Printing Fetched");
+        console.log(response.data[0]);
         setImage({
-          dots: response.data[0].dots,
+          ...image,
+          dots: resp.data,
           pid: response.data[0].pid,
           image: response.data[0].image,
           image_id: response.data[0].image_id,
         });
-        console.log("Image Data Set:", image);
+
+        console.log("Image Date Set:", image);
+
         console.log("Done Fetching");
         setdataFetched(true);
       })
@@ -61,9 +71,15 @@ function Image(props) {
         }}
         backgroundSize={"cover"}
         pid={image.image_id}
+        dots={image.dots}
       />
       {dataFetched && (
-        <DotsInfo height={480} width={480} pid={image.image_id} />
+        <DotsInfo
+          height={480}
+          width={480}
+          pid={image.image_id}
+          dots={image.dots}
+        />
       )}
     </div>
   );
