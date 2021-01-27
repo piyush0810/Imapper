@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 
-function AddImage({ pid, index, hideButton }) {
+function AddImage({ pid, index, refresh }) {
   console.log(
     "#########################################AddImage Component Rendered"
   );
@@ -48,29 +48,29 @@ function AddImage({ pid, index, hideButton }) {
   const handleUpload = async (e) => {
     e.preventDefault();
     if (image.image) {
-      // if (index >= 0) {
-      //   console.log("inside Index if");
-      //   const formDotData = new FormData();
-      //   formDotData.append("dot_id", dots[index].dot_id);
-      //   formDotData.append("parent_id", dots[index].parent_id);
-      //   formDotData.append("x", dots[index].x);
-      //   formDotData.append("y", dots[index].y);
-      //   formDotData.append("is_sensor", false);
-      //   //action for bool
-      //   formDotData.append("is_image", true);
-      //   formDotData.append("child_id", image.image_id);
-      //   let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
-      //   const resp = await axios
-      //     .post(url, formDotData, {
-      //       headers: {
-      //         "content-type": "multipart/form-data",
-      //         Authorization: "",
-      //       },
-      //     })
-      //     .catch((err) => console.log(err));
-      //   console.log("Response", resp);
-      //   console.log("Sent Dot POST Req");
-      // }
+      if (index >= 0) {
+        console.log("inside Index if");
+        const formDotData = new FormData();
+        formDotData.append("dot_id", dots[index].dot_id);
+        formDotData.append("parent_id", dots[index].parent_id);
+        formDotData.append("x", dots[index].x);
+        formDotData.append("y", dots[index].y);
+        formDotData.append("is_sensor", false);
+        //action for bool
+        formDotData.append("is_image", true);
+        formDotData.append("child_id", image.image_id);
+        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+        const resp = await axios
+          .post(url, formDotData, {
+            headers: {
+              "content-type": "multipart/form-data",
+              Authorization: "",
+            },
+          })
+          .catch((err) => console.log(err));
+        console.log("Response", resp);
+        console.log("Sent Dot POST Req");
+      }
 
       const formData = new FormData();
       formData.append("image", image.image);
@@ -97,6 +97,12 @@ function AddImage({ pid, index, hideButton }) {
           history.push(`/image/${image.image_id}`);
         })
         .catch((err) => console.log(err));
+
+      if (index >= 0) {
+        refresh((p) => {
+          return p + 1;
+        });
+      }
     } else {
       console.log("No File In Input");
     }

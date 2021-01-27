@@ -1,18 +1,20 @@
 import React, { useState } from "react";
 import { Form, Button, FormLabel, FormControl, Alert } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
+import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 
 function AddSensor(props) {
   console.log("addSensor Componen t Rendered");
-  const { onHide, pid, index, show, hideButton } = props;
+  const { onHide, pid, index, show, refresh } = props;
   const [isUploading, setIsUploading] = useState(false);
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
   const [volume, setVolume] = useState(0);
   const [unit, setunit] = useState("1"); //insert default value of unit
   const dots = useSelector((state) => state.dot.dots);
+  const dispatch = useDispatch();
 
   function getDotID(index) {
     return dots[index].dot_id;
@@ -36,6 +38,7 @@ function AddSensor(props) {
       formDotData.append("is_image", false);
       formDotData.append("child_id", gid);
       let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+      dispatch(DeleteDot(index));
       const resp = await axios
         .post(url, formDotData, {
           headers: {
@@ -73,7 +76,10 @@ function AddSensor(props) {
         .catch((err) => console.log(err));
       console.log("Sent Sensor POST Req");
       onHide();
-      hideButton(true);
+      refresh((p) => {
+        return p + 1;
+      });
+
       setIsUploading(false);
     } else {
       console.log("index is -ve");

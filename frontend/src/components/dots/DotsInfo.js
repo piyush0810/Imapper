@@ -31,36 +31,37 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
   const [isAddedImage, setisAddedImage] = useState(false);
   const [index, setIndex] = useState(-1);
   console.log("Index State:", index);
-  const [isAddedSensor, setisAddedSensor] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   console.log("*************************Completed Rendered *Dotsinfo ");
   function handleAddSensor(i) {
-    console.log("openning Modal");
+    // console.log("openning Modal");
     setModalShow(true);
-    console.log("Adding Index");
+    // console.log("Adding Index");
     setIndex(i);
-    console.log("Changed Index state");
+    // console.log("Changed Index state");
   }
   function handleAddImage(i) {
     setIndex(i);
   }
-  async function deleteDot(index) {
+  async function deleteDot(index, sizeDB) {
     console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Enter");
+    console.log("index recieved", index);
     console.log("setting flag ");
     setIsDeleting(true);
     console.log("Deleting Dots");
     if (index < 0) {
-      index = -index - 1;
+      index = sizeDB + index;
+      console.log("Index inside", index);
       console.log("Deleting from Server");
       let url = `http://localhost:8000/image/dotdel/${dots[index].dot_id}/`;
-      console.log("Printing Dots", dots);
+      // console.log("Printing Dots", dots);
       await axios.delete(url);
-      console.log("dot Deleted");
-      refresh((p) => {
-        p + 1;
-      });
+      // console.log("dot Deleted");
       console.log("Refresh called");
+      refresh((p) => {
+        return p + 1;
+      });
     } else {
       dispatch(DeleteDot(index));
     }
@@ -84,7 +85,7 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
                           Dot [{i}]........................
                           <Button
                             onClick={() => {
-                              deleteDot(i - Dots.length);
+                              deleteDot(i - Dots.length, Dots.length);
                             }}
                             variant="danger"
                           >
@@ -96,8 +97,8 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
                           Coordinates: x: {dot.x}, y: {dot.y}
                         </Card.Text>
 
-                        <Row>
-                          {(!dot.is_sensor || !dot.is_image) && (
+                        {!dot.child_id && (
+                          <Row>
                             <Col>
                               <Button
                                 onClick={() => {
@@ -109,8 +110,7 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
                                 Add Sensor
                               </Button>
                             </Col>
-                          )}
-                          {(!dot.is_sensor || !dot.is_image) && (
+
                             <Col>
                               <Button
                                 onClick={() => {
@@ -122,8 +122,8 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
                                 Add Image
                               </Button>
                             </Col>
-                          )}
-                        </Row>
+                          </Row>
+                        )}
                       </Card.Body>
                     </Card>
                   </Col>
@@ -139,11 +139,11 @@ export default function DotsInfo({ height, width, pid, Dots, refresh }) {
           pid={pid}
           index={index}
           show={modalShow}
-          hideButton={setisAddedSensor}
+          refresh={refresh}
         />
       )}
       {isAddImageClicked && (
-        <AddImage pid={pid} index={index} hideButton={setisAddedImage} />
+        <AddImage pid={pid} index={index} refresh={refresh} />
       )}
     </>
   );

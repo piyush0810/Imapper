@@ -36,7 +36,7 @@ function Image(props) {
       // console.log(`sending GET req to ${url}`);
       const res = await axios.get(url);
       // console.log("Printing Fetched Image Data:", res.data);
-      // console.log("Setting Image Data & Dots");
+      console.log("Setting Image Data & Dots");
       if (res.data.length) {
         setImage({
           ...image,
