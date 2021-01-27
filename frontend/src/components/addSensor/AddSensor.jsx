@@ -6,27 +6,50 @@ import axios from "axios";
 
 function AddSensor(props) {
   console.log("addSensor Componen t Rendered");
-  const { onHide, pid, index, show } = props;
+  const { onHide, pid, index, show, hideButton } = props;
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
   const [volume, setVolume] = useState(0);
   const [unit, setunit] = useState("1"); //insert default value of unit
   const dots = useSelector((state) => state.dot.dots);
-  // console.log("\\\\\\\\\\\\\\\\", dots);
+  console.log("Printing Dots from Param in AddSensor", dots);
   //console.log("Index", dots, typeof dots);
   function getDotID(index) {
     return dots[index].dot_id;
   }
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    // console.log("Submiting Sensor request");
+    // e.preventDefault();
+    // console.log("Submiting Sensor request", index);
+    // console.log(dots);
     let dotID = getDotID(index);
-    // console.log("------------------------", dotID);
-    const formData = new FormData();
     const gid = (
       Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
     ).toUpperCase();
-    let unitText = "";
+    // console.log("------------------------", dotID);
+    // console.log(dots[index]);
+    const formDotData = new FormData();
+    formDotData.append("dot_id", dots[index].dot_id);
+    formDotData.append("parent_id", dots[index].parent_id);
+    formDotData.append("x", dots[index].x);
+    formDotData.append("y", dots[index].y);
+    formDotData.append("is_sensor", true);
+    //action for bool
+    formDotData.append("is_image", false);
+    formDotData.append("child_id", gid);
+    let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+    const resp = await axios
+      .post(url, formDotData, {
+        headers: {
+          "content-type": "multipart/form-data",
+          Authorization: "",
+        },
+      })
+      .catch((err) => console.log(err));
+    // console.log("Response", resp);
+    // console.log("Sent Dot POST Req");
+
+    const formData = new FormData();
+
     if (isTemp) {
       switch (unit) {
         case "1":
@@ -38,9 +61,9 @@ function AddSensor(props) {
     formData.append("unit", unit);
     formData.append("dimensions", volume);
     formData.append("values", "");
-
     formData.append("dot_id", dotID);
-    let url = "http://localhost:8000/sensor/sensors/";
+
+    url = "http://localhost:8000/sensor/sensors/";
     const res = await axios
       .post(url, formData, {
         headers: {
@@ -49,8 +72,9 @@ function AddSensor(props) {
         },
       })
       .catch((err) => console.log(err));
-    console.log("Response", res);
+    // console.log("Response", res);
     onHide();
+    hideButton(true);
   };
   return (
     <Modal

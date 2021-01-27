@@ -144,7 +144,20 @@ class Navigation extends Component {
                     exact
                     onClick={this.toggleNavbarOnClick}
                   >
-                    AddImage
+                    Add Image
+                  </NavLink>
+                </NavItem>
+              )}
+              {this.props.authenticated && (
+                <NavItem>
+                  <NavLink
+                    tag={Link}
+                    to="/viewimage"
+                    activeClassName="active"
+                    exact
+                    onClick={this.toggleNavbarOnClick}
+                  >
+                    View Images
                   </NavLink>
                 </NavItem>
               )}
