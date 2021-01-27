@@ -29,3 +29,16 @@
 6. python manage.py migrate
 7. python manage.py createsuperuser
 8. python manage.py runserver
+
+
+Apis Samples:
+/sensor/sensors/                Gives Data for all sensors/adds new senso
+/sensor/value/(sensor_id)/      Gives data for values on that sensor/add new value
+/sensor/(sensor_id)/            Gives data for sensor_id/adds new image
+
+
+/image/images/                  Gives data for all images/adds new image
+/image/dot/(image_id)/          Gives data for dot on that image/add new dot
+/image/(image_id)/              Gives data for image_id/adds new image
+
+image/value/(image_id)/(sensor_name)/   gives data for sensor name(value array size should be 3)

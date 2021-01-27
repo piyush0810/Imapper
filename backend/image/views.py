@@ -1,13 +1,14 @@
 from django.shortcuts import render
-from .serializers import PostSerializer
-from .models import Image
+from .serializers import PostSerializer, DotSerializer
+from .models import Image,Dot
+from sensor.models import Sensor, Value
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
-
+import json
 # Create your views here.
 
 
@@ -42,7 +43,15 @@ class imagev(APIView):
         image_id = self.kwargs['image_id']
         # print("hi")
         images = Image.objects.filter(image_id=image_id)
-        print(type(images[0].image))
+        
+        for image in images:
+            dots =  Dot.objects.filter(parent_id=image_id)
+            data=[]
+            for dot in dots:
+                data.append(dot.dot_id)
+                print(data)
+            image.dots=json.dumps(data)
+        
         serializer = PostSerializer(images, many=True)
 
         return Response(serializer.data)
@@ -57,3 +66,82 @@ class imagev(APIView):
         else:
             print('error', posts_serializer.errors)
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+        
+
+@permission_classes((AllowAny, ))
+class dotv(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+       
+        image_id = self.kwargs['image_id']
+        
+        dots = Dot.objects.filter(parent_id=image_id)
+        print(dots)
+        serialize = DotSerializer(dots, many=True)
+        print("hh")
+        return Response(serialize.data)
+
+
+    def post(self, request, *args, **kwargs):
+
+        dots_serializer = DotSerializer(data=request.data)
+
+        if dots_serializer.is_valid():
+            dots_serializer.save()
+            return Response(dots_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', dots_serializer.errors)
+            return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes((AllowAny, ))
+class aggregator(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def funct( self, b,id,a,t):
+        image=Image.objects.filter(image_id=id)
+        dots = Dot.objects.filter(parent_id=id)
+        for dot in dots:
+            if dot.is_sensor:
+                values=Value.objects.filter(sensor_id=dot.child_id)
+                sensor=Sensor.objects.filter(sensor_id=dot.child_id)
+                # print(sensor[0].sensor_name)
+                # print(t)
+                if sensor[0].sensor_name==t:
+                    dimen=int(sensor[0].dimensions)
+                    for i in range(len( values)):
+                        a[i]=(a[i]*b+values[i].value*dimen)/(b+dimen)
+                    b=b+dimen    
+            else:
+                a,b=self.funct(b,dot.child_id,a,t)        
+        return (a,b)
+
+
+                    
+                
+
+
+    def get(self, request, *args, **kwargs):
+       
+        iid = self.kwargs['image_id']
+        k=[0,0,0]
+        j=0
+        t=self.kwargs['sensor_name']
+        x,y=self.funct(j,iid,k,t)
+
+        return Response(x)
+
+
+    def post(self, request, *args, **kwargs):
+
+        dots_serializer = DotSerializer(data=request.data)
+
+        if dots_serializer.is_valid():
+            dots_serializer.save()
+            return Response(dots_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', dots_serializer.errors)
+            return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

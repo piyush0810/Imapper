@@ -4,7 +4,7 @@ from .models import Sensor,Value
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sensor
-        fields = ('sensor_id','sensor_name','unit','dimensions','value')
+        fields = '__all__'
 
 class sensSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,3 +15,6 @@ class ValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Value
         fields = '__all__'
+
+
+        
