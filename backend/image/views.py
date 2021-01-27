@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import authentication_classes, permission_classes
 import json
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -95,6 +96,51 @@ class dotv(APIView):
         else:
             print('error', dots_serializer.errors)
             return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
+@permission_classes((AllowAny, ))
+class dotdel(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def deleteim(self,id):
+        dots=Dot.objects.filter(parent_id=id)
+        for dot in dots:
+            self.deletedot(dot.dot_id)
+        image=Image.objects.filter(image_id=id)
+        image.delete()
+    
+    def deletedot(self,id):
+        dot=Dot.objects.filter(dot_id=id)
+        if dot[0]:
+            dot=dot[0]
+            if dot.is_sensor:
+                sensor_id=dot.child_id
+                dot.delete()
+                sensor=Sensor.objects.filter(sensor_id=sensor_id)
+                sensor.delete()
+            elif dot.is_image:
+                image_id=dot.child_id
+                self.deleteim(image_id)
+                dot.delete()
+        
+                
+
+        
+    
+    
+
+
+
+    def delete(self, request, *args, **kwargs):
+        
+        dot_id = self.kwargs['dot_id']
+        dot=Dot.objects.filter(dot_id=dot_id)
+        if dot: 
+            self.deletedot(dot_id)               
+
+            return JsonResponse({"status":"ok"}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT) 
 
 
 @permission_classes((AllowAny, ))
