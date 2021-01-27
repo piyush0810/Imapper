@@ -41,10 +41,12 @@ function ViewImage(params) {
     modalShow: false,
     currSensor: "",
   });
+  console.log("MergeState State:", mergeState);
   const [isFetching, setIsFetching] = useState(true);
   const [isFetchingParentImg, setisFetchingParentImg] = useState(true);
+  const [isFetchingSensor, setIsFetchingSensor] = useState(true);
   const [parentImg, setparentImg] = useState();
-  console.log("Parent Image Data", parentImg);
+  console.log("Parent Image State:", parentImg);
 
   // console.log("----------------", images, sensors);
   if (!imageID) {
@@ -157,14 +159,21 @@ function ViewImage(params) {
     console.log("This Triggers when dot clicked");
   };
   async function handleShowGraph(id) {
-    // console.log("Showing Model");
-    // console.log(id, mergeState);
-    // let urll = `http://localhost:8000/sensor/${id}/`;
-    // console.log(`sending GET req to ${urll}`);
-    // const resp = await axios.get(urll);
-    // console.log("------------Sensor Data", resp.data[0]);
-    // console.log("After Fetchig", mergeState);
-    // setMergeState({ modalShow: true, currSensor: resp.data[0] });
+    setIsFetchingSensor(true);
+    console.log(
+      "-----------------------------------------Fetching Sensor Data"
+    );
+    console.log("Sensor ID recieved", id);
+    let urll = `http://localhost:8000/sensor/${id}/`;
+    console.log(`sending GET req to ${urll}`);
+    const resp = await axios.get(urll);
+    console.log("Sensor Data recieved", resp.data[0]);
+    console.log("Saving merge State");
+    setMergeState({ modalShow: true, currSensor: resp.data[0] });
+    setIsFetchingSensor(false);
+    console.log(
+      "-----------------------------------------Completed Fetching of Sensor Data"
+    );
   }
   return (
     <>
@@ -223,7 +232,6 @@ function ViewImage(params) {
             })}
 
             {senArray.map((sensor, i) => {
-              console.log("--------------Sensor Id", sensor.sensor_id);
               return (
                 <>
                   <Col xs={4} md={3}>
@@ -235,7 +243,7 @@ function ViewImage(params) {
                             : "Pressure"}
                         </Card.Title>
                         <Card.Subtitle className="mb-2 text-muted">
-                          Units {sensor.unit === "1" ? "celsius" : sensor.unit}
+                          Units {sensor.unit}
                         </Card.Subtitle>
 
                         <Button
@@ -255,16 +263,18 @@ function ViewImage(params) {
         </Container>
       )}
       {isFetching && <Alert variant="warning">Fetching Data</Alert>}
-      {/* <MyVerticallyCenteredModal
-        show={mergeState.modalShow}
-        onHide={() => {
-          setMergeState({
-            modalShow: false,
-            currSensor: mergeState.currSensor,
-          });
-        }}
-        mergeS={mergeState}
-      /> */}
+      {!isFetchingSensor && (
+        <MyVerticallyCenteredModal
+          show={mergeState.modalShow}
+          onHide={() => {
+            setMergeState({
+              modalShow: false,
+              currSensor: mergeState.currSensor,
+            });
+          }}
+          mergeS={mergeState}
+        />
+      )}
     </>
   );
 }
@@ -285,7 +295,7 @@ function MyVerticallyCenteredModal(props) {
       datasets: [
         {
           label: mergeS.currSensor.sensor_name,
-          data: [],
+          data: [...mergeS.currSensor.values],
           fill: false,
           backgroundColor: [],
           borderColor: [],
