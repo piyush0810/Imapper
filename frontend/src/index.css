@@ -123,3 +123,7 @@
 .box:hover::after {
   opacity: 1;
 }
+
+#image1 {
+  height: 150;
+}
