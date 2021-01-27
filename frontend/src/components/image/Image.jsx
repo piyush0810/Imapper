@@ -5,84 +5,85 @@ import { useHistory, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import axios from "axios";
+import { Alert } from "react-bootstrap";
 
 function Image(props) {
-  const [isEditing, setEditing] = useState(false);
+  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Image Component Rendered");
 
-  console.log("Image Component Rendered");
   const { imageID } = useParams();
-  //console.log(`Image ${imageID} Recieved in Image`);
-
-  const [dataFetched, setdataFetched] = useState(false);
-
+  const [isFetchingImage, setisFetchingImage] = useState(true);
+  const [callRefresh, setcallRefresh] = useState(0);
   const [image, setImage] = useState({
     dots: [],
     image: null,
     image_id: "",
     pid: "",
   });
-
+  console.log("Image State:", image);
+  console.log(
+    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Completed Rendered Image"
+  );
   useEffect(async () => {
-    console.log("Fetiching useEffect called");
-    let urll = `http://localhost:8000/image/dot/${imageID}/`;
-    console.log(`sending GET req to ${urll}`);
-    const resp = await axios.get(urll);
-    console.log(resp.data);
-
-    console.log("DOTS recieved", image.dots);
-    console.log("Image recieved from GET req");
-    //fetching Image Data from DB
-    let url = `http://localhost:8000/image/${imageID}`;
-    // console.log(`sending GET req to ${url}`);
-    axios({
-      method: "get",
-      url,
-    })
-      .then(async (response) => {
-        console.log("Printing Fetched");
-        console.log(response.data[0]);
+    console.log("--------------------Fetiching useEffect called");
+    setisFetchingImage(true);
+    if (imageID) {
+      let urll = `http://localhost:8000/image/dot/${imageID}/`;
+      // console.log(`sending GET req to ${urll}`);
+      const resp = await axios.get(urll);
+      // console.log("Dots Response Recieved", resp.data);
+      //fetching Image Data from DB
+      let url = `http://localhost:8000/image/${imageID}`;
+      // console.log(`sending GET req to ${url}`);
+      const res = await axios.get(url);
+      // console.log("Printing Fetched Image Data:", res.data);
+      // console.log("Setting Image Data & Dots");
+      if (res.data.length) {
         setImage({
           ...image,
           dots: resp.data,
-          pid: response.data[0].pid,
-          image: response.data[0].image,
-          image_id: response.data[0].image_id,
+          pid: res.data[0].pid,
+          image: res.data[0].image,
+          image_id: res.data[0].image_id,
         });
-
-        console.log("Image Date Set:", image);
-
-        console.log("Done Fetching");
-        setdataFetched(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+        // console.log("Changing Flag");
+        setisFetchingImage(false);
+        console.log("--------------------Fetiching useEffect Complete");
+      }
+    }
+  }, [imageID, callRefresh]);
 
   return (
-    <div>
-      <ReactImageDot
-        backgroundImageUrl={"http://localhost:8000" + image.image}
-        width="100%"
-        height={640}
-        dotRadius={6}
-        dotStyles={{
-          backgroundColor: "red",
-          boxShadow: "0 2px 4px gray",
-        }}
-        backgroundSize={"cover"}
-        pid={image.image_id}
-        Dots={image.dots}
-      />
-      {dataFetched && (
-        <DotsInfo
-          height={480}
-          width={480}
-          pid={image.image_id}
-          Dots={image.dots}
-        />
+    <>
+      {isFetchingImage && (
+        <Alert variant="warning">
+          Fetching Image Data or check the Image ID
+        </Alert>
       )}
-    </div>
+      {!isFetchingImage && (
+        <div>
+          <ReactImageDot
+            backgroundImageUrl={"http://localhost:8000" + image.image}
+            width="100%"
+            height={640}
+            dotRadius={6}
+            dotStyles={{
+              backgroundColor: "red",
+              boxShadow: "0 2px 4px gray",
+            }}
+            backgroundSize={"cover"}
+            pid={image.image_id}
+            Dots={image.dots}
+          />
+          <DotsInfo
+            height={480}
+            width={480}
+            pid={image.image_id}
+            Dots={image.dots}
+            refresh={setcallRefresh}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

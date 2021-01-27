@@ -13,8 +13,11 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 
 function AddImage({ pid, index, hideButton }) {
-  console.log("AddImage Component Rendered");
+  console.log(
+    "#########################################AddImage Component Rendered"
+  );
   const imageRef = useRef(null);
+  const history = useHistory();
   const dots = useSelector((state) => state.dot.dots);
 
   const [image, setImage] = useState({
@@ -23,43 +26,52 @@ function AddImage({ pid, index, hideButton }) {
     image_id: "",
     pid: pid ? pid : "-1",
   });
-  console.log("Initilized Data", image);
+  console.log("Image State:", image);
   const [isUpload, setIsUpload] = useState(false);
-  const history = useHistory();
-
+  console.log(
+    "######################################### Cmpleted Rendered AddImage"
+  );
   const handleChange = (e) => {
     const gid = (
       Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
     ).toUpperCase();
+    // console.log("Image State Changed");
     setImage({ ...image, image: e.target.files[0], image_id: gid });
+  };
+
+  const handleDelete = (e) => {
+    // console.log("Image Ref is changed");
+    imageRef.current.value = "";
+    // console.log("Image State Changed");
+    setImage({ ...image, image: null, image_id: "" });
   };
   const handleUpload = async (e) => {
     e.preventDefault();
     if (image.image) {
-      //console.log("Index in AddImage", index);
-      if (index >= 0) {
-        console.log("inside Index if");
-        const formDotData = new FormData();
-        formDotData.append("dot_id", dots[index].dot_id);
-        formDotData.append("parent_id", dots[index].parent_id);
-        formDotData.append("x", dots[index].x);
-        formDotData.append("y", dots[index].y);
-        formDotData.append("is_sensor", false);
-        //action for bool
-        formDotData.append("is_image", true);
-        formDotData.append("child_id", image.image_id);
-        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
-        const resp = await axios
-          .post(url, formDotData, {
-            headers: {
-              "content-type": "multipart/form-data",
-              Authorization: "",
-            },
-          })
-          .catch((err) => console.log(err));
-        console.log("Response", resp);
-        console.log("Sent Dot POST Req");
-      }
+      // if (index >= 0) {
+      //   console.log("inside Index if");
+      //   const formDotData = new FormData();
+      //   formDotData.append("dot_id", dots[index].dot_id);
+      //   formDotData.append("parent_id", dots[index].parent_id);
+      //   formDotData.append("x", dots[index].x);
+      //   formDotData.append("y", dots[index].y);
+      //   formDotData.append("is_sensor", false);
+      //   //action for bool
+      //   formDotData.append("is_image", true);
+      //   formDotData.append("child_id", image.image_id);
+      //   let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+      //   const resp = await axios
+      //     .post(url, formDotData, {
+      //       headers: {
+      //         "content-type": "multipart/form-data",
+      //         Authorization: "",
+      //       },
+      //     })
+      //     .catch((err) => console.log(err));
+      //   console.log("Response", resp);
+      //   console.log("Sent Dot POST Req");
+      // }
+
       const formData = new FormData();
       formData.append("image", image.image);
       formData.append("dots", image.dots);
@@ -71,31 +83,23 @@ function AddImage({ pid, index, hideButton }) {
         .post(url, formData, {
           headers: {
             "content-type": "multipart/form-data",
-            Authorization: "",
           },
         })
         .then((res) => {
-          // console.log(res.data);
-          // console.log("Hello");
+          console.log("Image Sucessfully Uploaded");
           setIsUpload(true);
-          if (pid) {
-            hideButton(true);
-          }
+          // if (pid) {
+          //   hideButton(true);
+          // }
           //history.push();
-          history.push("/");
-          history.replace(`/image/${image.image_id}`);
+          console.log("Changing Route");
+
+          history.push(`/image/${image.image_id}`);
         })
         .catch((err) => console.log(err));
-
-      // console.log("Added History");
     } else {
       console.log("No File In Input");
     }
-  };
-  const handleDelete = (e) => {
-    setImage({ image: null });
-    imageRef.current.value = "";
-    setIsUpload(false);
   };
 
   return (

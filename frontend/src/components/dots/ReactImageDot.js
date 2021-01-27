@@ -46,8 +46,6 @@ const defaultProps = {
 };
 
 function ReactImageDot(props) {
-  console.log("ReactImageDot Component Rendered");
-  const [grabbing, setgrabbing] = useState(false);
   const {
     width,
     height,
@@ -60,22 +58,29 @@ function ReactImageDot(props) {
     pid,
     Dots,
   } = props;
-  console.log("Dots Recieved From Param in ReactImageDot", Dots);
+  console.log("################## ReactImageDot Component Rendered");
+
+  const dispatch = useDispatch();
+  const [grabbing, setgrabbing] = useState(false);
+  const grabClass = grabbing ? "react-image-dot__grabbing" : "";
+  var myDots = [];
   var dots = useSelector((state) => {
-    // console.log("inside useSelector", state.dot.dots);
+    // console.log("Use Selectore Called", state.dot.dots);
     return state.dot.dots;
   });
-  // console.log("Returned State", dots);
-  var myDots = [];
+  // console.log("Dots From DB", Dots);
+  // console.log("Dots from useState", dots);
+
   dots.forEach(function (dot) {
-    console.log(dot);
     if (dot.parent_id == pid) {
       myDots.push(dot);
     }
   });
+
   dots = [...Dots, ...myDots];
-  // console.log("Final Dots", dots);
-  const dispatch = useDispatch();
+  console.log("Final Dots", dots);
+
+  console.log("################## ReactImageDot Component Rendered");
 
   function addDot(dot) {
     // console.log("Dispatching addDot function");
@@ -110,39 +115,37 @@ function ReactImageDot(props) {
     props.resetDots();
   };
 
-  const grabClass = grabbing ? "react-image-dot__grabbing" : "";
-
-  // console.log("URL in ReactImageDot->", backgroundImageUrl);
-  // console.log(dots);
   return (
     <>
-      <Container className="react-image-dot__container">
-        <Card
-          className="bg-dark text-white `react-image-dot__wrapper ${grabClass}`"
-          onMouseUp={onMouseUp}
-          style={{
-            ...styles,
-            backgroundImage: `url(${backgroundImageUrl})`,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            width,
-            height,
-            backgroundSize,
-          }}
-        >
-          {dots.map((dot, i) => (
-            <Dot
-              x={dot.x}
-              y={dot.y}
-              i={i}
-              styles={dotStyles}
-              moveDot={moveDot}
-              dotRadius={dotRadius}
-            />
-          ))}
-        </Card>
-        {props.resetDots && <button onClick={resetDots}>Reset</button>}
-      </Container>
+      {pid && (
+        <Container className="react-image-dot__container">
+          <Card
+            className="bg-dark text-white `react-image-dot__wrapper ${grabClass}`"
+            onMouseUp={onMouseUp}
+            style={{
+              ...styles,
+              backgroundImage: `url(${backgroundImageUrl})`,
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width,
+              height,
+              backgroundSize,
+            }}
+          >
+            {dots.map((dot, i) => (
+              <Dot
+                x={dot.x}
+                y={dot.y}
+                i={i}
+                styles={dotStyles}
+                moveDot={moveDot}
+                dotRadius={dotRadius}
+              />
+            ))}
+          </Card>
+          {props.resetDots && <button onClick={resetDots}>Reset</button>}
+        </Container>
+      )}
     </>
   );
 }

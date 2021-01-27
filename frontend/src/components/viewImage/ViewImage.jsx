@@ -138,17 +138,19 @@ function ViewImage(params) {
       url = `http://localhost:8000/image/${parentId}`;
       // console.log(`sending GET req to Fetch Parent Image Data`, url);
       const res = await axios.get(url);
-      // console.log("Parent Image  Data Recieved", res.data);
+      console.log("Parent Image  Data Recieved", res.data);
       // console.log("Setting Parent iamge Data into state");
-      setparentImg({
-        ...parentImg,
-        dots: resp.data,
-        pid: res.data[0].pid,
-        image: res.data[0].image,
-        image_id: res.data[0].image_id,
-      });
+      if (res.data.length) {
+        setparentImg({
+          ...parentImg,
+          dots: resp.data,
+          pid: res.data[0].pid,
+          image: res.data[0].image,
+          image_id: res.data[0].image_id,
+        });
+        setisFetchingParentImg(false);
+      }
       // console.log("Done Setting Parent Image Data");
-      setisFetchingParentImg(false);
     } else {
       // console.log("Parent ID Not Defined");
     }
@@ -177,7 +179,12 @@ function ViewImage(params) {
   }
   return (
     <>
-      {!isFetching && (
+      {isFetchingParentImg && (
+        <Alert variant="warning">
+          Fetching Parent Image Data or check the Image ID
+        </Alert>
+      )}
+      {!isFetchingParentImg && (
         <Container>
           <Row>
             <Card className="bg-dark text-white">
