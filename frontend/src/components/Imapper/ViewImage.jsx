@@ -27,8 +27,8 @@ function ViewImage(params) {
     // console.log("UseSelect for Sensors Called");
     return state.sensor;
   }, shallowEqual);
-  console.log("Images From Store", images);
-  console.log("Sensors From Store", sensors);
+  console.log("ViewImage: Images From Store", images);
+  console.log("ViewImage: Sensors From Store", sensors);
   let parentId = "";
   var parentImgURL = "";
   let imgArray = [];
@@ -37,12 +37,12 @@ function ViewImage(params) {
     modalShow: false,
     currSensor: "",
   });
-  console.log("MergeState State:", mergeState);
+  console.log("ViewImage: MergeState State:", mergeState);
   const [isFetching, setIsFetching] = useState(true);
   const [isFetchingParentImg, setisFetchingParentImg] = useState(true);
   const [isFetchingSensor, setIsFetchingSensor] = useState(true);
   const [parentImg, setparentImg] = useState();
-  console.log("Parent Image State:", parentImg);
+  console.log("ViewImage: Parent Image State:", parentImg);
 
   // console.log("----------------", images, sensors);
   if (!imageID) {
@@ -81,14 +81,12 @@ function ViewImage(params) {
           senArray.push(sensors[key]);
         }
       }
-      console.log("Images:", imgArray);
-      console.log("Sensors:", senArray);
+      console.log("ViewImage: Images:", imgArray);
+      console.log("ViewImage: Sensors:", senArray);
     }
   }
 
-  console.log(
-    "//////////////////////////////////////////////////////////////////Component Completed Rendered"
-  );
+  console.log("ViewImage: Component Completed Rendered");
 
   useEffect(async () => {
     // console.log("##################Fetching Data Action called");
@@ -136,6 +134,54 @@ function ViewImage(params) {
       const res = await axios.get(url);
       console.log("Parent Image  Data Recieved", res.data);
       // console.log("Setting Parent iamge Data into state");
+      url = `http://localhost:8000/image/value/${parentId}/pressure`;
+      const ressP = await axios.get(url);
+      url = `http://localhost:8000/image/value/${parentId}/temperature`;
+      const ressT = await axios.get(url);
+      console.log("ViewImage: Agg DataP", ressP.data);
+      console.log("ViewImage: Agg DataT", ressT.data);
+      var sizeP = ressP.data.length;
+      var tempP = [];
+      var sizeT = ressT.data.length;
+      var tempT = [];
+      // console.log("Viewimage: Size", sizeP);
+      for (let index = 0; index < sizeP; index++) {
+        tempP.push(index);
+      }
+      for (let index = 0; index < sizeT; index++) {
+        tempT.push(index);
+      }
+      var dataP = {
+        dataHorizontal: {
+          labels: [...tempP],
+          datasets: [
+            {
+              label: "Pressure",
+              data: [...ressP.data],
+              fill: false,
+              backgroundColor: [],
+              borderColor: [],
+              borderWidth: 1,
+            },
+          ],
+        },
+      };
+      var dataT = {
+        dataHorizontal: {
+          labels: [...tempT],
+          datasets: [
+            {
+              label: "Temperature",
+              data: [...ressT.data],
+              fill: false,
+              backgroundColor: [],
+              borderColor: [],
+              borderWidth: 1,
+            },
+          ],
+        },
+      };
+
       if (res.data.length) {
         setparentImg({
           ...parentImg,
@@ -143,6 +189,8 @@ function ViewImage(params) {
           pid: res.data[0].pid,
           image: res.data[0].image,
           image_id: res.data[0].image_id,
+          aggDataP: dataP,
+          aggDataT: dataT,
         });
         setisFetchingParentImg(false);
       }
@@ -212,7 +260,26 @@ function ViewImage(params) {
               )}
             </Card>
           </Row>
-
+          <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
+            <Col>
+              <MDBContainer style={{ maxWidth: "500px" }}>
+                <h3 className="mt-5">Pressure Bar Graph</h3>
+                <HorizontalBar
+                  data={parentImg.aggDataP.dataHorizontal}
+                  options={{ responsive: true }}
+                />
+              </MDBContainer>
+            </Col>
+            <Col>
+              <MDBContainer style={{ maxWidth: "500px" }}>
+                <h3 className="mt-5">Temperatue Bar Graph</h3>
+                <HorizontalBar
+                  data={parentImg.aggDataT.dataHorizontal}
+                  options={{ responsive: true }}
+                />
+              </MDBContainer>
+            </Col>
+          </Row>
           <Row
             sm={1}
             className="justify-content-sm-center"

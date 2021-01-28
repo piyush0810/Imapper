@@ -18,7 +18,6 @@ function View(params) {
   const images = useSelector((state) => state.img);
   console.log("View: Images from Store", images);
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
-  const [modalUploadImg, setModalUploadImg] = useState(false);
   const [refresh, setRefresh] = useState(0);
   var parentImgArray = [];
 
