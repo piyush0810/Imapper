@@ -4,6 +4,8 @@ import UploadImage from "../Imapper/UploadImage";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 import { Container, Row, Col, Card, Alert, Button } from "react-bootstrap";
+import { DeleteDot } from "../../actions/dots/dotsActions";
+import axios from "axios";
 
 export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
   console.log("DotInfo: Dotsinfo Component Rendered");
@@ -39,7 +41,23 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
   });
   console.log("DotInfo: MyLocalDots", myLocalDots);
 
-  async function deleteDot(index, sizeDB) {
+  async function deleteDot(index, type) {
+    console.log("DotInfo: DeleteDot called");
+    setIsDeleting(true);
+    if (type == "local") {
+      console.log("DotInfo:Local Dot Deleted");
+      dispatch(DeleteDot(index));
+    } else {
+      let url = `http://localhost:8000/image/dotdel/${index}/`;
+      console.log("DotInfo: Database Dot called");
+      await axios.delete(url);
+      console.log("DotsInfo: Refreshcalled");
+      refresh((p) => {
+        return p + 1;
+      });
+    }
+    setIsDeleting(false);
+
     // console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Enter");
     // console.log("index recieved", index);
     // console.log("setting flag ");
@@ -85,7 +103,7 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                           Dot [{i}]........................
                           <Button
                             onClick={() => {
-                              deleteDot(i - Dots.length, Dots.length);
+                              deleteDot(i, "local");
                             }}
                             variant="danger"
                           >
@@ -146,7 +164,7 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                             <Col md={{ span: 4, offset: 2 }}>
                               <Button
                                 onClick={() => {
-                                  deleteDot(i - Dots.length, Dots.length);
+                                  deleteDot(dot.dot_id, "db");
                                 }}
                                 variant="danger"
                               >
