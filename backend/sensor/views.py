@@ -73,14 +73,13 @@ class sensorv(APIView):
             data = []
             for value in values:
                 data.append(value.value)
-            print(data)
-            sensor.value = json.dumps(data)
-            print(sensor.value)
+
+            sensor.values = data
+            print(type(sensor.values))
             sensor.save()
 
         serializer = PostSerializer(sensors, many=True)
         # print(serializer[0][image])
-        print(sensors[0].value)
         return Response(serializer.data)
 
     # def save(self):

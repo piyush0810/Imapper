@@ -291,11 +291,12 @@ function MyVerticallyCenteredModal(props) {
   const mergeS = props.mergeS;
   console.log("Modal loaded", mergeS);
   console.log("Array", mergeS.currSensor.values);
-  var size = mergeS.currSensor.values ? mergeS.currSensor.values.length : 0;
+  var size = mergeS.currSensor.values.length;
   var temp = [];
   for (let index = 0; index < size; index++) {
     temp.push(index);
   }
+  console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
   var data = {
     dataHorizontal: {
       labels: [...temp],

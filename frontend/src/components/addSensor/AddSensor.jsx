@@ -23,6 +23,7 @@ function AddSensor(props) {
     console.log("Submiting Flag changed");
     setIsUploading(true);
     if (index >= 0) {
+      console.log("index ", index);
       let dotID = getDotID(index);
       const gid = (
         Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
@@ -38,7 +39,9 @@ function AddSensor(props) {
       formDotData.append("is_image", false);
       formDotData.append("child_id", gid);
       let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+      console.log("DEleting dot at index", index);
       dispatch(DeleteDot(index));
+      console.log("Sending Data");
       const resp = await axios
         .post(url, formDotData, {
           headers: {
@@ -103,11 +106,6 @@ function AddSensor(props) {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <AddSensor
-              onHide={props.onHide}
-              pid={props.pid}
-              index={props.index}
-            />
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <Form.Label>Select Type of Sensor</Form.Label>
