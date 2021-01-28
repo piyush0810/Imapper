@@ -1,133 +1,201 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import AddSensor from "../addSensor/AddSensor";
+import UploadImage from "../Imapper/UploadImage";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
-import AddImage from "../addImage/AddImage";
+import { useHistory, useParams } from "react-router-dom";
 import { Container, Row, Col, Card, Alert, Button } from "react-bootstrap";
 
-export default function DotsInfo({ height, width, pid, Dots }) {
-  console.log("Dotsinfo Component Rendered");
-  console.log("Prining dots from Param in DotsInfo", Dots);
-  var dots = useSelector((state) => {
-    // console.log("inside useSelector", state.dot.dots);
-    return state.dot.dots;
-  });
-  // console.log("Returned State", dots);
-  var myDots = [];
-  dots.forEach(function (dot) {
-    console.log(dot);
-    if (dot.parent_id == pid) {
-      myDots.push(dot);
-    }
-  });
-  dots = [...Dots, ...myDots];
-
-  // myDots = [...Dots, ...myDots];
-  console.log("final Dots", dots);
-  // useEffect(() => {
-  //   var myDots = [];
-  //   for (let dot in dots) {
-  //     if (dot.parent_id == pid) {
-  //       myDots.push(dot);
-  //     }
-  //   }
-  //   dots = [...Dots, ...myDots];
-  // }, [dots]);
-  // console.log("Image Add request from", pid);
-  const [modalShow, setModalShow] = React.useState(false);
-  const [isAddSensorClicked, setIsAddSensorClicked] = useState(false);
+export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
+  console.log("DotInfo: Dotsinfo Component Rendered");
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const [modalAddSensor, setModalAddSensor] = useState(false);
   const [isAddImageClicked, setIsAddImageClicked] = useState(false);
+  const [modalUploadImg, setModalUploadImg] = useState(false);
   const [isAddedImage, setisAddedImage] = useState(false);
   const [index, setIndex] = useState(-1);
-  const [isAddedSensor, setisAddedSensor] = useState(false);
-  const dispatch = useDispatch();
-  function handleAddSensor(i) {
-    setModalShow(true);
-    setIndex(i);
-  }
-  function handleAddImage(i) {
-    setIndex(i);
-  }
-  function deleteDot(index) {
-    dispatch(DeleteDot(index));
+  // console.log("DotInfo: Index State:", index);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // console.log("DotInfo: Completed Rendered *Dotsinfo ");
+  // function handleAddSensor(i) {
+  //   // console.log("openning Modal");
+  //   setModalShow(true);
+  //   // console.log("Adding Index");
+  //   setIndex(i);
+  //   // console.log("Changed Index state");
+  // }
+  var localDots = useSelector((state) => {
+    return state.dot.dots;
+  });
+  var myLocalDots = [];
+  console.log("DotInfo: Dots From DB", dbDots);
+  console.log("DotInfo: Dots from useState", localDots);
+
+  localDots.forEach(function (dot) {
+    if (dot.parent_id == pid) {
+      myLocalDots.push(dot);
+    }
+  });
+  console.log("DotInfo: MyLocalDots", myLocalDots);
+
+  async function deleteDot(index, sizeDB) {
+    // console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Enter");
+    // console.log("index recieved", index);
+    // console.log("setting flag ");
+    // setIsDeleting(true);
+    // console.log("Deleting Dots");
+    // if (index < 0) {
+    //   index = sizeDB + index;
+    //   console.log("Index inside", index);
+    //   console.log("Deleting from Server");
+    //   let url = `http://localhost:8000/image/dotdel/${dots[index].dot_id}/`;
+    //   // console.log("Printing Dots", dots);
+    //   await axios.delete(url);
+    //   // console.log("dot Deleted");
+    //   console.log("Refresh called");
+    //   refresh((p) => {
+    //     return p + 1;
+    //   });
+    // } else {
+    //   dispatch(DeleteDot(index));
+    // }
+    // setIsDeleting(false);
+    // console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Completed");
   }
 
   return (
     <>
-      <Container>
-        <Row xs={4} md={3} noGutters>
-          {dots.map((dot, i) => {
-            return (
-              <>
-                <Col>
-                  <Card style={{ width: "18rem" }}>
-                    <Card.Body>
-                      <Card.Title>
-                        Dot [{i}]........................
-                        <Button
-                          onClick={() => {
-                            deleteDot(i - Dots.length);
-                          }}
-                          variant="danger"
-                        >
-                          Remove
-                        </Button>
-                      </Card.Title>
+      {!isDeleting && (
+        <Container fluid>
+          <Row
+            md={6}
+            sm={1}
+            lg={6}
+            noGutters
+            className="justify-content-sm-center"
+          >
+            {myLocalDots.map((dot, i) => {
+              return (
+                <>
+                  <Col style={{ margin: "10px" }}>
+                    <Card style={{ width: "18rem" }}>
+                      <Card.Body>
+                        <Card.Title>
+                          Dot [{i}]........................
+                          <Button
+                            onClick={() => {
+                              deleteDot(i - Dots.length, Dots.length);
+                            }}
+                            variant="danger"
+                          >
+                            Remove
+                          </Button>
+                        </Card.Title>
 
-                      <Card.Text>
-                        Coordinates: x: {dot.x}, y: {dot.y}
-                      </Card.Text>
+                        <Card.Text>
+                          Coordinates: x: {dot.x}, y: {dot.y}
+                        </Card.Text>
 
-                      <Row>
-                        {!dot.is_sensor && (
-                          <Col>
-                            <Button
-                              onClick={() => {
-                                setIsAddSensorClicked(true);
-                                handleAddSensor(i - Dots.length);
-                              }}
-                              variant="outline-primary"
-                            >
-                              Add Sensor
-                            </Button>
-                          </Col>
+                        {!dot.child_id && (
+                          <Row>
+                            <Col>
+                              <Button
+                                onClick={() => {
+                                  setModalAddSensor(true);
+                                  setIndex(i);
+                                }}
+                                variant="outline-primary"
+                              >
+                                Add Sensor
+                              </Button>
+                            </Col>
+
+                            <Col>
+                              <Button
+                                onClick={() => {
+                                  setModalUploadImg(true);
+                                  setIndex(i);
+                                }}
+                                variant="outline-success"
+                              >
+                                Add Image
+                              </Button>
+                            </Col>
+                          </Row>
                         )}
-                        {!dot.is_image && (
-                          <Col>
-                            <Button
-                              onClick={() => {
-                                setIsAddImageClicked(true);
-                                handleAddImage(i - Dots.length);
-                              }}
-                              variant="outline-success"
-                            >
-                              Add Image
-                            </Button>
-                          </Col>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </>
+              );
+            })}
+          </Row>
+          <Row lg={4} sm={1} noGutters className="justify-content-sm-center">
+            {dbDots.map((dot, i) => {
+              return (
+                <>
+                  <Col style={{ margin: "10px" }}>
+                    <Card style={{ width: "250px" }}>
+                      <Card.Body>
+                        <Card.Title>
+                          <Row style={{ margin: "5px" }}>
+                            <Col sm={4}>
+                              {dot.is_image ? " Image" : " Sensor"}
+                            </Col>
+                            <Col md={{ span: 4, offset: 2 }}>
+                              <Button
+                                onClick={() => {
+                                  deleteDot(i - Dots.length, Dots.length);
+                                }}
+                                variant="danger"
+                              >
+                                Remove
+                              </Button>
+                            </Col>
+                          </Row>
+                        </Card.Title>
+                        {dot.is_image && (
+                          <Button
+                            variant="success"
+                            style={{ marginLeft: "60px" }}
+                            onClick={() => {
+                              history.push(`/image/${dot.child_id}`);
+                            }}
+                          >
+                            Open Image
+                          </Button>
                         )}
-                      </Row>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </>
-            );
-          })}
-        </Row>
-      </Container>
+                        <Card.Text style={{ margin: "10px" }}>
+                          Coordinates: x: {dot.x}, y: {dot.y}
+                        </Card.Text>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                </>
+              );
+            })}
+          </Row>
+        </Container>
+      )}
 
-      {isAddSensorClicked && (
-        <AddSensor
-          onHide={() => setModalShow(false)}
-          pid={pid}
-          index={index}
-          show={modalShow}
-          hideButton={setisAddedSensor}
-        />
-      )}
-      {isAddImageClicked && (
-        <AddImage pid={pid} index={index} hideButton={setisAddedImage} />
-      )}
+      <AddSensor
+        onHide={() => setModalAddSensor(false)}
+        pid={pid}
+        index={index}
+        show={modalAddSensor}
+        refresh={refresh}
+      />
+
+      <UploadImage
+        show={modalUploadImg}
+        onHide={() => {
+          setModalUploadImg(false);
+        }}
+        index={index}
+        pid={pid}
+        refresh={refresh}
+      />
     </>
   );
 }

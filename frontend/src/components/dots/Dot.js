@@ -19,7 +19,6 @@ Dot.propTypes = propTypes;
 Dot.defaultProps = defaultProps;
 
 function Dot(props) {
-  console.log("Dots Component rendered");
   const { x, y, styles, dotRadius } = props;
   const onMouseDown = () => {
     props.moveDot(props.i);

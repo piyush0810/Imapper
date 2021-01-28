@@ -14,9 +14,11 @@ import Login from "./containers/auth/LoginContainer";
 import Register from "./containers/auth/RegisterContainer";
 import ChangePassword from "./containers/auth/ChangePasswordContainer";
 
-import Image from "./components/image/Image";
-import AddImage from "./components/addImage/AddImage";
-import ViewImage from "./components/viewImage/ViewImage";
+import Image from "./components/Imapper/Image";
+
+import ViewImage from "./components/Imapper/ViewImage";
+import Home from "./components/Imapper/Home";
+import View from "./components/Imapper/View";
 import "./index.css";
 export const history = createHistory();
 
@@ -31,13 +33,10 @@ ReactDOM.render(
           <AuthenticatedRoute exact path="/register" component={Register} />
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
-          <Route exact path="/addimage" component={AddImage} />
-          <Route exact path="/addimage/:pid/:index" component={AddImage} />
-          <Route exact path="/image/:imageID" component={Image}>
-            <Image></Image>
-          </Route>
-          <Route exact path="/viewimage" component={ViewImage} />
+          <Route exact path="/addimage" component={Home} />
+          <Route exact path="/image/:imageID" component={Image} />
           <Route exact path="/viewimage/:imageID" component={ViewImage} />
+          <Route exact path="/view" component={View} />
         </Switch>
       </div>
     </Router>

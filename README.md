@@ -41,4 +41,6 @@ Apis Samples:
 /image/dot/(image_id)/          Gives data for dot on that image/add new dot
 /image/(image_id)/              Gives data for image_id/adds new image
 
-image/value/(image_id)/(sensor_name)/   gives data for sensor name(value array size should be 3)
+/image/value/(image_id)/(sensor_name)/   gives data for sensor name(value array size should be 3)
+
+/image/dotdel/(dot_id)/        deletes all data on that dot (either sensor or image)
