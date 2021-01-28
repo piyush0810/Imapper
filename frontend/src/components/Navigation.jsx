@@ -152,7 +152,7 @@ class Navigation extends Component {
                 <NavItem>
                   <NavLink
                     tag={Link}
-                    to="/viewimage"
+                    to="/view"
                     activeClassName="active"
                     exact
                     onClick={this.toggleNavbarOnClick}

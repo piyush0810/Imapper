@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Container,
@@ -15,7 +16,10 @@ import {
 
 function UploadImage(props) {
   console.log("UplaodImage: Component Rendered");
+  const dots = useSelector((state) => state.dot.dots);
+  const dispatch = useDispatch();
   const pid = props.pid;
+  const index = props.index;
   const imageRef = useRef(null);
 
   const [image, setImage] = useState({
@@ -48,12 +52,39 @@ function UploadImage(props) {
       formData.append("pid", image.pid);
       // console.log("PId in FromData", image.pid);
       let url = "http://localhost:8000/image/images/";
-      const resp = await axios.post(url, formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      });
+      const resp = await axios
+        .post(url, formData, {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        })
+        .catch((err) => console.log(err));
       console.log("UploadImage: Sent Post Request");
+      if (index >= 0) {
+        console.log("UploadImage:inside Index if");
+        const formDotData = new FormData();
+        formDotData.append("dot_id", dots[index].dot_id);
+        formDotData.append("parent_id", dots[index].parent_id);
+        formDotData.append("x", dots[index].x);
+        formDotData.append("y", dots[index].y);
+        formDotData.append("is_sensor", false);
+        //action for bool
+        formDotData.append("is_image", true);
+        formDotData.append("child_id", image.image_id);
+        console.log("UploadImage: Deleting Local Image");
+        dispatch(DeleteDot(index));
+        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+        const resp = await axios
+          .post(url, formDotData, {
+            headers: {
+              "content-type": "multipart/form-data",
+              Authorization: "",
+            },
+          })
+          .catch((err) => console.log(err));
+        console.log("UploadImage: Response", resp);
+        console.log("UploadImage: Sent Dot POST Req");
+      }
       props.onHide();
       props.refresh((p) => {
         return p + 1;

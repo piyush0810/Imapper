@@ -16,11 +16,7 @@ import { HorizontalBar } from "react-chartjs-2";
 import { MDBContainer } from "mdbreact";
 
 function ViewImage(params) {
-  console.log();
-  console.log(
-    "//////////////////////////////////////////////////////////////////View Compnent rendered"
-  );
-  console.log();
+  console.log("ViewImage: View Compnent rendered");
   const { imageID } = useParams();
   const dispatch = useDispatch();
   var images = useSelector((state) => {
@@ -185,13 +181,13 @@ function ViewImage(params) {
         </Alert>
       )}
       {!isFetchingParentImg && (
-        <Container>
-          <Row>
+        <Container fluid>
+          <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
             <Card className="bg-dark text-white">
               <Card.Img
                 src={"http://localhost:8000" + parentImgURL}
                 alt="Card image"
-                style={{ width: "100%", height: "640" }}
+                style={{ width: "640px", height: "480px" }}
               />
               {!isFetchingParentImg && (
                 <section>
@@ -217,22 +213,24 @@ function ViewImage(params) {
             </Card>
           </Row>
 
-          <Row>
+          <Row
+            sm={1}
+            className="justify-content-sm-center"
+            style={{ margin: "15px" }}
+          >
             {imgArray.map((image, i) => {
               return (
                 <>
-                  <Col xs={4} md={3}>
-                    <Card>
-                      <Link to={`/viewimage/${image.image_id}`}>
-                        <Card.Img
-                          className="box"
-                          variant="top"
-                          src={"http://localhost:8000" + image.image}
-                          style={{ height: "auto", width: "100%" }}
-                          id={`image${i.toString()}`}
-                        />
-                      </Link>
-                    </Card>
+                  <Col xs={4} md={3} style={{ margin: "15px" }}>
+                    <Link to={`/viewimage/${image.image_id}`}>
+                      <Card.Img
+                        className="box"
+                        variant="top"
+                        src={"http://localhost:8000" + image.image}
+                        style={{ maxHeight: "auto", maxWidth: "300px" }}
+                        id={`image${i.toString()}`}
+                      />
+                    </Link>
                   </Col>
                 </>
               );
@@ -242,18 +240,22 @@ function ViewImage(params) {
               return (
                 <>
                   <Col xs={4} md={3}>
-                    <Card style={{ width: "auto" }}>
+                    <Card style={{ maxWidth: "auto", height: "auto" }}>
                       <Card.Body>
-                        <Card.Title>
+                        <Card.Title style={{ margin: "15px" }}>
                           {sensor.sensor_name === "temperature"
                             ? "Temperature"
                             : "Pressure"}
                         </Card.Title>
-                        <Card.Subtitle className="mb-2 text-muted">
+                        <Card.Subtitle
+                          className="mb-2 text-muted"
+                          style={{ margin: "15px" }}
+                        >
                           Units {sensor.unit}
                         </Card.Subtitle>
 
                         <Button
+                          style={{ margin: "15px" }}
                           onClick={() => {
                             handleShowGraph(sensor.sensor_id);
                           }}

@@ -6,7 +6,7 @@ import { Modal } from "react-bootstrap";
 import axios from "axios";
 
 function AddSensor(props) {
-  console.log("addSensor Componen t Rendered");
+  console.log("AddSensor: addSensor Componen t Rendered");
   const { onHide, pid, index, show, refresh } = props;
   const [isUploading, setIsUploading] = useState(false);
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
@@ -20,10 +20,10 @@ function AddSensor(props) {
     return dots[index].dot_id;
   }
   const handleSubmit = async (e) => {
-    console.log("Submiting Flag changed");
+    console.log("AddSensor: Submiting Flag changed");
     setIsUploading(true);
     if (index >= 0) {
-      console.log("index ", index);
+      console.log("AddSensor: index ", index);
       let dotID = getDotID(index);
       const gid = (
         Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
@@ -39,9 +39,9 @@ function AddSensor(props) {
       formDotData.append("is_image", false);
       formDotData.append("child_id", gid);
       let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
-      console.log("DEleting dot at index", index);
+      console.log("AddSensor: DEleting dot at index", index);
       dispatch(DeleteDot(index));
-      console.log("Sending Data");
+      console.log("AddSensor: Sending Data");
       const resp = await axios
         .post(url, formDotData, {
           headers: {
@@ -51,7 +51,7 @@ function AddSensor(props) {
         })
         .catch((err) => console.log(err));
 
-      console.log("Sent Dot POST Req");
+      console.log("AddSensor: Sent Dot POST Req");
 
       const formData = new FormData();
 
@@ -77,15 +77,16 @@ function AddSensor(props) {
           },
         })
         .catch((err) => console.log(err));
-      console.log("Sent Sensor POST Req");
+      console.log("AddSensor: Sent Sensor POST Req");
       onHide();
+      console.log("AddSensor: Called Refresh Image Component");
       refresh((p) => {
         return p + 1;
       });
 
       setIsUploading(false);
     } else {
-      console.log("index is -ve");
+      console.log("AddSensor: index is -ve");
     }
   };
   return (
