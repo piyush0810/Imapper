@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-bootstrap";
 import Dot from "../dots/Dot";
-import { HorizontalBar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import { MDBContainer } from "mdbreact";
 
 function ViewImage(params) {
@@ -146,37 +146,63 @@ function ViewImage(params) {
       var tempT = [];
       // console.log("Viewimage: Size", sizeP);
       for (let index = 0; index < sizeP; index++) {
-        tempP.push(index);
+        tempP.push(index.toString());
       }
       for (let index = 0; index < sizeT; index++) {
-        tempT.push(index);
+        tempT.push(index.toString());
       }
       var dataP = {
-        dataHorizontal: {
+        dataLine: {
           labels: [...tempP],
           datasets: [
             {
-              label: "Pressure",
+              label: "Unit: Atm",
+              fill: true,
+              lineTension: 0.3,
+              backgroundColor: "rgba(225, 204,230, .3)",
+              borderColor: "rgb(205, 130, 158)",
+              borderCapStyle: "butt",
+              borderDash: [],
+              borderDashOffset: 0.0,
+              borderJoinStyle: "miter",
+              pointBorderColor: "rgb(205, 130,1 58)",
+              pointBackgroundColor: "rgb(255, 255, 255)",
+              pointBorderWidth: 10,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgb(0, 0, 0)",
+              pointHoverBorderColor: "rgba(220, 220, 220,1)",
+              pointHoverBorderWidth: 2,
+              pointRadius: 1,
+              pointHitRadius: 10,
               data: [...ressP.data],
-              fill: false,
-              backgroundColor: [],
-              borderColor: [],
-              borderWidth: 1,
             },
           ],
         },
       };
       var dataT = {
-        dataHorizontal: {
+        dataLine: {
           labels: [...tempT],
           datasets: [
             {
-              label: "Temperature",
+              label: "Unit: Celsius",
+              fill: true,
+              lineTension: 0.3,
+              backgroundColor: "rgba(225, 204,230, .3)",
+              borderColor: "rgb(205, 130, 158)",
+              borderCapStyle: "butt",
+              borderDash: [],
+              borderDashOffset: 0.0,
+              borderJoinStyle: "miter",
+              pointBorderColor: "rgb(205, 130,1 58)",
+              pointBackgroundColor: "rgb(255, 255, 255)",
+              pointBorderWidth: 10,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgb(0, 0, 0)",
+              pointHoverBorderColor: "rgba(220, 220, 220,1)",
+              pointHoverBorderWidth: 2,
+              pointRadius: 1,
+              pointHitRadius: 10,
               data: [...ressT.data],
-              fill: false,
-              backgroundColor: [],
-              borderColor: [],
-              borderWidth: 1,
             },
           ],
         },
@@ -263,18 +289,18 @@ function ViewImage(params) {
           <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
             <Col>
               <MDBContainer style={{ maxWidth: "500px" }}>
-                <h3 className="mt-5">Pressure Bar Graph</h3>
-                <HorizontalBar
-                  data={parentImg.aggDataP.dataHorizontal}
+                <h3 className="mt-5">Pressure Graph</h3>
+                <Line
+                  data={parentImg.aggDataP.dataLine}
                   options={{ responsive: true }}
                 />
               </MDBContainer>
             </Col>
             <Col>
               <MDBContainer style={{ maxWidth: "500px" }}>
-                <h3 className="mt-5">Temperatue Bar Graph</h3>
-                <HorizontalBar
-                  data={parentImg.aggDataT.dataHorizontal}
+                <h3 className="mt-5">Temperatue Graph</h3>
+                <Line
+                  data={parentImg.aggDataT.dataLine}
                   options={{ responsive: true }}
                 />
               </MDBContainer>
@@ -367,16 +393,29 @@ function MyVerticallyCenteredModal(props) {
   }
   console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
   var data = {
-    dataHorizontal: {
+    dataLine: {
       labels: [...temp],
       datasets: [
         {
-          label: mergeS.currSensor.sensor_name,
+          label: `Unit: ${mergeS.currSensor.unit}`,
+          fill: true,
+          lineTension: 0.3,
+          backgroundColor: "rgba(225, 204,230, .3)",
+          borderColor: "rgb(205, 130, 158)",
+          borderCapStyle: "butt",
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: "miter",
+          pointBorderColor: "rgb(205, 130,1 58)",
+          pointBackgroundColor: "rgb(255, 255, 255)",
+          pointBorderWidth: 10,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgb(0, 0, 0)",
+          pointHoverBorderColor: "rgba(220, 220, 220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
           data: [...mergeS.currSensor.values],
-          fill: false,
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
         },
       ],
     },
@@ -389,15 +428,16 @@ function MyVerticallyCenteredModal(props) {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {mergeS.currSensor.sensor_name == "pressure"
+            ? "Pressure Sensor"
+            : "Temperature Sensor"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <MDBContainer>
-          <h3 className="mt-5">Bar chart</h3>
-          <HorizontalBar
-            data={data.dataHorizontal}
-            options={{ responsive: true }}
-          />
+          <h3 className="mt-5"></h3>
+          <Line data={data.dataLine} options={{ responsive: true }} />
         </MDBContainer>
       </Modal.Body>
       <Modal.Footer>
