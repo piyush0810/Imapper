@@ -33,7 +33,7 @@ const GreenRadio = withStyles({
 })((props) => <Radio color="default" {...props} />);
 
 function AddModal(props) {
-  const { onHide, pid, index, markers, refresh } = props;
+  const { onHide, pid, markers, refresh } = props;
   const dispatch = useDispatch();
   const imageRef = useRef(null);
   const dots = useSelector((state) => state.dot.dots);
@@ -50,16 +50,17 @@ function AddModal(props) {
     image_id: "",
     pid: pid,
   });
-
+  console.log(image);
   /************************************************ Functions ***************************************************** */
   function getDotID(index) {
     return dots[index].dot_id;
   }
   const handleSubmitSensor = async (e) => {
-    console.log("AddSensor: Submiting Flag changed");
+    // console.log("AddSensor: Submiting Flag changed");
     setIsUploading(true);
     if (markers.length) {
       console.log("AddSensor: Markers Recieved", markers);
+      // Making Id's for dot and sensor
       const dot_id = (
         Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
       ).toUpperCase();
@@ -118,7 +119,6 @@ function AddModal(props) {
       refresh((p) => {
         return p + 1;
       });
-
       setIsUploading(false);
     } else {
       console.log("AddSensor: No Markers provided");
@@ -137,7 +137,7 @@ function AddModal(props) {
     imageRef.current.value = "";
     setImage({ ...image, image: null, image_id: "" });
   };
-  const handleUpload = async (e) => {
+  const handleUploadImage = async (e) => {
     e.preventDefault();
     if (image.image) {
       const formData = new FormData();
@@ -155,20 +155,22 @@ function AddModal(props) {
         })
         .catch((err) => console.log(err));
       console.log("UploadImage: Sent Post Request");
-      if (index >= 0) {
+      if (markers.length) {
         console.log("UploadImage:inside Index if");
         const formDotData = new FormData();
-        formDotData.append("dot_id", dots[index].dot_id);
-        formDotData.append("parent_id", dots[index].parent_id);
-        formDotData.append("x", Math.round(dots[index].x));
-        formDotData.append("y", Math.round(dots[index].y));
+        // Making Id's for dot and sensor
+        const dot_id = (
+          Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
+        ).toUpperCase();
+        var mark = markers.pop();
+        formDotData.append("dot_id", dot_id);
+        formDotData.append("parent_id", pid);
+        formDotData.append("x", Math.round(mark.top));
+        formDotData.append("y", Math.round(mark.left));
         formDotData.append("is_sensor", false);
-        //action for bool
         formDotData.append("is_image", true);
         formDotData.append("child_id", image.image_id);
-        console.log("UploadImage: Deleting Local Image");
-        dispatch(DeleteDot(index));
-        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
+        let url = `http://localhost:8000/image/dot/${pid}/`;
         const resp = await axios
           .post(url, formDotData, {
             headers: {
@@ -179,8 +181,13 @@ function AddModal(props) {
           .catch((err) => console.log(err));
         console.log("UploadImage: Response", resp);
         console.log("UploadImage: Sent Dot POST Req");
+      } else {
+        console.log("No Markers present");
       }
-      props.onHide();
+      refresh((p) => {
+        return p + 1;
+      });
+      onHide();
     } else {
       ("No Image Selected");
     }
@@ -284,7 +291,7 @@ function AddModal(props) {
             <Button onClick={handleDelete} variant="danger">
               Delete
             </Button>
-            <Button variant="success" type="submit" onClick={handleUpload}>
+            <Button variant="success" type="submit" onClick={handleUploadImage}>
               Upload
             </Button>
           </Form.Group>

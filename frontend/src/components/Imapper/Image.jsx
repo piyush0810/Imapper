@@ -27,7 +27,7 @@ function Image(props) {
     image_id: "",
     pid: "",
   });
-  console.log("Image: Markers", markers);
+  // console.log("Image: Markers", markers);
   /****************************************************** Body ******************************************** */
   var myDots = [];
   var dots = useSelector((state) => {
@@ -43,7 +43,7 @@ function Image(props) {
   });
 
   dots = [...image.dots, ...myDots];
-  console.log("Image: Final Dots", dots);
+  // console.log("Image: Final Dots", dots);
 
   /****************************************************** useEffects ************************************** */
   useEffect(async () => {
