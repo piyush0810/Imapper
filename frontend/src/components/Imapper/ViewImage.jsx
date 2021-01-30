@@ -261,7 +261,7 @@ function ViewImage(params) {
               <Card.Img
                 src={"http://localhost:8000" + parentImgURL}
                 alt="Card image"
-                style={{ maxWidth: "100%", maxHeight: "480px", padding: "5px" }}
+                style={{ width: "640px", height: "480px", padding: "5px" }}
               />
               {!isFetchingParentImg && (
                 <section>
@@ -298,7 +298,7 @@ function ViewImage(params) {
               </MDBContainer>
             </Col>
             <Col>
-              <MDBContainer style={{ maxWidth: "500px" }}>
+              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
                 <h3 className="mt-5">Aggregate Temperature Graph</h3>
                 <Line
                   data={parentImg.aggDataT.dataLine}

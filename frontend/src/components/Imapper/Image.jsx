@@ -62,14 +62,13 @@ function Image(props) {
           <Row className="justify-content-sm-center">
             <ReactImageDot
               backgroundImageUrl={"http://localhost:8000" + image.image}
-              width={640}
-              height={480}
+              width="640px"
+              height="480px"
               dotRadius={6}
               dotStyles={{
                 backgroundColor: "red",
                 boxShadow: "0 2px 4px gray",
               }}
-              backgroundSize={"cover"}
               pid={image.image_id}
               Dots={image.dots}
             />

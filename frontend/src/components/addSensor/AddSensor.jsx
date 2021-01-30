@@ -175,13 +175,15 @@ function AddSensor(props) {
                 />
               </Form.Group>
 
-              <Button variant="primary" type="submit">
+              <Button variant="outline-success" type="submit">
                 Add Sensor
               </Button>
             </Form>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={props.onHide}>Close</Button>
+            <Button onClick={props.onHide} variant="outline-danger">
+              Close
+            </Button>
           </Modal.Footer>
         </Modal>
       )}

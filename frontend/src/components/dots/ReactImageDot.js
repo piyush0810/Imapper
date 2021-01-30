@@ -124,16 +124,15 @@ function ReactImageDot(props) {
         >
           <Row className="justify-content-sm-center">
             <Card
-              className="bg-dark text-white `react-image-dot__wrapper ${grabClass}`"
+              className="bg-dark text-white `react-image-dot__wrapper ${grabClass}` displayBox"
               onMouseUp={onMouseUp}
               style={{
                 ...styles,
                 backgroundImage: `url(${backgroundImageUrl})`,
                 backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
+                padding: "5px",
                 width,
                 height,
-                backgroundSize,
               }}
             >
               {dots.map((dot, i) => (
