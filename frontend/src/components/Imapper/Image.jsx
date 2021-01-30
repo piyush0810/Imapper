@@ -3,15 +3,21 @@ import ReactImageDot from "../dots/ReactImageDot";
 import DotsInfo from "../dots/DotsInfo";
 import { useHistory, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-
+import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
+import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import AddModal from "./addModal";
 import axios from "axios";
-import { Alert, Container, Row, Card } from "react-bootstrap";
+import { Alert, Container, Modal, Row, Card } from "react-bootstrap";
 
 function Image(props) {
   console.log("Image: Image Component Rendered");
 
   const { imageID } = useParams();
   const [isFetchingImage, setisFetchingImage] = useState(true);
+  const [markers, setMarkers] = useState([]);
+  console.log("Image: Markers", markers);
+  const [addModalShow, setAddModalShow] = useState(false);
   const [callRefresh, setcallRefresh] = useState(0);
   const [image, setImage] = useState({
     dots: [],
@@ -49,7 +55,19 @@ function Image(props) {
       }
     }
   }, [imageID, callRefresh]);
-
+  const photoMarker = (props) => {
+    return (
+      <AddCircleIcon
+        onClick={() => {
+          console.log("Hello", props.top);
+        }}
+      />
+    );
+  };
+  function handleAddMarker(marker) {
+    setMarkers([...markers, marker]);
+    setAddModalShow(true);
+  }
   return (
     <>
       {isFetchingImage && (
@@ -57,7 +75,7 @@ function Image(props) {
           Fetching Image Data or check the Image ID
         </Alert>
       )}
-      {!isFetchingImage && (
+      {/* {!isFetchingImage && (
         <Container fluid>
           <Row className="justify-content-sm-center">
             <ReactImageDot
@@ -83,6 +101,34 @@ function Image(props) {
             />
           </Row>
         </Container>
+      )} */}
+      {!isFetchingImage && (
+        <>
+          <Container fluid>
+            <Row className="justify-content-sm-center">
+              <Card style={{ width: "720px", margin: "15px" }}>
+                <ImageMarker
+                  src={"http://localhost:8000" + image.image}
+                  markers={markers}
+                  onAddMarker={handleAddMarker}
+                  markerComponent={photoMarker}
+                />
+              </Card>
+            </Row>
+          </Container>
+        </>
+      )}
+      {addModalShow && (
+        <AddModal
+          show={addModalShow}
+          onHide={() => {
+            setAddModalShow(false);
+            setMarkers((prev) => {
+              prev.pop();
+              return [...prev];
+            });
+          }}
+        />
       )}
     </>
   );

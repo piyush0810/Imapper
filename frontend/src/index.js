@@ -19,6 +19,7 @@ import Image from "./components/Imapper/Image";
 import ViewImage from "./components/Imapper/ViewImage";
 import Home from "./components/Imapper/Home";
 import View from "./components/Imapper/View";
+import Test from "./Test";
 import "./index.css";
 export const history = createHistory();
 
