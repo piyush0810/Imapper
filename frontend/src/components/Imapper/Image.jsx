@@ -4,19 +4,21 @@ import DotsInfo from "../dots/DotsInfo";
 import { useHistory, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
-import PhotoCameraIcon from "@material-ui/icons/PhotoCamera";
+import PhotoCamera from "@material-ui/icons/PhotoCamera";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import PhotoLibraryIcon from "@material-ui/icons/PhotoLibrary";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import AddModal from "./addModal";
 import axios from "axios";
 import { Alert, Container, Modal, Row, Card } from "react-bootstrap";
 
 function Image(props) {
-  console.log("Image: Image Component Rendered");
-
   const { imageID } = useParams();
+
+  /**************************************************** States ****************************************** */
   const [isFetchingImage, setisFetchingImage] = useState(true);
   const [markers, setMarkers] = useState([]);
-  console.log("Image: Markers", markers);
   const [addModalShow, setAddModalShow] = useState(false);
   const [callRefresh, setcallRefresh] = useState(0);
   const [image, setImage] = useState({
@@ -25,22 +27,32 @@ function Image(props) {
     image_id: "",
     pid: "",
   });
-  console.log("Image: Image State:", image);
-  console.log("Image: Completed Rendered Image");
+  console.log("Image: Markers", markers);
+  /****************************************************** Body ******************************************** */
+  var myDots = [];
+  var dots = useSelector((state) => {
+    return state.dot.dots;
+  });
+  console.log("Image: Dots From DB", image.dots);
+  console.log("Image: Dots from useState", dots);
+
+  dots.forEach(function (dot) {
+    if (dot.parent_id == pid) {
+      myDots.push(dot);
+    }
+  });
+
+  dots = [...image.dots, ...myDots];
+  console.log("Image: Final Dots", dots);
+
+  /****************************************************** useEffects ************************************** */
   useEffect(async () => {
-    console.log("Image: Fetiching useEffect called");
     setisFetchingImage(true);
     if (imageID) {
       let urll = `http://localhost:8000/image/dot/${imageID}/`;
-      // console.log(`Image: sending GET req to ${urll}`);
       const resp = await axios.get(urll);
-      // console.log("Image:Dots Response Recieved", resp.data);
-      //fetching Image Data from DB
       let url = `http://localhost:8000/image/${imageID}`;
-      // console.log(`Image: sending GET req to ${url}`);
       const res = await axios.get(url);
-      // console.log("Image: Printing Fetched Image Data:", res.data);
-      // console.log("Image: Setting Image Data & Dots");
       if (res.data.length) {
         setImage({
           ...image,
@@ -49,21 +61,45 @@ function Image(props) {
           image: res.data[0].image,
           image_id: res.data[0].image_id,
         });
-        // console.log("Image: Changing Flag");
+        var _markers = [];
+        resp.data.forEach(function (dot) {
+          markers.push({ top: dot.x, left: dot.y });
+        });
+        setMarkers([...markers, ..._markers]);
         setisFetchingImage(false);
-        console.log("Image:  Fetiching useEffect Complete");
       }
     }
   }, [imageID, callRefresh]);
-  const photoMarker = (props) => {
+
+  /***************************************************** Functions ***************************************** */
+  function addMarker(props) {
     return (
-      <AddCircleIcon
+      <IconButton
+        color="primary"
+        aria-label="upload picture"
+        component="span"
         onClick={() => {
           console.log("Hello", props.top);
         }}
-      />
+      >
+        <AddCircleIcon />
+      </IconButton>
     );
-  };
+  }
+  function photoMarker(props) {
+    return (
+      <IconButton
+        color="primary"
+        aria-label="upload picture"
+        component="span"
+        onClick={() => {
+          console.log("Hello", props.top);
+        }}
+      >
+        <PhotoCamera />
+      </IconButton>
+    );
+  }
   function handleAddMarker(marker) {
     setMarkers([...markers, marker]);
     setAddModalShow(true);
@@ -111,7 +147,7 @@ function Image(props) {
                   src={"http://localhost:8000" + image.image}
                   markers={markers}
                   onAddMarker={handleAddMarker}
-                  markerComponent={photoMarker}
+                  markerComponent={addMarker}
                 />
               </Card>
             </Row>
@@ -128,6 +164,9 @@ function Image(props) {
               return [...prev];
             });
           }}
+          pid={image.image_id}
+          markers={markers}
+          refresh={setcallRefresh}
         />
       )}
     </>
