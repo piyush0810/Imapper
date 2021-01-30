@@ -98,7 +98,7 @@ function ReactImageDot(props) {
     addDot({
       dot_id: gid,
       x: Math.round(e.clientX - bounds.left),
-      y: e.clientY - bounds.top,
+      y: Math.round(e.clientY - bounds.top),
       parent_id: pid,
       is_sensor: 0,
       is_image: 0,
@@ -118,8 +118,11 @@ function ReactImageDot(props) {
   return (
     <>
       {pid && (
-        <Container className="react-image-dot__container">
-          <Row className="justify-content-sm-center" style={{ margin: "10px" }}>
+        <Container
+          className="react-image-dot__container"
+          style={{ margin: "10px" }}
+        >
+          <Row className="justify-content-sm-center">
             <Card
               className="bg-dark text-white `react-image-dot__wrapper ${grabClass}`"
               onMouseUp={onMouseUp}

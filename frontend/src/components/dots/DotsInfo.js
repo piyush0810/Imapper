@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import AddSensor from "../addSensor/AddSensor";
 import UploadImage from "../Imapper/UploadImage";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams, Link } from "react-router-dom";
 import { Container, Row, Col, Card, Alert, Button } from "react-bootstrap";
 import { DeleteDot } from "../../actions/dots/dotsActions";
 import axios from "axios";
@@ -10,23 +10,18 @@ import axios from "axios";
 export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
   console.log("DotInfo: Dotsinfo Component Rendered");
   const dispatch = useDispatch();
-  const history = useHistory();
+  var images = useSelector((state) => state.img);
+  var sensors = useSelector((state) => state.sensor);
+
+  console.log("DotInfo:images Selector", images);
+  console.log("DotInfo:sensors Selectors", sensors);
   const [modalAddSensor, setModalAddSensor] = useState(false);
-  const [isAddImageClicked, setIsAddImageClicked] = useState(false);
   const [modalUploadImg, setModalUploadImg] = useState(false);
-  const [isAddedImage, setisAddedImage] = useState(false);
   const [index, setIndex] = useState(-1);
   // console.log("DotInfo: Index State:", index);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // console.log("DotInfo: Completed Rendered *Dotsinfo ");
-  // function handleAddSensor(i) {
-  //   // console.log("openning Modal");
-  //   setModalShow(true);
-  //   // console.log("Adding Index");
-  //   setIndex(i);
-  //   // console.log("Changed Index state");
-  // }
+  const [isFetching, setIsFetching] = useState(true);
+  var canRender = !isDeleting && !isFetching;
   var localDots = useSelector((state) => {
     return state.dot.dots;
   });
@@ -57,34 +52,53 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
       });
     }
     setIsDeleting(false);
-
-    // console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Enter");
-    // console.log("index recieved", index);
-    // console.log("setting flag ");
-    // setIsDeleting(true);
-    // console.log("Deleting Dots");
-    // if (index < 0) {
-    //   index = sizeDB + index;
-    //   console.log("Index inside", index);
-    //   console.log("Deleting from Server");
-    //   let url = `http://localhost:8000/image/dotdel/${dots[index].dot_id}/`;
-    //   // console.log("Printing Dots", dots);
-    //   await axios.delete(url);
-    //   // console.log("dot Deleted");
-    //   console.log("Refresh called");
-    //   refresh((p) => {
-    //     return p + 1;
-    //   });
-    // } else {
-    //   dispatch(DeleteDot(index));
-    // }
-    // setIsDeleting(false);
-    // console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& Completed");
   }
-
+  useEffect(async () => {
+    setIsFetching(true);
+    let url = "http://localhost:8000/image/images/";
+    const res = await axios.get(url);
+    dispatch({
+      type: "FETCH_IMAGES",
+      payload: res.data,
+    });
+    url = "http://localhost:8000/sensor/sensors/";
+    const resp = await axios.get(url);
+    dispatch({
+      type: "FETCH_SENSORS",
+      payload: resp.data,
+    });
+    setIsFetching(false);
+  }, []);
+  function getImageURL(id) {
+    for (let key in images) {
+      if (images[key].image_id == id) {
+        return images[key].image;
+      }
+    }
+    return "";
+  }
+  function getSensorName(id) {
+    for (let key in sensors) {
+      if (sensors[key].sensor_id == id) {
+        return sensors[key].sensor_name == "pressure"
+          ? "Pressure"
+          : "Temperature";
+      }
+    }
+    return "";
+  }
+  function getSensorUnit(id) {
+    for (let key in sensors) {
+      if (sensors[key].sensor_id == id) {
+        return `Unit: ${sensors[key].unit}`;
+      }
+    }
+    return "";
+  }
   return (
     <>
-      {!isDeleting && (
+      {!canRender && <Alert variant="warning">Fetching Data Please Wait</Alert>}
+      {canRender && (
         <Container fluid>
           <Row
             md={6}
@@ -99,19 +113,22 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                   <Col style={{ margin: "10px" }}>
                     <Card style={{ width: "18rem" }}>
                       <Card.Body>
-                        <Card.Title>
-                          Dot [{i}]........................
+                        <Card.Title
+                          style={{ marginLeft: "5px", marginTop: "5px" }}
+                        >
+                          Dot [{i}]
                           <Button
+                            style={{ marginLeft: "115px", marginTop: "5px" }}
                             onClick={() => {
                               deleteDot(i, "local");
                             }}
-                            variant="danger"
+                            variant="outline-danger"
                           >
                             Remove
                           </Button>
                         </Card.Title>
 
-                        <Card.Text>
+                        <Card.Text style={{ margin: "15px" }}>
                           Coordinates: x: {dot.x}, y: {dot.y}
                         </Card.Text>
 
@@ -119,6 +136,7 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                           <Row>
                             <Col>
                               <Button
+                                style={{ margin: "5px" }}
                                 onClick={() => {
                                   setModalAddSensor(true);
                                   setIndex(i);
@@ -131,6 +149,7 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
 
                             <Col>
                               <Button
+                                style={{ margin: "5px" }}
                                 onClick={() => {
                                   setModalUploadImg(true);
                                   setIndex(i);
@@ -158,10 +177,8 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                       <Card.Body>
                         <Card.Title>
                           <Row style={{ margin: "5px" }}>
-                            <Col sm={4}>
-                              {dot.is_image ? " Image" : " Sensor"}
-                            </Col>
-                            <Col md={{ span: 4, offset: 2 }}>
+                            <Col>{dot.is_image ? " Image" : " Sensor"}</Col>
+                            <Col>
                               <Button
                                 onClick={() => {
                                   deleteDot(dot.dot_id, "db");
@@ -174,15 +191,28 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
                           </Row>
                         </Card.Title>
                         {dot.is_image && (
-                          <Button
-                            variant="success"
-                            style={{ marginLeft: "60px" }}
-                            onClick={() => {
-                              history.push(`/image/${dot.child_id}`);
-                            }}
-                          >
-                            Open Image
-                          </Button>
+                          <Link to={`/image/${dot.child_id}`}>
+                            <Card.Img
+                              className="box "
+                              src={
+                                "http://localhost:8000" +
+                                getImageURL(dot.child_id)
+                              }
+                              style={{
+                                padding: "5px",
+                                maxHeight: "auto",
+                                maxWidth: "100%",
+                                minWidth: "150px",
+                              }}
+                              alt="Image Not Available"
+                            />
+                          </Link>
+                        )}
+                        {dot.is_sensor && (
+                          <Card.Text style={{ margin: "10px" }}>
+                            {getSensorName(dot.child_id)} <br />
+                            {getSensorUnit(dot.child_id)}
+                          </Card.Text>
                         )}
                         <Card.Text style={{ margin: "10px" }}>
                           Coordinates: x: {dot.x}, y: {dot.y}
@@ -196,24 +226,26 @@ export default function DotsInfo({ height, width, pid, dbDots, refresh }) {
           </Row>
         </Container>
       )}
-
-      <AddSensor
-        onHide={() => setModalAddSensor(false)}
-        pid={pid}
-        index={index}
-        show={modalAddSensor}
-        refresh={refresh}
-      />
-
-      <UploadImage
-        show={modalUploadImg}
-        onHide={() => {
-          setModalUploadImg(false);
-        }}
-        index={index}
-        pid={pid}
-        refresh={refresh}
-      />
+      {modalAddSensor && (
+        <AddSensor
+          onHide={() => setModalAddSensor(false)}
+          pid={pid}
+          index={index}
+          show={modalAddSensor}
+          refresh={refresh}
+        />
+      )}
+      {modalUploadImg && (
+        <UploadImage
+          show={modalUploadImg}
+          onHide={() => {
+            setModalUploadImg(false);
+          }}
+          index={index}
+          pid={pid}
+          refresh={refresh}
+        />
+      )}
     </>
   );
 }

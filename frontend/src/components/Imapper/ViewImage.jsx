@@ -174,7 +174,7 @@ function ViewImage(params) {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [...ressP.data],
+              data: [...ressP.data, 0],
             },
           ],
         },
@@ -202,7 +202,7 @@ function ViewImage(params) {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [...ressT.data],
+              data: [...ressT.data, 0],
             },
           ],
         },
@@ -261,7 +261,7 @@ function ViewImage(params) {
               <Card.Img
                 src={"http://localhost:8000" + parentImgURL}
                 alt="Card image"
-                style={{ width: "640px", height: "480px" }}
+                style={{ maxWidth: "100%", maxHeight: "480px", padding: "5px" }}
               />
               {!isFetchingParentImg && (
                 <section>
@@ -286,10 +286,11 @@ function ViewImage(params) {
               )}
             </Card>
           </Row>
+          {/* Showing Agg Graphs*/}
           <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
             <Col>
-              <MDBContainer style={{ maxWidth: "500px" }}>
-                <h3 className="mt-5">Pressure Graph</h3>
+              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
+                <h3 className="mt-5">Aggregate Pressure Graph</h3>
                 <Line
                   data={parentImg.aggDataP.dataLine}
                   options={{ responsive: true }}
@@ -298,7 +299,7 @@ function ViewImage(params) {
             </Col>
             <Col>
               <MDBContainer style={{ maxWidth: "500px" }}>
-                <h3 className="mt-5">Temperatue Graph</h3>
+                <h3 className="mt-5">Aggregate Temperature Graph</h3>
                 <Line
                   data={parentImg.aggDataT.dataLine}
                   options={{ responsive: true }}
@@ -311,16 +312,21 @@ function ViewImage(params) {
             className="justify-content-sm-center"
             style={{ margin: "15px" }}
           >
+            {/* Printing Child Images */}
             {imgArray.map((image, i) => {
               return (
                 <>
-                  <Col xs={4} md={3} style={{ margin: "15px" }}>
+                  <Col style={{ margin: "15px" }}>
                     <Link to={`/viewimage/${image.image_id}`}>
                       <Card.Img
                         className="box"
                         variant="top"
                         src={"http://localhost:8000" + image.image}
-                        style={{ maxHeight: "auto", maxWidth: "300px" }}
+                        style={{
+                          maxHeight: "auto",
+                          maxWidth: "300px",
+                          minWidth: "150px",
+                        }}
                         id={`image${i.toString()}`}
                       />
                     </Link>
@@ -328,30 +334,39 @@ function ViewImage(params) {
                 </>
               );
             })}
-
+          </Row>
+          <Row style={{ marginBottom: "200px" }}>
             {senArray.map((sensor, i) => {
               return (
                 <>
                   <Col xs={4} md={3}>
-                    <Card style={{ maxWidth: "auto", height: "auto" }}>
-                      <Card.Body>
-                        <Card.Title style={{ margin: "15px" }}>
+                    <Card
+                      style={{
+                        maxHeight: "300px",
+                        minHeight: "auto",
+                        maxWidth: "300px",
+                        minWidth: "120px",
+                        margin: "15px",
+                      }}
+                    >
+                      <Card.Body style={{ textAlign: "center" }}>
+                        <Card.Title>
                           {sensor.sensor_name === "temperature"
                             ? "Temperature"
                             : "Pressure"}
                         </Card.Title>
                         <Card.Subtitle
                           className="mb-2 text-muted"
-                          style={{ margin: "15px" }}
+                          style={{ padding: "5px" }}
                         >
                           Units {sensor.unit}
                         </Card.Subtitle>
 
                         <Button
-                          style={{ margin: "15px" }}
                           onClick={() => {
                             handleShowGraph(sensor.sensor_id);
                           }}
+                          style={{ padding: "2.5px", width: "100%" }}
                         >
                           Show Data
                         </Button>
@@ -415,7 +430,7 @@ function MyVerticallyCenteredModal(props) {
           pointHoverBorderWidth: 2,
           pointRadius: 1,
           pointHitRadius: 10,
-          data: [...mergeS.currSensor.values],
+          data: [...mergeS.currSensor.values, 0],
         },
       ],
     },
@@ -441,7 +456,9 @@ function MyVerticallyCenteredModal(props) {
         </MDBContainer>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
+        <Button onClick={props.onHide} variant="outline-danger">
+          Close
+        </Button>
       </Modal.Footer>
     </Modal>
   );

@@ -12,7 +12,7 @@ function AddSensor(props) {
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
   const [volume, setVolume] = useState(0);
-  const [unit, setunit] = useState("1"); //insert default value of unit
+  const [unit, setunit] = useState("C"); //insert default value of unit
   const dots = useSelector((state) => state.dot.dots);
   const dispatch = useDispatch();
 
@@ -32,8 +32,8 @@ function AddSensor(props) {
       const formDotData = new FormData();
       formDotData.append("dot_id", dots[index].dot_id);
       formDotData.append("parent_id", dots[index].parent_id);
-      formDotData.append("x", dots[index].x);
-      formDotData.append("y", dots[index].y);
+      formDotData.append("x", Math.round(dots[index].x));
+      formDotData.append("y", Math.round(dots[index].y));
       formDotData.append("is_sensor", true);
       //action for bool
       formDotData.append("is_image", false);
