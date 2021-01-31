@@ -6,13 +6,13 @@ import { logoutAction } from "../actions/auth/authActions";
 
 function mapStateToProps(state) {
   return {
-    authenticated: state.auth.authenticated
+    authenticated: state.auth.authenticated,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    logoutAction: () => dispatch(logoutAction())
+    logoutAction: () => dispatch(logoutAction()),
   };
 }
 

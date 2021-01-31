@@ -22,7 +22,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
-import AddModal from "./addModal";
+
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;

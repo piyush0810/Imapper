@@ -1,7 +1,10 @@
-import React, { Component } from "react";
-import { NavLink as Link } from "react-router-dom";
+import { NavLink as Link, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 
 // import "../index.css";
+import Fab from "@material-ui/core/Fab";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 import {
   Collapse,
@@ -10,119 +13,127 @@ import {
   Nav,
   NavItem,
   NavLink,
+  NavbarBrand,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
 
-class Navigation extends Component {
-  constructor(props) {
-    super(props);
+function Navigation(props) {
+  var history = useHistory();
+  const [isOpen, setIsOpen] = useState(false);
+  // const [toggle, setToggle] = useState()
+  const toggle = () => {
+    setIsOpen(!isOpen);
+  };
 
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      isOpen: false,
-    };
-  }
-  toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
-  }
-
-  toggleNavbarOnClick = () => {
+  const toggleNavbarOnClick = () => {
     if (window.innerWidth <= 989) {
-      return this.toggle();
+      return toggle();
     }
   };
 
-  userIsAuthenticatedEmail() {
-    if (this.props.authenticated) {
-      return [
-        <UncontrolledDropdown
-          nav
-          className="nav-item dropdown"
-          key="email-auth"
-        >
-          <DropdownToggle nav caret className="nav-link">
-            Account
-          </DropdownToggle>
-          <DropdownMenu className="dropdown-menu">
-            <DropdownItem className="inverse-dropdown">
-              <span key="signout" onClick={this.props.logoutAction}>
+  const userIsAuthenticatedEmail = () => {
+    if (props.authenticated) {
+      return (
+        <>
+          <UncontrolledDropdown
+            nav
+            className="nav-item dropdown"
+            key="email-auth"
+          >
+            <DropdownToggle nav caret className="nav-link">
+              Account
+            </DropdownToggle>
+            <DropdownMenu className="dropdown-menu">
+              <DropdownItem className="inverse-dropdown">
+                <span key="signout" onClick={props.logoutAction}>
+                  <NavLink
+                    tag={Link}
+                    to="/signout"
+                    onClick={toggleNavbarOnClick}
+                  >
+                    Log out
+                  </NavLink>
+                </span>
+              </DropdownItem>
+              <DropdownItem className="inverse-dropdown">
                 <NavLink
                   tag={Link}
-                  to="/signout"
-                  onClick={this.toggleNavbarOnClick}
+                  to="/changepassword"
+                  onClick={toggleNavbarOnClick}
                 >
-                  Log out
+                  Change Password
                 </NavLink>
-              </span>
-            </DropdownItem>
-            <DropdownItem className="inverse-dropdown">
-              <NavLink
-                tag={Link}
-                to="/changepassword"
-                onClick={this.toggleNavbarOnClick}
-              >
-                Change Password
-              </NavLink>
-            </DropdownItem>
-          </DropdownMenu>
-        </UncontrolledDropdown>,
-      ];
+              </DropdownItem>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+          ,
+        </>
+      );
     }
-  }
-
-  userIsNotAuthenticated() {
-    if (!this.props.authenticated) {
-      return [
-        <UncontrolledDropdown nav className="nav-item dropdown" key="not-auth">
-          <DropdownToggle nav caret className="nav-link">
-            Login
-          </DropdownToggle>
-          <DropdownMenu className="dropdown-menu">
-            <DropdownItem className="inverse-dropdown">
-              <NavLink
-                tag={Link}
-                to="/login"
-                key="log-in"
-                activeClassName="active"
-                exact
-                onClick={this.toggleNavbarOnClick}
-              >
-                Site Log in
-              </NavLink>
-            </DropdownItem>
-            <DropdownItem className="inverse-dropdown">
-              <NavLink
-                tag={Link}
-                to="/register"
-                key="sign-up"
-                activeClassName="active"
-                exact
-                onClick={this.toggleNavbarOnClick}
-              >
-                Register
-              </NavLink>
-            </DropdownItem>
-          </DropdownMenu>
-        </UncontrolledDropdown>,
-      ];
+  };
+  const userIsNotAuthenticated = () => {
+    if (!props.authenticated) {
+      return (
+        <>
+          <UncontrolledDropdown
+            nav
+            className="nav-item dropdown"
+            key="not-auth"
+          >
+            <DropdownToggle nav caret className="nav-link">
+              Login
+            </DropdownToggle>
+            <DropdownMenu className="dropdown-menu">
+              <DropdownItem className="inverse-dropdown">
+                <NavLink
+                  tag={Link}
+                  to="/login"
+                  key="log-in"
+                  activeClassName="active"
+                  exact
+                  onClick={toggleNavbarOnClick}
+                >
+                  Site Log in
+                </NavLink>
+              </DropdownItem>
+              <DropdownItem className="inverse-dropdown">
+                <NavLink
+                  tag={Link}
+                  to="/register"
+                  key="sign-up"
+                  activeClassName="active"
+                  exact
+                  onClick={toggleNavbarOnClick}
+                >
+                  Register
+                </NavLink>
+              </DropdownItem>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+          ,
+        </>
+      );
     }
-  }
+  };
 
-  render() {
-    return (
+  return (
+    <>
       <div>
         <Navbar
           color="faded"
           className="navbar navbar-toggleable-md navbar-inverse bg-inverse"
           expand="md"
         >
-          <NavbarToggler onClick={this.toggle} />
-          <Collapse isOpen={this.state.isOpen} navbar>
+          <NavbarBrand href="/">Imapper</NavbarBrand>
+          <NavbarToggler
+            onClick={() => {
+              toggle();
+            }}
+          />
+          <Collapse isOpen={isOpen} navbar>
             <Nav navbar style={{ margin: "auto" }}>
               <NavItem>
                 <NavLink
@@ -130,45 +141,60 @@ class Navigation extends Component {
                   to="/"
                   activeClassName="active"
                   exact
-                  onClick={this.toggleNavbarOnClick}
+                  onClick={toggleNavbarOnClick}
                 >
                   Home
                 </NavLink>
               </NavItem>
-              {this.props.authenticated && (
+              {props.authenticated && (
                 <NavItem>
                   <NavLink
                     tag={Link}
                     to="/addproject"
                     activeClassName="active"
                     exact
-                    onClick={this.toggleNavbarOnClick}
+                    onClick={toggleNavbarOnClick}
                   >
                     Add Project
                   </NavLink>
                 </NavItem>
               )}
-              {this.props.authenticated && (
+              {props.authenticated && (
                 <NavItem>
                   <NavLink
                     tag={Link}
                     to="/view"
                     activeClassName="active"
                     exact
-                    onClick={this.toggleNavbarOnClick}
+                    onClick={toggleNavbarOnClick}
                   >
                     View Project
                   </NavLink>
                 </NavItem>
               )}
-              {this.userIsNotAuthenticated()}
-              {this.userIsAuthenticatedEmail()}
+              {userIsNotAuthenticated()}
+              {userIsAuthenticatedEmail()}
             </Nav>
           </Collapse>
         </Navbar>
+        <Fab color="#292B2C" style={{ margin: "5px" }}>
+          <ArrowBackIcon
+            onClick={() => {
+              console.log("Back Button Clicked");
+              history.goBack();
+            }}
+          />
+        </Fab>
+        <Fab color="#292B2C" aria-label="add" style={{ margin: "5px" }}>
+          <ArrowForwardIcon
+            onClick={() => {
+              console.log("Forward Button Clicked");
+              history.goForward();
+            }}
+          />
+        </Fab>
       </div>
-    );
-  }
+    </>
+  );
 }
-
 export default Navigation;
