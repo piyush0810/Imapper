@@ -9,9 +9,22 @@ import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
 import AddModal from "./addModal";
 import axios from "axios";
-import { Alert, Container, Modal, Row, Card, Dropdown } from "react-bootstrap";
+import {
+  Alert as alert,
+  Container,
+  Modal,
+  Row,
+  Card,
+  Dropdown,
+} from "react-bootstrap";
 import Tooltip from "@material-ui/core/Tooltip";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 const HtmlTooltip = withStyles((theme) => ({
   tooltip: {
     backgroundColor: "#f5f5f9",
@@ -22,8 +35,10 @@ const HtmlTooltip = withStyles((theme) => ({
     border: "1px solid #dadde9",
   },
 }))(Tooltip);
+
 function Image(props) {
   const { imageID } = useParams();
+  let history = useHistory();
   /************************************************** Store ********************************************* */
   const dispatch = useDispatch();
   var dots = useSelector((state) => {
@@ -39,6 +54,8 @@ function Image(props) {
   console.log("Image: Images From Store", images);
   /**************************************************** States ****************************************** */
   const [isFetchingImage, setisFetchingImage] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [snackMSG, setsnackMSG] = useState("");
   const [markers, setMarkers] = useState([]);
   const [addModalShow, setAddModalShow] = useState(false);
   const [callRefresh, setcallRefresh] = useState(0);
@@ -48,9 +65,12 @@ function Image(props) {
     image_id: "",
     pid: "",
   });
-  // console.log("Image: Markers", markers);
+  const [isDeleting, setIsDeleting] = useState(false);
+  console.log("Image: Markers", markers);
   /****************************************************** Body ******************************************** */
   var myDots = [];
+  let clicks = [];
+  let timeout;
 
   dots.forEach(function (dot) {
     if (dot.parent_id == pid) {
@@ -79,7 +99,7 @@ function Image(props) {
         });
         var _markers = [];
         resp.data.forEach(function (dot) {
-          markers.push({ top: dot.x, left: dot.y });
+          _markers.push({ top: dot.x, left: dot.y });
         });
 
         url = "http://localhost:8000/sensor/sensors/";
@@ -95,28 +115,78 @@ function Image(props) {
           type: "FETCH_IMAGES",
           payload: resppp.data,
         });
-        setMarkers([...markers, ..._markers]);
+        console.log("Markers", _markers);
+        setMarkers([..._markers]);
         setisFetchingImage(false);
       }
     }
   }, [imageID, callRefresh]);
 
   /***************************************************** Functions ***************************************** */
+  function singleClick(event, id, isImage) {
+    console.log("SingleClick");
+    if (isImage) {
+      history.push(`/image/${id}`);
+    }
+  }
 
+  function doubleClick(event, id, isImage) {
+    // alert("doubleClick");
+    deleteDot(id, isImage);
+  }
+
+  function clickHandler(event, id, dot_id, isImage) {
+    event.preventDefault();
+    clicks.push(new Date().getTime());
+    window.clearTimeout(timeout);
+    timeout = window.setTimeout(() => {
+      if (
+        clicks.length > 1 &&
+        clicks[clicks.length - 1] - clicks[clicks.length - 2] < 250
+      ) {
+        doubleClick(event.target, dot_id, isImage);
+      } else {
+        singleClick(event.target, id, isImage);
+      }
+    }, 250);
+  }
+
+  async function deleteDot(id, isImage) {
+    console.log("DotInfo: DeleteDot called");
+    setIsDeleting(true);
+
+    let url = `http://localhost:8000/image/dotdel/${id}/`;
+    console.log("DotInfo: Database Dot called");
+    await axios.delete(url);
+    console.log("DotsInfo: Refreshcalled");
+    setcallRefresh((p) => {
+      return p + 1;
+    });
+
+    setIsDeleting(false);
+    if (isImage) {
+      setsnackMSG("Successfully Deleted Image");
+    } else {
+      setsnackMSG("Successfully Deleted Sensor");
+    }
+    setOpen(true);
+  }
   function addMarker(props) {
     var x = props.top;
     var y = props.left;
     var isImage = false;
     var id = "";
+    var dot_id = "";
     dots.forEach(function (dot) {
       if (dot.x == x && dot.y == y) {
         id = dot.child_id;
+        dot_id = dot.dot_id;
         if (dot.is_image) {
           isImage = true;
         }
       }
     });
-    return isImage ? PhotoMarker(id) : SensorMarker(id);
+    return isImage ? PhotoMarker(id, dot_id) : SensorMarker(id, dot_id);
   }
   function getSensorByID(id) {
     for (var key in sensors) {
@@ -134,34 +204,40 @@ function Image(props) {
     }
     return "";
   }
-  function SensorMarker(id) {
+  function SensorMarker(id, dot_id) {
     var title = "Sensor";
     if (id) {
       var sensor = getSensorByID(id);
       title = (
-        <Card>
-          <Card.Body style={{ textAlign: "center" }}>
-            <Card.Title>
-              {sensor.sensor_name === "temperature"
-                ? "Temperature"
-                : "Pressure"}
-            </Card.Title>
-            <Card.Subtitle
-              className="mb-2 text-muted"
-              style={{ padding: "5px" }}
-            >
-              Units {sensor.unit}
-            </Card.Subtitle>
-          </Card.Body>
-        </Card>
+        <>
+          {isDeleting && <CircularProgress color="secondary" />}
+          {!isDeleting && (
+            <Card>
+              <Card.Body style={{ textAlign: "center" }}>
+                <Card.Title>
+                  {sensor.sensor_name === "temperature"
+                    ? "Temperature"
+                    : "Pressure"}
+                </Card.Title>
+                <Card.Subtitle
+                  className="mb-2 text-muted"
+                  style={{ padding: "5px" }}
+                >
+                  Units {sensor.unit}
+                </Card.Subtitle>
+              </Card.Body>
+            </Card>
+          )}
+        </>
       );
     }
     return (
       <HtmlTooltip title={title} arrow>
         <IconButton
           component="span"
-          onClick={() => {
-            console.log("Hello Sensor", props.top);
+          onClick={(e) => {
+            var isImage = false;
+            clickHandler(e, id, dot_id, isImage);
           }}
         >
           <SettingsInputAntennaSharpIcon color="secondary" fontSize="large" />
@@ -169,22 +245,27 @@ function Image(props) {
       </HtmlTooltip>
     );
   }
-  function PhotoMarker(id) {
+  function PhotoMarker(id, dot_id) {
     var title = "Image";
     if (id) {
       var image = getImageByID(id);
       title = (
-        <Card.Img
-          className="box"
-          variant="top"
-          src={"http://localhost:8000" + image.image}
-          style={{
-            maxHeight: "auto",
-            maxWidth: "300px",
-            minWidth: "150px",
-            padding: "1px",
-          }}
-        />
+        <>
+          {isDeleting && <CircularProgress color="secondary" />}
+          {!isDeleting && (
+            <Card.Img
+              className="box"
+              variant="top"
+              src={"http://localhost:8000" + image.image}
+              style={{
+                maxHeight: "auto",
+                maxWidth: "300px",
+                minWidth: "150px",
+                padding: "1px",
+              }}
+            />
+          )}
+        </>
       );
     }
     return (
@@ -192,8 +273,9 @@ function Image(props) {
         <IconButton
           style={{ color: "#2a3eb1" }}
           component="span"
-          onClick={() => {
-            console.log("Hello Sensor", props.top);
+          onClick={(e) => {
+            var isImage = true;
+            clickHandler(e, id, dot_id, isImage);
           }}
         >
           <PhotoLibrarySharpIcon fontSize="large" />
@@ -205,12 +287,18 @@ function Image(props) {
     setMarkers([...markers, marker]);
     setAddModalShow(true);
   }
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  }
   return (
     <>
       {isFetchingImage && (
-        <Alert variant="warning">
+        <alert variant="warning">
           Fetching Image Data or check the Image ID
-        </Alert>
+        </alert>
       )}
       {!isFetchingImage && (
         <>
@@ -249,6 +337,15 @@ function Image(props) {
           refresh={setcallRefresh}
         />
       )}
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {snackMSG}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
