@@ -34,7 +34,7 @@ ReactDOM.render(
           <AuthenticatedRoute exact path="/register" component={Register} />
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
-          <Route exact path="/addimage" component={Home} />
+          <Route exact path="/addproject" component={Home} />
           <Route exact path="/image/:imageID" component={Image} />
           <Route exact path="/viewimage/:imageID" component={ViewImage} />
           <Route exact path="/view" component={View} />

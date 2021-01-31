@@ -139,12 +139,12 @@ class Navigation extends Component {
                 <NavItem>
                   <NavLink
                     tag={Link}
-                    to="/addimage"
+                    to="/addproject"
                     activeClassName="active"
                     exact
                     onClick={this.toggleNavbarOnClick}
                   >
-                    Add Image
+                    Add Project
                   </NavLink>
                 </NavItem>
               )}
@@ -157,7 +157,7 @@ class Navigation extends Component {
                     exact
                     onClick={this.toggleNavbarOnClick}
                   >
-                    View Images
+                    View Project
                   </NavLink>
                 </NavItem>
               )}

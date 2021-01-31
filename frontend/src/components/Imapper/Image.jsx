@@ -1,18 +1,11 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
-import ReactImageDot from "../dots/ReactImageDot";
-import DotsInfo from "../dots/DotsInfo";
+import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import ImageMarker, { Marker, MarkerComponentProps } from "react-image-marker";
-import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
-import IconButton from "@material-ui/core/IconButton";
-import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
-import AddModal from "./addModal";
+import ImageMarker from "react-image-marker";
 import axios from "axios";
 import {
   Alert as alert,
   Container,
-  Modal,
   Row,
   Card,
   Dropdown,
@@ -22,6 +15,12 @@ import { withStyles, makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
+import IconButton from "@material-ui/core/IconButton";
+import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
+import AddModal from "./addModal";
+
+/************************************************************* Global Functions ************************* */
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -37,50 +36,41 @@ const HtmlTooltip = withStyles((theme) => ({
 }))(Tooltip);
 
 function Image(props) {
+  /************************************************** Hooks ********************************************* */
   const { imageID } = useParams();
-  let history = useHistory();
-  /************************************************** Store ********************************************* */
+  var history = useHistory();
   const dispatch = useDispatch();
-  var dots = useSelector((state) => {
-    return state.dot.dots;
-  });
   var sensors = useSelector((state) => {
     return state.sensor;
   });
   var images = useSelector((state) => {
     return state.img;
   });
-  console.log("Image: Sensors From Store", sensors);
-  console.log("Image: Images From Store", images);
-  /**************************************************** States ****************************************** */
+  /*************************************************** States *********************************************** */
   const [isFetchingImage, setisFetchingImage] = useState(true);
   const [open, setOpen] = useState(false);
   const [snackMSG, setsnackMSG] = useState("");
   const [markers, setMarkers] = useState([]);
   const [addModalShow, setAddModalShow] = useState(false);
   const [callRefresh, setcallRefresh] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [image, setImage] = useState({
     dots: [],
     image: null,
     image_id: "",
     pid: "",
   });
-  const [isDeleting, setIsDeleting] = useState(false);
-  console.log("Image: Markers", markers);
+
   /****************************************************** Body ******************************************** */
-  var myDots = [];
+  var dots = [...image.dots];
   let clicks = [];
   let timeout;
 
-  dots.forEach(function (dot) {
-    if (dot.parent_id == pid) {
-      myDots.push(dot);
-    }
-  });
-
-  dots = [...image.dots, ...myDots];
-  // console.log("Image: Final Dots", dots);
-  console.log("Image: Dots From DB", image.dots);
+  /*****************************************************console Statements ******************************** */
+  console.log("Image: Sensors From Store", sensors);
+  console.log("Image: Images From Store", images);
+  console.log("Image: Markers", markers);
+  console.log("Image: Dots From DB", dots);
   /****************************************************** useEffects ************************************** */
   useEffect(async () => {
     setisFetchingImage(true);
@@ -115,7 +105,6 @@ function Image(props) {
           type: "FETCH_IMAGES",
           payload: resppp.data,
         });
-        console.log("Markers", _markers);
         setMarkers([..._markers]);
         setisFetchingImage(false);
       }
@@ -124,14 +113,13 @@ function Image(props) {
 
   /***************************************************** Functions ***************************************** */
   function singleClick(event, id, isImage) {
-    console.log("SingleClick");
+    console.log("Image: SingleClick");
     if (isImage) {
       history.push(`/image/${id}`);
     }
   }
 
   function doubleClick(event, id, isImage) {
-    // alert("doubleClick");
     deleteDot(id, isImage);
   }
 
@@ -152,13 +140,13 @@ function Image(props) {
   }
 
   async function deleteDot(id, isImage) {
-    console.log("DotInfo: DeleteDot called");
+    console.log("Image: DeleteDot called");
     setIsDeleting(true);
 
     let url = `http://localhost:8000/image/dotdel/${id}/`;
-    console.log("DotInfo: Database Dot called");
+    console.log("Image: Database Dot called");
     await axios.delete(url);
-    console.log("DotsInfo: Refreshcalled");
+    console.log("Image: Refreshcalled");
     setcallRefresh((p) => {
       return p + 1;
     });
@@ -293,6 +281,8 @@ function Image(props) {
     }
     setOpen(false);
   }
+
+  /****************************************************** Render Function ********************************* */
   return (
     <>
       {isFetchingImage && (

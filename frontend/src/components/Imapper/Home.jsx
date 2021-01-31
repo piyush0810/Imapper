@@ -70,7 +70,7 @@ function Home(params) {
                 marginLeft: "10px",
               }}
             >
-              Add Parent Image
+              Add Project
             </Button>
           </Row>
           <Row className="justify-content-sm-center">

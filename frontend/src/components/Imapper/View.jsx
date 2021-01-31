@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-bootstrap";
 
-function View(props) {
+function View(params) {
   console.log("View: Component Rendered");
   const dispatch = useDispatch();
   const images = useSelector((state) => state.img);
