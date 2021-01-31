@@ -13,7 +13,7 @@ from django.http import JsonResponse
 # Create your views here.
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class imageview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -35,7 +35,7 @@ class imageview(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class imagev(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -69,7 +69,7 @@ class imagev(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class dotv(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -95,7 +95,7 @@ class dotv(APIView):
             return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class dotdel(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -131,7 +131,7 @@ class dotdel(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class aggregator(APIView):
     parser_classes = (MultiPartParser, FormParser)
 

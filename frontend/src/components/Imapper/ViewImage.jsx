@@ -104,13 +104,21 @@ function ViewImage() {
     // Fetching all Sensors and Images
     setIsFetching(true);
     let url = "http://localhost:8000/sensor/sensors/";
-    const resp = await axios.get(url);
+    const resp = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
     url = "http://localhost:8000/image/images/";
-    const res = await axios.get(url);
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
@@ -123,13 +131,29 @@ function ViewImage() {
     if (parentId) {
       setisFetchingParentImg(true);
       let url = `http://localhost:8000/image/dot/${parentId}/`;
-      const resp = await axios.get(url);
+      const resp = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/${parentId}`;
-      const res = await axios.get(url);
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      const ressP = await axios.get(url);
+      const ressP = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      const ressT = await axios.get(url);
+      const ressT = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       console.log("ViewImage: Agg DataP", ressP.data);
       console.log("ViewImage: Agg DataT", ressT.data);
       var sizeP = ressP.data.length;
@@ -226,7 +250,11 @@ function ViewImage() {
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
     let urll = `http://localhost:8000/sensor/${id}/`;
-    const resp = await axios.get(urll);
+    const resp = await axios.get(urll, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     // console.log("Sensor Data recieved", resp.data[0]);
     setMergeState({ modalShow: true, currSensor: resp.data[0] });
     setIsFetchingSensor(false);

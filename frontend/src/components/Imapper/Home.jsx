@@ -45,7 +45,11 @@ function Home(params) {
   useEffect(async () => {
     setIsFetchingParentImg(true);
     let url = "http://localhost:8000/image/images/";
-    const res = await axios.get(url);
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,

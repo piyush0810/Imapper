@@ -22,6 +22,10 @@ import {
 
 function Navigation(props) {
   var history = useHistory();
+  console.log(
+    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Current Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+    history.location
+  );
   const [isOpen, setIsOpen] = useState(false);
   // const [toggle, setToggle] = useState()
   const toggle = () => {

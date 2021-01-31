@@ -56,6 +56,7 @@ function UploadImage(props) {
         .post(url, formData, {
           headers: {
             "content-type": "multipart/form-data",
+            Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
           },
         })
         .catch((err) => console.log(err));
@@ -78,7 +79,7 @@ function UploadImage(props) {
           .post(url, formDotData, {
             headers: {
               "content-type": "multipart/form-data",
-              Authorization: "",
+              Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
             },
           })
           .catch((err) => console.log(err));

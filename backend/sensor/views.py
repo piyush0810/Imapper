@@ -16,7 +16,7 @@ import random
 # Create your views here.
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -73,7 +73,7 @@ class sensorview(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorv(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -118,7 +118,7 @@ class sensorv(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorvalue(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
