@@ -38,7 +38,7 @@ function AddModal(props) {
   const imageRef = useRef(null);
   const dots = useSelector((state) => state.dot.dots);
   /********************************************** States ******************************************************** */
-  const [selectedValue, setSelectedValue] = useState("i");
+  const [selectedValue, setSelectedValue] = useState("s");
   const [isUploading, setIsUploading] = useState(false);
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
@@ -52,9 +52,6 @@ function AddModal(props) {
   });
   console.log(image);
   /************************************************ Functions ***************************************************** */
-  function getDotID(index) {
-    return dots[index].dot_id;
-  }
   const handleSubmitSensor = async (e) => {
     // console.log("AddSensor: Submiting Flag changed");
     setIsUploading(true);
@@ -323,18 +320,6 @@ function AddModal(props) {
             <FormControlLabel
               value="top"
               control={
-                <Radio
-                  checked={selectedValue === "i"}
-                  onChange={handleRadioChange}
-                  value="i"
-                />
-              }
-              label="Add Image"
-              labelPlacement="top"
-            />
-            <FormControlLabel
-              value="top"
-              control={
                 <GreenRadio
                   checked={selectedValue === "s"}
                   onChange={handleRadioChange}
@@ -342,6 +327,18 @@ function AddModal(props) {
                 />
               }
               label="Add Sensor"
+              labelPlacement="top"
+            />
+            <FormControlLabel
+              value="top"
+              control={
+                <Radio
+                  checked={selectedValue === "i"}
+                  onChange={handleRadioChange}
+                  value="i"
+                />
+              }
+              label="Add Image"
               labelPlacement="top"
             />
           </RadioGroup>

@@ -327,7 +327,6 @@ function ViewImage(params) {
                           maxWidth: "300px",
                           minWidth: "150px",
                         }}
-                        id={`image${i.toString()}`}
                       />
                     </Link>
                   </Col>
