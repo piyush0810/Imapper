@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef, shallowEqual } from "react";
-import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
-import { AddDot, DeleteDot } from "../../actions/dots/dotsActions";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Container,
@@ -33,6 +31,7 @@ const GreenRadio = withStyles({
 })((props) => <Radio color="default" {...props} />);
 
 function AddModal(props) {
+  /********************************************** Hooks ******************************************************** */
   const { onHide, pid, markers, refresh } = props;
   const dispatch = useDispatch();
   const imageRef = useRef(null);
@@ -53,10 +52,8 @@ function AddModal(props) {
   console.log(image);
   /************************************************ Functions ***************************************************** */
   const handleSubmitSensor = async (e) => {
-    // console.log("AddSensor: Submiting Flag changed");
     setIsUploading(true);
     if (markers.length) {
-      console.log("AddSensor: Markers Recieved", markers);
       // Making Id's for dot and sensor
       const dot_id = (
         Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
@@ -83,9 +80,6 @@ function AddModal(props) {
           },
         })
         .catch((err) => console.log(err));
-
-      console.log("AddSensor: Sent Dot POST Req");
-
       const formData = new FormData();
 
       if (isTemp) {
@@ -110,15 +104,13 @@ function AddModal(props) {
           },
         })
         .catch((err) => console.log(err));
-      console.log("AddSensor: Sent Sensor POST Req");
       onHide();
-      console.log("AddSensor: Called Refresh Image Component");
       refresh((p) => {
         return p + 1;
       });
       setIsUploading(false);
     } else {
-      console.log("AddSensor: No Markers provided");
+      console.log("addModal: No Markers provided");
     }
   };
   const handleRadioChange = (event) => {
@@ -296,6 +288,7 @@ function AddModal(props) {
       </Container>
     );
   };
+  /****************************************************** Render Function************************************************* */
   return (
     <Modal
       {...props}
