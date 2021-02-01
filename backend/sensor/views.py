@@ -13,8 +13,6 @@ import requests
 import json
 import random
 
-# Create your views here.
-
 
 # @permission_classes((AllowAny, ))
 class sensorview(APIView):
@@ -48,7 +46,18 @@ class sensorview(APIView):
         # # jsonResponse = json.loads(uploadedImageInfo.text)
         # # print( jsonResponse["data"]["display_url"])
         # # super().save()
-
+        
+        value1=Value(sensor_id=request.data["sensor_id"],value=random.randint(3, 100))
+        
+        value1.save()
+        
+        value2=Value(sensor_id=request.data["sensor_id"],value=random.randint(3,100))
+        
+        value2.save()
+        
+        value3=Value(sensor_id=request.data["sensor_id"],value=random.randint(3, 100))
+        
+        value3.save()
         posts_serializer = PostSerializer(data=request.data)
         value1 = Value(
             sensor_id=request.data["sensor_id"], value=random.randint(3, 100))
