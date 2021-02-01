@@ -18,7 +18,6 @@ function View(params) {
   const images = useSelector((state) => state.img);
   console.log("View: Images from Store", images);
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
-  const [modalUploadImg, setModalUploadImg] = useState(false);
   const [refresh, setRefresh] = useState(0);
   var parentImgArray = [];
 
@@ -50,23 +49,20 @@ function View(params) {
         <Alert variant="warning">Fetching Data from Server</Alert>
       )}
       {!isFetchingParentImg && (
-        <Container fluid>
+        <Container fluid style={{ marginTop: "10px" }}>
           <Row className="justify-content-sm-center">
             {parentImgArray.map((image, i) => {
               return (
                 <>
-                  <Col xs={12} md="auto" lg="auto">
+                  <Col xs={12} md="auto" lg="auto" style={{ margin: "10px" }}>
                     <Card xl>
                       <Link to={`/viewimage/${image.image_id}`}>
                         <Card.Img
                           src={"http://localhost:8000" + image.image}
                           style={{
-                            height: "480px",
-                            width: "auto",
-                            marginTop: "10px",
-                            marginBottom: "10px",
-                            marginRight: "10px",
-                            marginLeft: "10px",
+                            maxHeight: "480px",
+                            maxWidth: "100%",
+                            padding: "5px",
                           }}
                         />
                       </Link>

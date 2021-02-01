@@ -65,8 +65,8 @@ function UploadImage(props) {
         const formDotData = new FormData();
         formDotData.append("dot_id", dots[index].dot_id);
         formDotData.append("parent_id", dots[index].parent_id);
-        formDotData.append("x", dots[index].x);
-        formDotData.append("y", dots[index].y);
+        formDotData.append("x", Math.round(dots[index].x));
+        formDotData.append("y", Math.round(dots[index].y));
         formDotData.append("is_sensor", false);
         //action for bool
         formDotData.append("is_image", true);

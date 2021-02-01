@@ -36,6 +36,12 @@ function Home(params) {
   function handleAddImage() {
     setModalUploadImg(true);
   }
+  function handleDelete(id) {
+    console.log("Home: Req For Delete parent Image: ", id);
+    setRefresh((p) => {
+      return p + 1;
+    });
+  }
   useEffect(async () => {
     setIsFetchingParentImg(true);
     let url = "http://localhost:8000/image/images/";
@@ -53,10 +59,10 @@ function Home(params) {
         <Alert variant="warning">Fetching Data from Server</Alert>
       )}
       {!isFetchingParentImg && (
-        <Container fluid>
+        <Container fluid="sm" style={{ padding: "50px" }}>
           <Row className="justify-content-sm-center">
             <Button
-              variant="primary"
+              variant="outline-primary"
               onClick={handleAddImage}
               style={{
                 marginTop: "10px",
@@ -65,29 +71,36 @@ function Home(params) {
                 marginLeft: "10px",
               }}
             >
-              Add Parent Image
+              Add Project
             </Button>
           </Row>
           <Row className="justify-content-sm-center">
             {parentImgArray.map((image, i) => {
               return (
                 <>
-                  <Col xs={12} md="auto" lg="auto">
+                  <Col xs={10} md="auto" lg="auto" style={{ margin: "100px" }}>
                     <Card xl>
                       <Link to={`/image/${image.image_id}`}>
                         <Card.Img
                           src={"http://localhost:8000" + image.image}
                           style={{
-                            height: "480px",
-                            width: "auto",
-                            marginTop: "10px",
-                            marginBottom: "10px",
-                            marginRight: "10px",
-                            marginLeft: "10px",
+                            maxHeight: "480px",
+                            maxWidth: "100%",
+                            padding: "5px",
                           }}
                         />
                       </Link>
                     </Card>
+                  </Col>
+                  <Col xs={2} md="auto" lg="auto">
+                    <Button
+                      variant="outline-danger"
+                      onClick={() => {
+                        handleDelete(image.image_id);
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </Col>
                 </>
               );

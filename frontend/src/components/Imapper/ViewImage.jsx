@@ -7,135 +7,200 @@ import {
   Row,
   Col,
   Card,
-  Alert,
+  Alert as alert,
   Button,
   Modal,
 } from "react-bootstrap";
-import Dot from "../dots/Dot";
-import { HorizontalBar } from "react-chartjs-2";
+import ImageMarker from "react-image-marker";
+import { Line } from "react-chartjs-2";
 import { MDBContainer } from "mdbreact";
+import Tooltip from "@material-ui/core/Tooltip";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
+import IconButton from "@material-ui/core/IconButton";
+import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
 
-function ViewImage(params) {
-  console.log("ViewImage: View Compnent rendered");
+/************************************************************* Global Functions ************************* */
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+const HtmlTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: "#f5f5f9",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: "auto",
+    padding: "1px",
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+  },
+}))(Tooltip);
+
+function ViewImage() {
+  /*********************************************************** Hooks ******************************************************* */
   const { imageID } = useParams();
   const dispatch = useDispatch();
+  var history = useHistory();
   var images = useSelector((state) => {
-    // console.log("UseSelect for Images Called");
     return state.img;
   }, shallowEqual);
   var sensors = useSelector((state) => {
-    // console.log("UseSelect for Sensors Called");
     return state.sensor;
   }, shallowEqual);
-  console.log("Images From Store", images);
-  console.log("Sensors From Store", sensors);
-  let parentId = "";
-  var parentImgURL = "";
-  let imgArray = [];
-  let senArray = [];
+
+  /************************************************************ States ******************************************************* */
   const [mergeState, setMergeState] = useState({
     modalShow: false,
     currSensor: "",
   });
-  console.log("MergeState State:", mergeState);
   const [isFetching, setIsFetching] = useState(true);
   const [isFetchingParentImg, setisFetchingParentImg] = useState(true);
   const [isFetchingSensor, setIsFetchingSensor] = useState(true);
-  const [parentImg, setparentImg] = useState();
-  console.log("Parent Image State:", parentImg);
+  const [parentImg, setparentImg] = useState({
+    dots: [],
+    image: null,
+    image_id: "",
+    pid: "",
+    aggDataP: "",
+    aggDataT: "",
+  });
+  const [markers, setMarkers] = useState([]);
+  /*********************************************************** Body ********************************************************* */
+  let parentId = imageID;
+  var parentImgURL = "";
+  var dots = [...parentImg.dots];
+  let imgArray = [];
+  let senArray = [];
 
-  // console.log("----------------", images, sensors);
-  if (!imageID) {
-    if (!isFetching) {
-      //if this is parent image and data has been fetched
-      // console.log("Geting Parent ID from Images");
-      for (let key in images) {
-        // console.log(images[key]);
-        if (images[key].pid == "-1") {
-          parentId = images[key].image_id;
-          continue;
-        }
-        break;
-      }
-    }
-  } else {
-    // console.log("Recieved Parent ID from URL");
-    parentId = imageID;
-  }
   if (parentId) {
-    // console.log("parent Id,", parentId);
     if (!isFetching) {
-      // console.log("Getting Parent Images and Sensors");
       for (let key in images) {
         if (images[key].pid === parentId) {
           imgArray.push(images[key]);
         }
         if (images[key].image_id == parentId) {
-          //this is the parent Image
           parentImgURL = images[key].image;
         }
       }
-      // console.log("Parent ImG URL:", parentImgURL);
       for (let key in sensors) {
         if (sensors[key].pid === parentId) {
           senArray.push(sensors[key]);
         }
       }
-      console.log("Images:", imgArray);
-      console.log("Sensors:", senArray);
     }
   }
-
-  console.log(
-    "//////////////////////////////////////////////////////////////////Component Completed Rendered"
-  );
-
+  /******************************************************** Console Statements *************************************************** */
+  console.log("ViewImage: All Images From Store", images);
+  console.log("ViewImage: All Sensors From Store", sensors);
+  console.log("ViewImage: Images of parent image:", imgArray);
+  console.log("ViewImage: Sensors of parent image:", senArray);
+  console.log("ViewImage: MergeState State:", mergeState);
+  console.log("ViewImage: Parent Image State:", parentImg);
+  console.log("ViewImage: Dots From DB", parentImg.dots);
+  /*********************************************************** Use Effects ********************************************** */
   useEffect(async () => {
-    // console.log("##################Fetching Data Action called");
-
-    // console.log("Setting Flag to true for Fetching");
+    // Fetching all Sensors and Images
     setIsFetching(true);
     let url = "http://localhost:8000/sensor/sensors/";
-    // console.log("Sending GET Req for Sensors to", url);
     const resp = await axios.get(url);
-    // console.log("Recieved Sensor data", resp.data);
-    // console.log("Dispatching Sensors");
     dispatch({
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
-    // console.log("Done Dispatching Sensors");
     url = "http://localhost:8000/image/images/";
-    // console.log("Sending GET Req for Images to", url);
     const res = await axios.get(url);
-    // console.log("Recieved Image data", res.data);
-    // console.log("Dispatching Images");
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
     });
-    // console.log("Done Dispatching Images");
-    // console.log("##################Fetching is Done");
-
     setIsFetching(false);
   }, []);
 
   useEffect(async () => {
-    // console.log("------------------Fetching Parent Image Data");
-
+    //Fetching parent image Data
     if (parentId) {
-      // console.log("Setting Flag for Fetching parent Image");
       setisFetchingParentImg(true);
-      // console.log("Parent ID Recieved", parentId);
       let url = `http://localhost:8000/image/dot/${parentId}/`;
-      // console.log(`sending GET req to Fetch Dots`, url);
       const resp = await axios.get(url);
-      // console.log("Parent Dots  Data Recieved", resp.data);
       url = `http://localhost:8000/image/${parentId}`;
-      // console.log(`sending GET req to Fetch Parent Image Data`, url);
       const res = await axios.get(url);
-      console.log("Parent Image  Data Recieved", res.data);
-      // console.log("Setting Parent iamge Data into state");
+      url = `http://localhost:8000/image/value/${parentId}/pressure`;
+      const ressP = await axios.get(url);
+      url = `http://localhost:8000/image/value/${parentId}/temperature`;
+      const ressT = await axios.get(url);
+      console.log("ViewImage: Agg DataP", ressP.data);
+      console.log("ViewImage: Agg DataT", ressT.data);
+      var sizeP = ressP.data.length;
+      var tempP = [];
+      var unitP = "atm";
+      var sizeT = ressT.data.length;
+      var tempT = [];
+      var unitT = "Celsius";
+      for (let index = 0; index < sizeP; index++) {
+        tempP.push(index.toString());
+      }
+      for (let index = 0; index < sizeT; index++) {
+        tempT.push(index.toString());
+      }
+      var dataP = {
+        dataLine: {
+          labels: [...tempP],
+          datasets: [
+            {
+              label: `Unit: ${unitP}`,
+              fill: true,
+              lineTension: 0.3,
+              backgroundColor: "rgba(225, 204,230, .3)",
+              borderColor: "rgb(205, 130, 158)",
+              borderCapStyle: "butt",
+              borderDash: [],
+              borderDashOffset: 0.0,
+              borderJoinStyle: "miter",
+              pointBorderColor: "rgb(205, 130,1 58)",
+              pointBackgroundColor: "rgb(255, 255, 255)",
+              pointBorderWidth: 10,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgb(0, 0, 0)",
+              pointHoverBorderColor: "rgba(220, 220, 220,1)",
+              pointHoverBorderWidth: 2,
+              pointRadius: 1,
+              pointHitRadius: 10,
+              data: [...ressP.data, 0],
+            },
+          ],
+        },
+      };
+      var dataT = {
+        dataLine: {
+          labels: [...tempT],
+          datasets: [
+            {
+              label: `Unit: ${unitT}`,
+              fill: true,
+              lineTension: 0.3,
+              backgroundColor: "rgba(225, 204,230, .3)",
+              borderColor: "rgb(205, 130, 158)",
+              borderCapStyle: "butt",
+              borderDash: [],
+              borderDashOffset: 0.0,
+              borderJoinStyle: "miter",
+              pointBorderColor: "rgb(205, 130,1 58)",
+              pointBackgroundColor: "rgb(255, 255, 255)",
+              pointBorderWidth: 10,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: "rgb(0, 0, 0)",
+              pointHoverBorderColor: "rgba(220, 220, 220,1)",
+              pointHoverBorderWidth: 2,
+              pointRadius: 1,
+              pointHitRadius: 10,
+              data: [...ressT.data, 0],
+            },
+          ],
+        },
+      };
+
       if (res.data.length) {
         setparentImg({
           ...parentImg,
@@ -143,122 +208,243 @@ function ViewImage(params) {
           pid: res.data[0].pid,
           image: res.data[0].image,
           image_id: res.data[0].image_id,
+          aggDataP: dataP,
+          aggDataT: dataT,
         });
+        var _markers = [];
+        resp.data.forEach(function (dot) {
+          _markers.push({ top: dot.x, left: dot.y });
+        });
+        setMarkers([..._markers]);
         setisFetchingParentImg(false);
       }
-      // console.log("Done Setting Parent Image Data");
     } else {
-      // console.log("Parent ID Not Defined");
+      console.log("Parent ID Not Defined");
     }
-    // console.log("------------------Done fetching Parent Image");
   }, [parentId]);
-
-  const moveDot = (index) => {
-    console.log("This Triggers when dot clicked");
-  };
+  /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
-    console.log(
-      "-----------------------------------------Fetching Sensor Data"
-    );
-    console.log("Sensor ID recieved", id);
     let urll = `http://localhost:8000/sensor/${id}/`;
-    console.log(`sending GET req to ${urll}`);
     const resp = await axios.get(urll);
-    console.log("Sensor Data recieved", resp.data[0]);
-    console.log("Saving merge State");
+    // console.log("Sensor Data recieved", resp.data[0]);
     setMergeState({ modalShow: true, currSensor: resp.data[0] });
     setIsFetchingSensor(false);
-    console.log(
-      "-----------------------------------------Completed Fetching of Sensor Data"
+  }
+
+  function addMarker(props) {
+    var x = props.top;
+    var y = props.left;
+    var isImage = false;
+    var id = "";
+    var dot_id = "";
+    dots.forEach(function (dot) {
+      if (dot.x == x && dot.y == y) {
+        id = dot.child_id;
+        dot_id = dot.dot_id;
+        if (dot.is_image) {
+          isImage = true;
+        }
+      }
+    });
+    return isImage ? PhotoMarker(id, dot_id) : SensorMarker(id, dot_id);
+  }
+  function getSensorByID(id) {
+    for (var key in sensors) {
+      if (sensors[key].sensor_id == id) {
+        return sensors[key];
+      }
+    }
+    return "";
+  }
+  function getImageByID(id) {
+    for (var key in images) {
+      if (images[key].image_id == id) {
+        return images[key];
+      }
+    }
+    return "";
+  }
+  function SensorMarker(id, dot_id) {
+    var title = "Sensor";
+    if (id) {
+      var sensor = getSensorByID(id);
+      title = (
+        <>
+          <Card>
+            <Card.Body style={{ textAlign: "center" }}>
+              <Card.Title>
+                {sensor.sensor_name === "temperature"
+                  ? "Temperature"
+                  : "Pressure"}
+              </Card.Title>
+              <Card.Subtitle
+                className="mb-2 text-muted"
+                style={{ padding: "5px" }}
+              >
+                Units {sensor.unit}
+              </Card.Subtitle>
+            </Card.Body>
+          </Card>
+        </>
+      );
+    }
+    return (
+      <HtmlTooltip title={title} arrow>
+        <IconButton
+          component="span"
+          onClick={() => {
+            handleShowGraph(sensor.sensor_id);
+          }}
+        >
+          <SettingsInputAntennaSharpIcon color="secondary" fontSize="large" />
+        </IconButton>
+      </HtmlTooltip>
     );
   }
+  function PhotoMarker(id, dot_id) {
+    var title = "Image";
+    if (id) {
+      var image = getImageByID(id);
+      title = (
+        <>
+          <Card.Img
+            className="box"
+            variant="top"
+            src={"http://localhost:8000" + image.image}
+            style={{
+              maxHeight: "auto",
+              maxWidth: "300px",
+              minWidth: "150px",
+              padding: "1px",
+            }}
+          />
+        </>
+      );
+    }
+    return (
+      <HtmlTooltip title={title} arrow>
+        <IconButton
+          style={{ color: "#2a3eb1" }}
+          component="span"
+          onClick={(e) => {
+            history.push(`/viewimage/${id}`);
+          }}
+        >
+          <PhotoLibrarySharpIcon fontSize="large" />
+        </IconButton>
+      </HtmlTooltip>
+    );
+  }
+
+  /*********************************************************** Render Function ********************************************** */
+
   return (
     <>
       {isFetchingParentImg && (
-        <Alert variant="warning">
+        <alert variant="warning">
           Fetching Parent Image Data or check the Image ID
-        </Alert>
+        </alert>
       )}
       {!isFetchingParentImg && (
-        <Container fluid>
-          <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
-            <Card className="bg-dark text-white">
-              <Card.Img
+        <Container>
+          {/* Showing Parent Image */}
+          <Row className="justify-content-sm-center">
+            <Card
+              style={{
+                maxWidth: window.innerWidth,
+                maxHeight: window.innerHeight,
+                margin: "15px",
+              }}
+            >
+              <ImageMarker
                 src={"http://localhost:8000" + parentImgURL}
-                alt="Card image"
-                style={{ width: "640px", height: "480px" }}
+                markers={markers}
+                markerComponent={addMarker}
               />
-              {!isFetchingParentImg && (
-                <section>
-                  {parentImg.dots.map((dot, i) => {
-                    return (
-                      <>
-                        <Dot
-                          x={dot.x}
-                          y={dot.y}
-                          i={i}
-                          styles={{
-                            backgroundColor: "red",
-                            boxShadow: "0 2px 4px gray",
-                          }}
-                          dotRadius={6}
-                          moveDot={moveDot}
-                        />
-                      </>
-                    );
-                  })}
-                </section>
-              )}
             </Card>
           </Row>
-
+          {/* Showing Agg Graphs*/}
+          <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
+            <Col>
+              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
+                <h3 className="mt-5">Aggregate Pressure Graph</h3>
+                <Line
+                  data={parentImg.aggDataP.dataLine}
+                  options={{ responsive: true }}
+                />
+              </MDBContainer>
+            </Col>
+            <Col>
+              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
+                <h3 className="mt-5">Aggregate Temperature Graph</h3>
+                <Line
+                  data={parentImg.aggDataT.dataLine}
+                  options={{ responsive: true }}
+                />
+              </MDBContainer>
+            </Col>
+          </Row>
           <Row
             sm={1}
             className="justify-content-sm-center"
             style={{ margin: "15px" }}
           >
+            {/* Printing Child Images */}
             {imgArray.map((image, i) => {
               return (
                 <>
-                  <Col xs={4} md={3} style={{ margin: "15px" }}>
+                  <Col style={{ margin: "15px" }}>
                     <Link to={`/viewimage/${image.image_id}`}>
                       <Card.Img
                         className="box"
                         variant="top"
                         src={"http://localhost:8000" + image.image}
-                        style={{ maxHeight: "auto", maxWidth: "300px" }}
-                        id={`image${i.toString()}`}
+                        style={{
+                          maxHeight: "auto",
+                          maxWidth: "300px",
+                          minWidth: "150px",
+                        }}
                       />
                     </Link>
                   </Col>
                 </>
               );
             })}
-
+          </Row>
+          {/* Showing Sensors */}
+          <Row style={{ marginBottom: "200px" }}>
             {senArray.map((sensor, i) => {
               return (
                 <>
                   <Col xs={4} md={3}>
-                    <Card style={{ maxWidth: "auto", height: "auto" }}>
-                      <Card.Body>
-                        <Card.Title style={{ margin: "15px" }}>
+                    <Card
+                      style={{
+                        maxHeight: "300px",
+                        minHeight: "auto",
+                        maxWidth: "300px",
+                        minWidth: "120px",
+                        margin: "15px",
+                      }}
+                    >
+                      <Card.Body style={{ textAlign: "center" }}>
+                        <Card.Title>
                           {sensor.sensor_name === "temperature"
                             ? "Temperature"
                             : "Pressure"}
                         </Card.Title>
                         <Card.Subtitle
                           className="mb-2 text-muted"
-                          style={{ margin: "15px" }}
+                          style={{ padding: "5px" }}
                         >
                           Units {sensor.unit}
                         </Card.Subtitle>
 
                         <Button
-                          style={{ margin: "15px" }}
                           onClick={() => {
                             handleShowGraph(sensor.sensor_id);
                           }}
+                          style={{ padding: "2.5px", width: "100%" }}
                         >
                           Show Data
                         </Button>
@@ -271,7 +457,7 @@ function ViewImage(params) {
           </Row>
         </Container>
       )}
-      {isFetching && <Alert variant="warning">Fetching Data</Alert>}
+      {isFetching && <alert variant="warning">Fetching Data</alert>}
       {!isFetchingSensor && (
         <MyVerticallyCenteredModal
           show={mergeState.modalShow}
@@ -300,16 +486,29 @@ function MyVerticallyCenteredModal(props) {
   }
   console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
   var data = {
-    dataHorizontal: {
+    dataLine: {
       labels: [...temp],
       datasets: [
         {
-          label: mergeS.currSensor.sensor_name,
-          data: [...mergeS.currSensor.values],
-          fill: false,
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1,
+          label: `Unit: ${mergeS.currSensor.unit}`,
+          fill: true,
+          lineTension: 0.3,
+          backgroundColor: "rgba(225, 204,230, .3)",
+          borderColor: "rgb(205, 130, 158)",
+          borderCapStyle: "butt",
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: "miter",
+          pointBorderColor: "rgb(205, 130,1 58)",
+          pointBackgroundColor: "rgb(255, 255, 255)",
+          pointBorderWidth: 10,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: "rgb(0, 0, 0)",
+          pointHoverBorderColor: "rgba(220, 220, 220,1)",
+          pointHoverBorderWidth: 2,
+          pointRadius: 1,
+          pointHitRadius: 10,
+          data: [...mergeS.currSensor.values, 0],
         },
       ],
     },
@@ -322,19 +521,22 @@ function MyVerticallyCenteredModal(props) {
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">
+          {mergeS.currSensor.sensor_name == "pressure"
+            ? "Pressure Sensor"
+            : "Temperature Sensor"}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <MDBContainer>
-          <h3 className="mt-5">Bar chart</h3>
-          <HorizontalBar
-            data={data.dataHorizontal}
-            options={{ responsive: true }}
-          />
+          <h3 className="mt-5"></h3>
+          <Line data={data.dataLine} options={{ responsive: true }} />
         </MDBContainer>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
+        <Button onClick={props.onHide} variant="outline-danger">
+          Close
+        </Button>
       </Modal.Footer>
     </Modal>
   );
