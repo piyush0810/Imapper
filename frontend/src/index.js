@@ -24,9 +24,9 @@ import ChangePassword from "./containers/auth/ChangePasswordContainer";
 import Image from "./components/Imapper/Image";
 
 import ViewImage from "./components/Imapper/ViewImage";
-import Home from "./components/Imapper/Home";
+import AddPImage from "./components/Imapper/AddPImage";
 import View from "./components/Imapper/View";
-
+import EditPImage from "./components/Imapper/EditPImage";
 import "./index.css";
 export const history = createHistory();
 
@@ -41,7 +41,8 @@ ReactDOM.render(
           <AuthenticatedRoute exact path="/register" component={Register} />
           <Route exact path="/signout" render={() => <Redirect to="/" />} />
           <Route exact path="/changepassword" component={ChangePassword} />
-          <Route exact path="/addproject" component={Home} />
+          <Route exact path="/addsites" component={AddPImage} />
+          <Route exact path="/editsites" component={EditPImage} />
           <Route exact path="/image/:imageID" component={Image} />
           <Route exact path="/viewimage/:imageID" component={ViewImage} />
           <Route exact path="/view" component={View} />

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+import { AddCurrBread } from "../../actions/breads/breadsActions";
 import {
   Container,
   Row,
@@ -22,6 +23,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
+import { Breadcrumbs, Typography } from "@material-ui/core";
 
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
@@ -49,7 +51,7 @@ function ViewImage() {
   var sensors = useSelector((state) => {
     return state.sensor;
   }, shallowEqual);
-
+  const currUser = useSelector((state) => state.curr_user);
   /************************************************************ States ******************************************************* */
   const [mergeState, setMergeState] = useState({
     modalShow: false,
@@ -62,6 +64,7 @@ function ViewImage() {
     dots: [],
     image: null,
     image_id: "",
+    image_name: "",
     pid: "",
     aggDataP: "",
     aggDataT: "",
@@ -100,17 +103,26 @@ function ViewImage() {
   console.log("ViewImage: Parent Image State:", parentImg);
   console.log("ViewImage: Dots From DB", parentImg.dots);
   /*********************************************************** Use Effects ********************************************** */
+
   useEffect(async () => {
     // Fetching all Sensors and Images
     setIsFetching(true);
     let url = "http://localhost:8000/sensor/sensors/";
-    const resp = await axios.get(url);
+    const resp = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
-    url = "http://localhost:8000/image/images/";
-    const res = await axios.get(url);
+    url = `http://localhost:8000/image/images/${currUser.username}`;
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
@@ -123,13 +135,29 @@ function ViewImage() {
     if (parentId) {
       setisFetchingParentImg(true);
       let url = `http://localhost:8000/image/dot/${parentId}/`;
-      const resp = await axios.get(url);
+      const resp = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/${parentId}`;
-      const res = await axios.get(url);
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      const ressP = await axios.get(url);
+      const ressP = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      const ressT = await axios.get(url);
+      const ressT = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       console.log("ViewImage: Agg DataP", ressP.data);
       console.log("ViewImage: Agg DataT", ressT.data);
       var sizeP = ressP.data.length;
@@ -144,6 +172,7 @@ function ViewImage() {
       for (let index = 0; index < sizeT; index++) {
         tempT.push(index.toString());
       }
+
       var dataP = {
         dataLine: {
           labels: [...tempP],
@@ -172,6 +201,7 @@ function ViewImage() {
           ],
         },
       };
+
       var dataT = {
         dataLine: {
           labels: [...tempT],
@@ -207,6 +237,7 @@ function ViewImage() {
           dots: resp.data,
           pid: res.data[0].pid,
           image: res.data[0].image,
+          image_name: res.data[0].image_name,
           image_id: res.data[0].image_id,
           aggDataP: dataP,
           aggDataT: dataT,
@@ -222,11 +253,16 @@ function ViewImage() {
       console.log("Parent ID Not Defined");
     }
   }, [parentId]);
+
   /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
     let urll = `http://localhost:8000/sensor/${id}/`;
-    const resp = await axios.get(urll);
+    const resp = await axios.get(urll, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     // console.log("Sensor Data recieved", resp.data[0]);
     setMergeState({ modalShow: true, currSensor: resp.data[0] });
     setIsFetchingSensor(false);

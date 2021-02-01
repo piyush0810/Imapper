@@ -13,10 +13,8 @@ import requests
 import json
 import random
 
-# Create your views here.
 
-
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -49,7 +47,6 @@ class sensorview(APIView):
         # # print( jsonResponse["data"]["display_url"])
         # # super().save()
 
-        posts_serializer = PostSerializer(data=request.data)
         value1 = Value(
             sensor_id=request.data["sensor_id"], value=random.randint(3, 100))
 
@@ -64,6 +61,8 @@ class sensorview(APIView):
             sensor_id=request.data["sensor_id"], value=random.randint(3, 100))
 
         value3.save()
+        posts_serializer = PostSerializer(data=request.data)
+
         if posts_serializer.is_valid():
             posts_serializer.save()
 
@@ -73,7 +72,7 @@ class sensorview(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorv(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -118,7 +117,7 @@ class sensorv(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@permission_classes((AllowAny, ))
+# @permission_classes((AllowAny, ))
 class sensorvalue(APIView):
     parser_classes = (MultiPartParser, FormParser)
 

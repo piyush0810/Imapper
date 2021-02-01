@@ -46,6 +46,7 @@ function Image(props) {
   var images = useSelector((state) => {
     return state.img;
   });
+  const currUser = useSelector((state) => state.curr_user);
   /*************************************************** States *********************************************** */
   const [isFetchingImage, setisFetchingImage] = useState(true);
   const [open, setOpen] = useState(false);
@@ -76,9 +77,17 @@ function Image(props) {
     setisFetchingImage(true);
     if (imageID) {
       let urll = `http://localhost:8000/image/dot/${imageID}/`;
-      const resp = await axios.get(urll);
+      const resp = await axios.get(urll, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       let url = `http://localhost:8000/image/${imageID}`;
-      const res = await axios.get(url);
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
       if (res.data.length) {
         setImage({
           ...image,
@@ -93,14 +102,22 @@ function Image(props) {
         });
 
         url = "http://localhost:8000/sensor/sensors/";
-        const respp = await axios.get(url);
+        const respp = await axios.get(url, {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+          },
+        });
         dispatch({
           type: "FETCH_SENSORS",
           payload: respp.data,
         });
 
-        url = "http://localhost:8000/image/images/";
-        const resppp = await axios.get(url);
+        url = `http://localhost:8000/image/images/${currUser.username}`;
+        const resppp = await axios.get(url, {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+          },
+        });
         dispatch({
           type: "FETCH_IMAGES",
           payload: resppp.data,

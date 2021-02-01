@@ -21,7 +21,7 @@ class InnerLoginForm extends Component {
       handleBlur,
       handleSubmit,
       handleReset,
-      classes
+      classes,
     } = this.props;
 
     return (
@@ -87,19 +87,19 @@ class InnerLoginForm extends Component {
 const EnhancedForm = withFormik({
   mapPropsToValues: () => ({
     username: "",
-    password: ""
+    password: "",
   }),
   validationSchema: Yup.object().shape({
     username: Yup.string().required("This field is required"),
     password: Yup.string()
       .min(6, "The password must be at least 6 characters")
-      .required("Password is required")
+      .required("Password is required"),
   }),
   handleSubmit: (
     { username, password },
     { props, setSubmitting, setErrors }
   ) => {
-    props.loginAction({ username, password }).then(response => {
+    props.loginAction({ username, password }).then((response) => {
       if (response.non_field_errors) {
         setErrors({ password: response.non_field_errors[0] });
       } else {
@@ -113,7 +113,7 @@ const EnhancedForm = withFormik({
     });
     setSubmitting(false);
   },
-  displayName: "LoginForm" //hlps with react devtools
+  displayName: "LoginForm", //hlps with react devtools
 })(InnerLoginForm);
 
 export const Login = withStyles(styles)(EnhancedForm);

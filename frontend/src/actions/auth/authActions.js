@@ -5,7 +5,7 @@ import { backendUrl } from "../backendUrl";
 let url = process.env.REACT_APP_DEV_URL || backendUrl;
 
 function authenticateAction(userData, dispatch, location, push) {
-  return async function() {
+  return async function () {
     if (navigator.cookieEnabled) {
       localStorage.setItem("ecom_token", userData.token);
     }
@@ -21,13 +21,13 @@ function registrationSuccessMessage() {
 }
 
 function registerAction(data) {
-  return async function() {
+  return async function () {
     let response = await fetch(`${url}/auth/users/create/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     let responseJson = response.json();
     return responseJson;
@@ -35,13 +35,13 @@ function registerAction(data) {
 }
 
 function loginAction(data) {
-  return async function() {
+  return async function () {
     let response = await fetch(`${url}/auth/jwt/create/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     let responseJson = await response.json();
     return responseJson;
@@ -59,5 +59,5 @@ export {
   loginAction,
   authenticateAction,
   logoutAction,
-  registrationSuccessMessage
+  registrationSuccessMessage,
 };

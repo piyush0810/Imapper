@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from custom_user.models import User
 from .serializers import PostSerializer, DotSerializer
 from .models import Image, Dot
 from sensor.models import Sensor, Value
@@ -19,6 +20,36 @@ class imageview(APIView):
 
     def get(self, request, *args, **kwargs):
         images = Image.objects.all()
+        serializer = PostSerializer(images, many=True)
+
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+
+        posts_serializer = PostSerializer(data=request.data)
+
+        if posts_serializer.is_valid():
+            posts_serializer.save()
+            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', posts_serializer.errors)
+            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes((AllowAny, ))
+class userimage(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        username = self.kwargs['username']
+        user = User.objects.filter(username=username)[0]
+        if user.is_admin:
+            images = Image.objects.all()
+        elif user.is_staff:
+            images = Image.objects.filter(username=username)
+        else:
+            images = Image.objects.filter(username=user.parent_name)
+
         serializer = PostSerializer(images, many=True)
 
         return Response(serializer.data)
@@ -174,3 +205,17 @@ class aggregator(APIView):
         else:
             print('error', dots_serializer.errors)
             return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes((AllowAny, ))
+class deleteall(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        users = User.objects.filter(is_superuser=False)
+        users.delete()
+        images = Image.objects.all()
+        images.delete()
+        Sensor.objects.all().delete()
+
+        return Response("congratulations,all mall tall deleted")

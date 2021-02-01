@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import UploadImage from "./UploadImage";
+
 import {
   Container,
   Row,
@@ -13,14 +13,17 @@ import {
   Modal,
 } from "react-bootstrap";
 
-function Home(params) {
-  console.log("Home: Component Rendered");
+function EditImage(params) {
+  /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
   const images = useSelector((state) => state.img);
-  console.log("Home: Images from Store", images);
+  const currUser = useSelector((state) => state.curr_user);
+
+  /*********************************************************** States ********************************************************* */
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
-  const [modalUploadImg, setModalUploadImg] = useState(false);
   const [refresh, setRefresh] = useState(0);
+
+  /*********************************************************** Body ********************************************************* */
   var parentImgArray = [];
 
   if (!isFetchingParentImg) {
@@ -30,22 +33,29 @@ function Home(params) {
         continue;
       }
     }
-    console.log("Home: Parent Images:", parentImgArray);
   }
-  console.log("Home: Ended Home COmp");
-  function handleAddImage() {
-    setModalUploadImg(true);
-  }
+  /*********************************************************** Console Statements ********************************************** */
+
+  console.log("Home: Images from Store", images);
+  console.log("Home: Parent Images:", parentImgArray);
+
+  /*********************************************************** Functions ********************************************** **********/
+
   function handleDelete(id) {
-    console.log("Home: Req For Delete parent Image: ", id);
+    // console.log("Home: Req For Delete parent Image: ", id);
     setRefresh((p) => {
       return p + 1;
     });
   }
+  /*********************************************************** Use Effects ******************************************************** */
   useEffect(async () => {
     setIsFetchingParentImg(true);
-    let url = "http://localhost:8000/image/images/";
-    const res = await axios.get(url);
+    let url = `http://localhost:8000/image/images/${currUser.username}`;
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
@@ -53,6 +63,7 @@ function Home(params) {
     console.log("Done Dispatching Images");
     setIsFetchingParentImg(false);
   }, [refresh]);
+  /*********************************************************** Render Function ********************************************** */
   return (
     <>
       {isFetchingParentImg && (
@@ -61,25 +72,12 @@ function Home(params) {
       {!isFetchingParentImg && (
         <Container fluid="sm" style={{ padding: "50px" }}>
           <Row className="justify-content-sm-center">
-            <Button
-              variant="outline-primary"
-              onClick={handleAddImage}
-              style={{
-                marginTop: "10px",
-                marginBottom: "10px",
-                marginRight: "10px",
-                marginLeft: "10px",
-              }}
-            >
-              Add Project
-            </Button>
-          </Row>
-          <Row className="justify-content-sm-center">
             {parentImgArray.map((image, i) => {
               return (
                 <>
                   <Col xs={10} md="auto" lg="auto" style={{ margin: "100px" }}>
                     <Card xl>
+                      {image.image_name}
                       <Link to={`/image/${image.image_id}`}>
                         <Card.Img
                           src={"http://localhost:8000" + image.image}
@@ -108,16 +106,8 @@ function Home(params) {
           </Row>
         </Container>
       )}
-      <UploadImage
-        show={modalUploadImg}
-        onHide={() => {
-          setModalUploadImg(false);
-        }}
-        pid={"-1"}
-        refresh={setRefresh}
-        index={-1}
-      />
     </>
   );
 }
-export default Home;
+
+export default EditImage;
