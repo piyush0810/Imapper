@@ -54,7 +54,6 @@ function AddModal(props) {
   console.log(image);
   /************************************************ Functions ***************************************************** */
   const handleSubmitSensor = async (e) => {
-    alert("Func Called");
     setIsUploading(true);
     if (markers.length) {
       // Making Id's for dot and sensor

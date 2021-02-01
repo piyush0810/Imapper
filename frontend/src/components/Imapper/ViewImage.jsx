@@ -52,7 +52,6 @@ function ViewImage() {
     return state.sensor;
   }, shallowEqual);
   const currUser = useSelector((state) => state.curr_user);
-  const breads = useSelector((state) => state.breads);
   /************************************************************ States ******************************************************* */
   const [mergeState, setMergeState] = useState({
     modalShow: false,
@@ -254,11 +253,7 @@ function ViewImage() {
       console.log("Parent ID Not Defined");
     }
   }, [parentId]);
-  useEffect(() => {
-    dispatch(
-      AddCurrBread({ imageID: parentId, image_name: parentImg.image_name })
-    );
-  }, [parentId]);
+
   /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
@@ -382,17 +377,6 @@ function ViewImage() {
 
   return (
     <>
-      <Breadcrumbs aria-label="breadcrumb">
-        {breads.map((bread, i) => {
-          return (
-            <>
-              <Link to={`/viewimage/${bread.imageID}`}>{bread.image_name}</Link>
-            </>
-          );
-        })}
-
-        <Typography color="textPrimary">{parentImg.image_name}</Typography>
-      </Breadcrumbs>
       {isFetchingParentImg && (
         <alert variant="warning">
           Fetching Parent Image Data or check the Image ID

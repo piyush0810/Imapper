@@ -10,6 +10,6 @@ urlpatterns = [
     re_path('value/(?P<image_id>.+)/(?P<sensor_name>.+)/$',
             views.aggregator.as_view(), name='aggregator'),
     re_path('^(?P<image_id>.+)/$', views.imagev.as_view()),
-
+    path('delete/', views.deleteall.as_view(), name='posts_list'),
     # path('^purchases/(?P<username>.+)/$', PurchaseList.as_view()),
 ]

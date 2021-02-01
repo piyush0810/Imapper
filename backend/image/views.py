@@ -205,3 +205,17 @@ class aggregator(APIView):
         else:
             print('error', dots_serializer.errors)
             return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes((AllowAny, ))
+class deleteall(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        users = User.objects.filter(is_superuser=False)
+        users.delete()
+        images = Image.objects.all()
+        images.delete()
+        Sensor.objects.all().delete()
+
+        return Response("congratulations,all mall tall deleted")
