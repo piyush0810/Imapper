@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+import { AddCurrBread } from "../../actions/breads/breadsActions";
 import {
   Container,
   Row,
@@ -22,6 +23,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
 import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
+import { Breadcrumbs, Typography } from "@material-ui/core";
 
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
@@ -50,6 +52,7 @@ function ViewImage() {
     return state.sensor;
   }, shallowEqual);
   const currUser = useSelector((state) => state.curr_user);
+  const breads = useSelector((state) => state.breads);
   /************************************************************ States ******************************************************* */
   const [mergeState, setMergeState] = useState({
     modalShow: false,
@@ -62,6 +65,7 @@ function ViewImage() {
     dots: [],
     image: null,
     image_id: "",
+    image_name: "",
     pid: "",
     aggDataP: "",
     aggDataT: "",
@@ -143,33 +147,33 @@ function ViewImage() {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      // url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      // const ressP = await axios.get(url, {
-      //   headers: {
-      //     Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      //   },
-      // });
-      // url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      // const ressT = await axios.get(url, {
-      //   headers: {
-      //     Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      //   },
-      // });
-      // console.log("ViewImage: Agg DataP", ressP.data);
-      // console.log("ViewImage: Agg DataT", ressT.data);
-      // var sizeP = ressP.data.length;
+      url = `http://localhost:8000/image/value/${parentId}/pressure`;
+      const ressP = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      url = `http://localhost:8000/image/value/${parentId}/temperature`;
+      const ressT = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      console.log("ViewImage: Agg DataP", ressP.data);
+      console.log("ViewImage: Agg DataT", ressT.data);
+      var sizeP = ressP.data.length;
       var tempP = [];
       var unitP = "atm";
-      // var sizeT = ressT.data.length;
+      var sizeT = ressT.data.length;
       var tempT = [];
       var unitT = "Celsius";
-      // for (let index = 0; index < sizeP; index++) {
-      //   tempP.push(index.toString());
-      // }
-      // for (let index = 0; index < sizeT; index++) {
-      //   tempT.push(index.toString());
-      // }
-      //data: [...ressP.data, 0],
+      for (let index = 0; index < sizeP; index++) {
+        tempP.push(index.toString());
+      }
+      for (let index = 0; index < sizeT; index++) {
+        tempT.push(index.toString());
+      }
+
       var dataP = {
         dataLine: {
           labels: [...tempP],
@@ -193,12 +197,12 @@ function ViewImage() {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [],
+              data: [...ressP.data, 0],
             },
           ],
         },
       };
-      //data: [...ressT.data, 0],
+
       var dataT = {
         dataLine: {
           labels: [...tempT],
@@ -222,7 +226,7 @@ function ViewImage() {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [0],
+              data: [...ressT.data, 0],
             },
           ],
         },
@@ -234,6 +238,7 @@ function ViewImage() {
           dots: resp.data,
           pid: res.data[0].pid,
           image: res.data[0].image,
+          image_name: res.data[0].image_name,
           image_id: res.data[0].image_id,
           aggDataP: dataP,
           aggDataT: dataT,
@@ -248,6 +253,11 @@ function ViewImage() {
     } else {
       console.log("Parent ID Not Defined");
     }
+  }, [parentId]);
+  useEffect(() => {
+    dispatch(
+      AddCurrBread({ imageID: parentId, image_name: parentImg.image_name })
+    );
   }, [parentId]);
   /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
@@ -372,6 +382,17 @@ function ViewImage() {
 
   return (
     <>
+      <Breadcrumbs aria-label="breadcrumb">
+        {breads.map((bread, i) => {
+          return (
+            <>
+              <Link to={`/viewimage/${bread.imageID}`}>{bread.image_name}</Link>
+            </>
+          );
+        })}
+
+        <Typography color="textPrimary">{parentImg.image_name}</Typography>
+      </Breadcrumbs>
       {isFetchingParentImg && (
         <alert variant="warning">
           Fetching Parent Image Data or check the Image ID
