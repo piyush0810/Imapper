@@ -1,10 +1,8 @@
 import { NavLink as Link, useHistory } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import React, { useState, useEffect } from "react";
 
 // import "../index.css";
-import Fab from "@material-ui/core/Fab";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 
 import {
   Collapse,
@@ -21,11 +19,27 @@ import {
 } from "reactstrap";
 
 function Navigation(props) {
+  const currUser = useSelector((state) => state.curr_user);
+  var AddSitesBool = false;
+  var ViewSitesBool = false;
+  var EditSitesBool = false;
+  if (currUser.is_approved) {
+    if (currUser.is_admin) {
+      AddSitesBool = true;
+      ViewSitesBool = true;
+      EditSitesBool = true;
+    } else if (currUser.is_staff) {
+      AddSitesBool = true;
+      ViewSitesBool = true;
+      EditSitesBool = true;
+    } else {
+      if (!currUser.is_admin && !currUser.is_admin) {
+        ViewSitesBool = true;
+      }
+    }
+  }
+  console.log("Navigation Data:", currUser);
   var history = useHistory();
-  console.log(
-    "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Current Location !!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-    history.location
-  );
   const [isOpen, setIsOpen] = useState(false);
   // const [toggle, setToggle] = useState()
   const toggle = () => {
@@ -151,52 +165,53 @@ function Navigation(props) {
                 </NavLink>
               </NavItem>
               {props.authenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={Link}
-                    to="/addproject"
-                    activeClassName="active"
-                    exact
-                    onClick={toggleNavbarOnClick}
-                  >
-                    Add Project
-                  </NavLink>
-                </NavItem>
-              )}
-              {props.authenticated && (
-                <NavItem>
-                  <NavLink
-                    tag={Link}
-                    to="/view"
-                    activeClassName="active"
-                    exact
-                    onClick={toggleNavbarOnClick}
-                  >
-                    View Project
-                  </NavLink>
-                </NavItem>
+                <>
+                  {AddSitesBool && (
+                    <NavItem>
+                      <NavLink
+                        tag={Link}
+                        to="/addsites"
+                        activeClassName="active"
+                        exact
+                        onClick={toggleNavbarOnClick}
+                      >
+                        Add Sites
+                      </NavLink>
+                    </NavItem>
+                  )}
+                  {EditSitesBool && (
+                    <NavItem>
+                      <NavLink
+                        tag={Link}
+                        to="/editsites"
+                        activeClassName="active"
+                        exact
+                        onClick={toggleNavbarOnClick}
+                      >
+                        Edit Sites
+                      </NavLink>
+                    </NavItem>
+                  )}
+                  {ViewSitesBool && (
+                    <NavItem>
+                      <NavLink
+                        tag={Link}
+                        to="/view"
+                        activeClassName="active"
+                        exact
+                        onClick={toggleNavbarOnClick}
+                      >
+                        View Sites
+                      </NavLink>
+                    </NavItem>
+                  )}
+                </>
               )}
               {userIsNotAuthenticated()}
               {userIsAuthenticatedEmail()}
             </Nav>
           </Collapse>
         </Navbar>
-        <Fab color="#292B2C" style={{ margin: "5px" }}>
-          <ArrowBackIcon
-            onClick={() => {
-              console.log("Back Button Clicked");
-              history.goBack();
-            }}
-          />
-        </Fab>
-        <Fab color="#292B2C" aria-label="add" style={{ margin: "5px" }}>
-          <ArrowForwardIcon
-            onClick={() => {
-              console.log("Forward Button Clicked");
-              history.goForward();
-            }}
-          />
-        </Fab>
       </div>
     </>
   );
