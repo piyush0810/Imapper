@@ -35,7 +35,7 @@ function AddModal(props) {
   const { onHide, pid, markers, refresh } = props;
   const dispatch = useDispatch();
   const imageRef = useRef(null);
-  const dots = useSelector((state) => state.dot.dots);
+  const currUser = useSelector((state) => state.curr_user);
   /********************************************** States ******************************************************** */
   const [selectedValue, setSelectedValue] = useState("s");
   const [isUploading, setIsUploading] = useState(false);
@@ -48,6 +48,8 @@ function AddModal(props) {
     image: null,
     image_id: "",
     pid: pid,
+    image_name: "",
+    username: currUser.username,
   });
   console.log(image);
   /************************************************ Functions ***************************************************** */
@@ -134,6 +136,8 @@ function AddModal(props) {
       formData.append("dots", image.dots);
       formData.append("image_id", image.image_id);
       formData.append("pid", image.pid);
+      formData.append("image_name", image.image_name);
+      formData.append("username", currUser.username);
       // console.log("PId in FromData", image.pid);
       let url = "http://localhost:8000/image/images/";
       const resp = await axios
@@ -269,9 +273,20 @@ function AddModal(props) {
   };
   const imageForm = () => {
     return (
-      <Container>
+      <Container style={{ width: "100%" }}>
         <Form>
           <Form.Group>
+            <Form.Control
+              type="text"
+              placeholder="Add Image Name"
+              required
+              onChange={(e) => {
+                setImage({
+                  ...image,
+                  image_name: e.target.value,
+                });
+              }}
+            />
             <Form.File
               label="JPEG/JPG"
               onChange={handleChange}

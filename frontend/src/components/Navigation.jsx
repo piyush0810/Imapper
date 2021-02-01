@@ -1,9 +1,9 @@
 import { NavLink as Link, useHistory } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import React, { useState, useEffect } from "react";
-
+import { AddCurrUser } from "../actions/user/userActions";
 // import "../index.css";
-
+import axios from "axios";
 import {
   Collapse,
   Navbar,
@@ -19,7 +19,8 @@ import {
 } from "reactstrap";
 
 function Navigation(props) {
-  const currUser = useSelector((state) => state.curr_user);
+  const currUser = useSelector((state) => state.curr_user, shallowEqual);
+  const dispatch = useDispatch();
   var AddSitesBool = false;
   var ViewSitesBool = false;
   var EditSitesBool = false;
@@ -51,7 +52,15 @@ function Navigation(props) {
       return toggle();
     }
   };
-
+  useEffect(async () => {
+    let url = `http://localhost:8000/user/name/`;
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
+    dispatch(AddCurrUser(res.data));
+  });
   const userIsAuthenticatedEmail = () => {
     if (props.authenticated) {
       return (

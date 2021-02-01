@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
+import { AddCurrUser } from "../../actions/user/userActions";
 import UploadImage from "./UploadImage";
 import {
   Container,
@@ -14,13 +15,27 @@ import {
 } from "react-bootstrap";
 
 function AddPImage(params) {
+  /*********************************************************** Hooks ********************************************************* */
+  const dispatch = useDispatch();
+  /*********************************************************** States ********************************************************* */
   const [modalUploadImg, setModalUploadImg] = useState(false);
   const [refresh, setRefresh] = useState(0);
 
+  /*********************************************************** UseEffects ********************************************************* */
+  useEffect(async () => {
+    let url = `http://localhost:8000/user/name/`;
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
+    dispatch(AddCurrUser(res.data));
+  }, [refresh]);
+  /*********************************************************** Functions ********************************************************* */
   function handleAddImage() {
     setModalUploadImg(true);
   }
-
+  /*********************************************************** Render Function ********************************************************* */
   return (
     <>
       <Container fluid="sm" style={{ padding: "50px" }}>

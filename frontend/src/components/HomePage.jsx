@@ -17,9 +17,10 @@ import {
 import SendIcon from "@material-ui/icons/Send";
 import { Form } from "reactstrap";
 const HomePage = ({ registration_message }) => {
+  /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
+  /*********************************************************** States ********************************************************* */
   const [staffUsername, setStaffUsername] = useState("");
-
   const [currUser, setcurrUser] = useState({
     username: "",
     parent_name: "",
@@ -27,7 +28,6 @@ const HomePage = ({ registration_message }) => {
     is_staff: "",
     is_approved: "",
   });
-
   const [sentRequestNotAccepted, setSentRequestNotAccepted] = useState(false);
   const [needToSendReq, setNeedToSendReq] = useState(false);
   const [refresh, setRefresh] = useState(0);
@@ -36,9 +36,12 @@ const HomePage = ({ registration_message }) => {
     is_staff: false,
     is_viewer: false,
   });
+  /*********************************************************** Body ********************************************************* */
+
   console.log("HomePage: CurrUser:", currUser);
+  /*********************************************************** UseEffects ********************************************************* */
+
   useEffect(() => {
-    console.log("Check Called");
     if (!currUser.is_approved) {
       if (!currUser.is_admin && !currUser.is_staff) {
         setNeedToSendReq(true);
@@ -70,6 +73,8 @@ const HomePage = ({ registration_message }) => {
 
     dispatch(AddCurrUser(res.data));
   }, [refresh]);
+
+  /*********************************************************** Functions ********************************************************* */
 
   const handleChange = async (event) => {
     if (event.target.value == "admin") {
@@ -105,6 +110,8 @@ const HomePage = ({ registration_message }) => {
       setRefresh(refresh + 1);
     }
   };
+  /*********************************************************** Render Function ********************************************************* */
+
   return (
     <>
       {registration_message && (

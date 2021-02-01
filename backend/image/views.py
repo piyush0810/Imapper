@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from custom_user.models import User
 from .serializers import PostSerializer, DotSerializer
 from .models import Image, Dot
 from sensor.models import Sensor, Value
@@ -13,7 +14,7 @@ from django.http import JsonResponse
 # Create your views here.
 
 
-# @permission_classes((AllowAny, ))
+@permission_classes((AllowAny, ))
 class imageview(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -35,7 +36,37 @@ class imageview(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @permission_classes((AllowAny, ))
+@permission_classes((AllowAny, ))
+class userimage(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        username = self.kwargs['username']
+        user = User.objects.filter(username=username)[0]
+        if user.is_admin:
+            images = Image.objects.all()
+        elif user.is_staff:
+            images = Image.objects.filter(username=username)
+        else:
+            images = Image.objects.filter(username=user.parent_name)
+
+        serializer = PostSerializer(images, many=True)
+
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+
+        posts_serializer = PostSerializer(data=request.data)
+
+        if posts_serializer.is_valid():
+            posts_serializer.save()
+            return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', posts_serializer.errors)
+            return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@permission_classes((AllowAny, ))
 class imagev(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -69,7 +100,7 @@ class imagev(APIView):
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @permission_classes((AllowAny, ))
+@permission_classes((AllowAny, ))
 class dotv(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -95,7 +126,7 @@ class dotv(APIView):
             return Response(dots_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# @permission_classes((AllowAny, ))
+@permission_classes((AllowAny, ))
 class dotdel(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -131,7 +162,7 @@ class dotdel(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# @permission_classes((AllowAny, ))
+@permission_classes((AllowAny, ))
 class aggregator(APIView):
     parser_classes = (MultiPartParser, FormParser)
 

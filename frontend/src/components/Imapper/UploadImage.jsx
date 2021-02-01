@@ -17,6 +17,7 @@ import {
 function UploadImage(props) {
   console.log("UplaodImage: Component Rendered");
   const dots = useSelector((state) => state.dot.dots);
+  const currUser = useSelector((state) => state.curr_user);
   const dispatch = useDispatch();
   const pid = props.pid;
   const index = props.index;
@@ -27,6 +28,8 @@ function UploadImage(props) {
     image: null,
     image_id: "",
     pid: pid,
+    image_name: "",
+    username: currUser.username,
   });
   console.log("UploadImage: image State", image);
   console.log("UploadImage: Component Ended");
@@ -50,6 +53,9 @@ function UploadImage(props) {
       formData.append("dots", image.dots);
       formData.append("image_id", image.image_id);
       formData.append("pid", image.pid);
+      formData.append("image_name", image.image_name);
+      formData.append("username", image.username);
+
       // console.log("PId in FromData", image.pid);
       let url = "http://localhost:8000/image/images/";
       const resp = await axios
@@ -61,31 +67,6 @@ function UploadImage(props) {
         })
         .catch((err) => console.log(err));
       console.log("UploadImage: Sent Post Request");
-      if (index >= 0) {
-        console.log("UploadImage:inside Index if");
-        const formDotData = new FormData();
-        formDotData.append("dot_id", dots[index].dot_id);
-        formDotData.append("parent_id", dots[index].parent_id);
-        formDotData.append("x", Math.round(dots[index].x));
-        formDotData.append("y", Math.round(dots[index].y));
-        formDotData.append("is_sensor", false);
-        //action for bool
-        formDotData.append("is_image", true);
-        formDotData.append("child_id", image.image_id);
-        console.log("UploadImage: Deleting Local Image");
-        dispatch(DeleteDot(index));
-        let url = `http://localhost:8000/image/dot/${dots[index].parent_id}/`;
-        const resp = await axios
-          .post(url, formDotData, {
-            headers: {
-              "content-type": "multipart/form-data",
-              Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-            },
-          })
-          .catch((err) => console.log(err));
-        console.log("UploadImage: Response", resp);
-        console.log("UploadImage: Sent Dot POST Req");
-      }
       props.onHide();
       props.refresh((p) => {
         return p + 1;
@@ -110,6 +91,17 @@ function UploadImage(props) {
         <Container>
           <Form>
             <Form.Group>
+              <Form.Control
+                type="text"
+                placeholder="Add Project Name"
+                required
+                onChange={(e) => {
+                  setImage({
+                    ...image,
+                    image_name: e.target.value,
+                  });
+                }}
+              />
               <Form.File
                 label="JPEG/JPG"
                 onChange={handleChange}

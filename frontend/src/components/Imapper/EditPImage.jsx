@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import UploadImage from "./UploadImage";
+
 import {
   Container,
   Row,
@@ -14,13 +14,18 @@ import {
 } from "react-bootstrap";
 
 function EditImage(params) {
-  console.log("Home: Component Rendered");
+  /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
   const images = useSelector((state) => state.img);
+  const currUser = useSelector((state) => state.curr_user);
+
+  /*********************************************************** States ********************************************************* */
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
   const [refresh, setRefresh] = useState(0);
+
+  /*********************************************************** Body ********************************************************* */
   var parentImgArray = [];
-  console.log("Home: Images from Store", images);
+
   if (!isFetchingParentImg) {
     for (let key in images) {
       if (images[key].pid == "-1") {
@@ -28,18 +33,24 @@ function EditImage(params) {
         continue;
       }
     }
-    console.log("Home: Parent Images:", parentImgArray);
   }
-  console.log("Home: Ended Home COmp");
+  /*********************************************************** Console Statements ********************************************** */
+
+  console.log("Home: Images from Store", images);
+  console.log("Home: Parent Images:", parentImgArray);
+
+  /*********************************************************** Functions ********************************************** **********/
+
   function handleDelete(id) {
-    console.log("Home: Req For Delete parent Image: ", id);
+    // console.log("Home: Req For Delete parent Image: ", id);
     setRefresh((p) => {
       return p + 1;
     });
   }
+  /*********************************************************** Use Effects ******************************************************** */
   useEffect(async () => {
     setIsFetchingParentImg(true);
-    let url = "http://localhost:8000/image/images/";
+    let url = `http://localhost:8000/image/images/${currUser.username}`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -52,6 +63,7 @@ function EditImage(params) {
     console.log("Done Dispatching Images");
     setIsFetchingParentImg(false);
   }, [refresh]);
+  /*********************************************************** Render Function ********************************************** */
   return (
     <>
       {isFetchingParentImg && (
@@ -65,6 +77,7 @@ function EditImage(params) {
                 <>
                   <Col xs={10} md="auto" lg="auto" style={{ margin: "100px" }}>
                     <Card xl>
+                      {image.image_name}
                       <Link to={`/image/${image.image_id}`}>
                         <Card.Img
                           src={"http://localhost:8000" + image.image}

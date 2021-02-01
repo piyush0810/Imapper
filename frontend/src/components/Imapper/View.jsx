@@ -11,14 +11,17 @@ import {
   Button,
   Modal,
 } from "react-bootstrap";
-
 function View(params) {
-  console.log("View: Component Rendered");
+  /*********************************************************** Hooks ********************************************************* */
+
   const dispatch = useDispatch();
+  const currUser = useSelector((state) => state.curr_user);
   const images = useSelector((state) => state.img);
-  console.log("View: Images from Store", images);
+
+  /*********************************************************** States ********************************************************* */
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
   const [refresh, setRefresh] = useState(0);
+  /*********************************************************** Body ********************************************************* */
   var parentImgArray = [];
 
   if (!isFetchingParentImg) {
@@ -28,13 +31,15 @@ function View(params) {
         continue;
       }
     }
-    console.log("View: Parent Images:", parentImgArray);
   }
-  console.log("View: Ended Home COmp");
+  /*********************************************************** Console Statements ********************************************************* */
+  console.log("View: Images from Store", images);
+  console.log("View: Parent Images:", parentImgArray);
+  /*********************************************************** UseEffects ********************************************************* */
 
   useEffect(async () => {
     setIsFetchingParentImg(true);
-    let url = "http://localhost:8000/image/images/";
+    let url = `http://localhost:8000/image/images/${currUser.username}`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -47,6 +52,9 @@ function View(params) {
     console.log("View: Done Dispatching Images");
     setIsFetchingParentImg(false);
   }, [refresh]);
+
+  /*********************************************************** functions ********************************************************* */
+  /*********************************************************** Render Function ********************************************************* */
   return (
     <>
       {isFetchingParentImg && (

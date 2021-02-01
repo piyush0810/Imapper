@@ -49,7 +49,7 @@ function ViewImage() {
   var sensors = useSelector((state) => {
     return state.sensor;
   }, shallowEqual);
-
+  const currUser = useSelector((state) => state.curr_user);
   /************************************************************ States ******************************************************* */
   const [mergeState, setMergeState] = useState({
     modalShow: false,
@@ -100,6 +100,7 @@ function ViewImage() {
   console.log("ViewImage: Parent Image State:", parentImg);
   console.log("ViewImage: Dots From DB", parentImg.dots);
   /*********************************************************** Use Effects ********************************************** */
+
   useEffect(async () => {
     // Fetching all Sensors and Images
     setIsFetching(true);
@@ -113,7 +114,7 @@ function ViewImage() {
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
-    url = "http://localhost:8000/image/images/";
+    url = `http://localhost:8000/image/images/${currUser.username}`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -142,32 +143,33 @@ function ViewImage() {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      const ressP = await axios.get(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-        },
-      });
-      url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      const ressT = await axios.get(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-        },
-      });
-      console.log("ViewImage: Agg DataP", ressP.data);
-      console.log("ViewImage: Agg DataT", ressT.data);
-      var sizeP = ressP.data.length;
+      // url = `http://localhost:8000/image/value/${parentId}/pressure`;
+      // const ressP = await axios.get(url, {
+      //   headers: {
+      //     Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      //   },
+      // });
+      // url = `http://localhost:8000/image/value/${parentId}/temperature`;
+      // const ressT = await axios.get(url, {
+      //   headers: {
+      //     Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      //   },
+      // });
+      // console.log("ViewImage: Agg DataP", ressP.data);
+      // console.log("ViewImage: Agg DataT", ressT.data);
+      // var sizeP = ressP.data.length;
       var tempP = [];
       var unitP = "atm";
-      var sizeT = ressT.data.length;
+      // var sizeT = ressT.data.length;
       var tempT = [];
       var unitT = "Celsius";
-      for (let index = 0; index < sizeP; index++) {
-        tempP.push(index.toString());
-      }
-      for (let index = 0; index < sizeT; index++) {
-        tempT.push(index.toString());
-      }
+      // for (let index = 0; index < sizeP; index++) {
+      //   tempP.push(index.toString());
+      // }
+      // for (let index = 0; index < sizeT; index++) {
+      //   tempT.push(index.toString());
+      // }
+      //data: [...ressP.data, 0],
       var dataP = {
         dataLine: {
           labels: [...tempP],
@@ -191,11 +193,12 @@ function ViewImage() {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [...ressP.data, 0],
+              data: [],
             },
           ],
         },
       };
+      //data: [...ressT.data, 0],
       var dataT = {
         dataLine: {
           labels: [...tempT],
@@ -219,7 +222,7 @@ function ViewImage() {
               pointHoverBorderWidth: 2,
               pointRadius: 1,
               pointHitRadius: 10,
-              data: [...ressT.data, 0],
+              data: [0],
             },
           ],
         },
