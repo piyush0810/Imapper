@@ -27,29 +27,31 @@ const HomePage = ({ registration_message }) => {
     is_staff: "",
     is_approved: "",
   });
-  console.log("HomePage: CurrUser:", currUser);
-  var showReqSentAlert = false;
-  if (!currUser.is_approved) {
-    if (!currUser.is_admin && !currUser.is_staff) {
-      showReqSentAlert = false;
-    } else {
-      showReqSentAlert = true;
-    }
-  } else {
-    if (!currUser.is_admin && !currUser.is_staff) {
-      showReqSentAlert = true;
-    } else {
-      showReqSentAlert = false;
-      //Approved
-    }
-  }
+
+  const [sentRequestNotAccepted, setSentRequestNotAccepted] = useState(false);
+  const [needToSendReq, setNeedToSendReq] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [value, setValue] = useState({
     is_admin: false,
     is_staff: false,
     is_viewer: false,
   });
-
+  console.log("HomePage: CurrUser:", currUser);
+  useEffect(() => {
+    console.log("Check Called");
+    if (!currUser.is_approved) {
+      if (!currUser.is_admin && !currUser.is_staff) {
+        setNeedToSendReq(true);
+        setSentRequestNotAccepted(false);
+      } else {
+        setSentRequestNotAccepted(true);
+        setNeedToSendReq(false);
+      }
+    } else {
+      setNeedToSendReq(false);
+      setSentRequestNotAccepted(false);
+    }
+  }, [refresh, currUser]);
   useEffect(async () => {
     let url = `http://localhost:8000/user/name/`;
     const res = await axios.get(url, {
@@ -57,7 +59,7 @@ const HomePage = ({ registration_message }) => {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
       },
     });
-    console.log("UserData", res.data);
+    // console.log("UserData", res.data);
     setcurrUser({
       username: res.data.username,
       parent_name: res.data.parent_name,
@@ -65,6 +67,7 @@ const HomePage = ({ registration_message }) => {
       is_staff: res.data.is_staff,
       is_approved: res.data.is_approved,
     });
+
     dispatch(AddCurrUser(res.data));
   }, [refresh]);
 
@@ -111,10 +114,10 @@ const HomePage = ({ registration_message }) => {
       )}
       {currUser.username && (
         <Container fixed style={{ maxWidth: "480px", marginTop: "10px" }}>
-          {showReqSentAlert && (
+          {sentRequestNotAccepted && (
             <Alert severity="info">Request For Approval Sent</Alert>
           )}
-          {!showReqSentAlert && (
+          {needToSendReq && (
             <Card style={{ padding: "50px" }}>
               <Form>
                 <FormControl style={{ margin: "5px" }}>
