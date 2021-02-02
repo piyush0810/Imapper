@@ -66,6 +66,8 @@ function Navigation(props) {
   const [requests, setRequests] = useState([]);
   const [refresh, setRefresh] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFetchingRequests, setIsFetchingRequests] = useState(true);
+  const [isFetchingCurrUser, setIsFetchingCurrUser] = useState(true);
   // const [toggle, setToggle] = useState()
   /********************************************************* Body ************************************************** */
 
@@ -135,6 +137,86 @@ function Navigation(props) {
             />
           );
         }
+      }
+    }
+  };
+  const getBellNotificaionAdmin = () => {
+    if (currUser.is_approved) {
+      if (currUser.is_admin) {
+        return (
+          <>
+            {currUser.is_admin && (
+              <>
+                <NavItem style={{ marginLeft: "100px" }}>
+                  <IconButton component="span">
+                    <Badge badgeContent={requests.length} color="secondary">
+                      <NotificationsActiveOutlinedIcon
+                        style={{ color: "#FFFFFF" }}
+                        onClick={handleClick}
+                      />
+                    </Badge>
+                  </IconButton>
+                </NavItem>
+                <Menu
+                  id="simple-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  {requests.map((req, i) => {
+                    return (
+                      <MenuItem>
+                        <Card className={classes.root}>
+                          <CardContent>
+                            <Typography
+                              className={classes.title}
+                              color="textSecondary"
+                              gutterBottom
+                            >
+                              User: {req.username}
+                            </Typography>
+                            <Typography variant="h5" component="h2">
+                              Staff Request
+                            </Typography>
+                          </CardContent>
+                          <CardActions>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              className={classes.button}
+                              startIcon={<SaveIcon />}
+                              onClick={() => {
+                                handleReq(req.username, "True");
+                              }}
+                            >
+                              Accept
+                            </Button>
+
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              className={classes.button}
+                              startIcon={<DeleteIcon />}
+                              onClick={() => {
+                                handleReq(req.username, "False");
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </MenuItem>
+                    );
+                  })}
+                  {requests.length == 0 && (
+                    <MenuItem>No Pending Requests</MenuItem>
+                  )}
+                </Menu>
+              </>
+            )}
+          </>
+        );
       }
     }
   };
@@ -248,6 +330,7 @@ function Navigation(props) {
 
   /********************************************************* useEffects ************************************************** */
   useEffect(async () => {
+    setIsFetchingCurrUser(true);
     if (props.authenticated) {
       let url = `http://localhost:8000/user/name/`;
       const res = await axios.get(url, {
@@ -256,9 +339,11 @@ function Navigation(props) {
         },
       });
       dispatch(AddCurrUser(res.data));
+      setIsFetchingCurrUser(false);
     }
   });
   useEffect(async () => {
+    setIsFetchingRequests(true);
     if (props.authenticated) {
       // console.log("Getting Requests for Staff Approval");
       let url = "http://localhost:8000/user/approval/";
@@ -270,6 +355,7 @@ function Navigation(props) {
       // console.log("Got Requests for Staff Approval");
       setRequests([...res.data]);
       // console.log("Fetching Requests:", res.data);
+      setIsFetchingRequests(false);
     }
   }, [refresh, props.authenticated]);
 
@@ -342,83 +428,11 @@ function Navigation(props) {
                       </NavLink>
                     </NavItem>
                   )}
-                  {currUser.is_admin && (
-                    <>
-                      <NavItem style={{ marginLeft: "100px" }}>
-                        <IconButton component="span">
-                          <Badge
-                            badgeContent={requests.length}
-                            color="secondary"
-                          >
-                            <NotificationsActiveOutlinedIcon
-                              style={{ color: "#FFFFFF" }}
-                              onClick={handleClick}
-                            />
-                          </Badge>
-                        </IconButton>
-                      </NavItem>
-                      <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                      >
-                        {requests.map((req, i) => {
-                          return (
-                            <MenuItem>
-                              <Card className={classes.root}>
-                                <CardContent>
-                                  <Typography
-                                    className={classes.title}
-                                    color="textSecondary"
-                                    gutterBottom
-                                  >
-                                    User: {req.username}
-                                  </Typography>
-                                  <Typography variant="h5" component="h2">
-                                    Staff Request
-                                  </Typography>
-                                </CardContent>
-                                <CardActions>
-                                  <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.button}
-                                    startIcon={<SaveIcon />}
-                                    onClick={() => {
-                                      handleReq(req.username, "True");
-                                    }}
-                                  >
-                                    Accept
-                                  </Button>
-
-                                  <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    className={classes.button}
-                                    startIcon={<DeleteIcon />}
-                                    onClick={() => {
-                                      handleReq(req.username, "False");
-                                    }}
-                                  >
-                                    Reject
-                                  </Button>
-                                </CardActions>
-                              </Card>
-                            </MenuItem>
-                          );
-                        })}
-                        {requests.length == 0 && (
-                          <MenuItem>No Pending Requests</MenuItem>
-                        )}
-                      </Menu>
-                    </>
-                  )}
                 </>
               )}
               {userIsNotAuthenticated()}
               {userIsAuthenticatedEmail()}
+              {!isFetchingRequests && getBellNotificaionAdmin()}
             </Nav>
           </Collapse>
         </Navbar>

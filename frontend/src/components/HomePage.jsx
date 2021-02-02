@@ -38,8 +38,10 @@ const HomePage = ({ registration_message }) => {
     is_staff: false,
     is_viewer: false,
   });
+  const [isFetchingData, setIsFetchingData] = useState(true);
   /*********************************************************** Body ********************************************************* */
-
+  console.log("HomePage: RefreshValue:", refresh);
+  console.log("HomePage: Fetching Data:", isFetchingData);
   console.log("HomePage: CurrUser:", currUser);
   console.log("HomePage: Authenticated Bool", authenticated);
   /*********************************************************** UseEffects ********************************************************* */
@@ -58,9 +60,12 @@ const HomePage = ({ registration_message }) => {
       setNeedToSendReq(false);
       setSentRequestNotAccepted(false);
     }
-  }, [refresh, currUser.username, authenticated]);
+  }, [isFetchingData]);
   useEffect(async () => {
+    console.log("Fetching Effect called");
+    setIsFetchingData(true);
     if (authenticated) {
+      console.log("Inside");
       let url = `http://localhost:8000/user/name/`;
       const res = await axios.get(url, {
         headers: {
@@ -76,8 +81,9 @@ const HomePage = ({ registration_message }) => {
         is_approved: res.data.is_approved,
       });
       //dispatch(AddCurrUser(res.data));
+      setIsFetchingData(false);
     }
-  }, [refresh]);
+  }, [refresh, authenticated]);
 
   /*********************************************************** Functions ********************************************************* */
 
@@ -95,6 +101,7 @@ const HomePage = ({ registration_message }) => {
   const submitRequest = async (e) => {
     e.preventDefault();
     console.log("StaffUsername", siteAdminUsername);
+    console.log("RefreshvalueInside Fun", refresh);
     let url = `http://localhost:8000/user/name/`;
     const formDotData = new FormData();
     if (value.is_admin || value.is_viewer || value.is_staff) {
@@ -124,7 +131,7 @@ const HomePage = ({ registration_message }) => {
           <strong>{registration_message}</strong>
         </div>
       )}
-      {currUser.username && (
+      {!isFetchingData && (
         <Container fixed style={{ maxWidth: "480px", marginTop: "10px" }}>
           {sentRequestNotAccepted && (
             <Alert severity="info">Request For Approval Sent</Alert>
@@ -161,7 +168,9 @@ const HomePage = ({ registration_message }) => {
                     variant="contained"
                     color="primary"
                     endIcon={<SendIcon />}
-                    onClick={submitRequest}
+                    onClick={(e) => {
+                      submitRequest(e);
+                    }}
                   >
                     Send
                   </Button>
