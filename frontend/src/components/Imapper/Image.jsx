@@ -9,6 +9,7 @@ import {
   Row,
   Card,
   Dropdown,
+  Button,
 } from "react-bootstrap";
 import Tooltip from "@material-ui/core/Tooltip";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
@@ -19,6 +20,13 @@ import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAnten
 import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
 import AddModal from "./addModal";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
@@ -47,7 +55,7 @@ function Image(props) {
     return state.img;
   });
   const currUser = useSelector((state) => state.curr_user);
-  /*************************************************** States *********************************************** */
+  /********************************************************* States *********************************************** */
   const [isFetchingImage, setisFetchingImage] = useState(true);
   const [open, setOpen] = useState(false);
   const [snackMSG, setsnackMSG] = useState("");
@@ -61,13 +69,14 @@ function Image(props) {
     image_id: "",
     pid: "",
   });
-
-  /****************************************************** Body ******************************************** */
+  const [deleteData, setDeleteData] = useState({ id: "", isImage: "" });
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  /*********************************************************** Body ******************************************** */
   var dots = [...image.dots];
   let clicks = [];
   let timeout;
 
-  /*****************************************************console Statements ******************************** */
+  /******************************************************* Console Statements ******************************** */
   console.log("Image: Sensors From Store", sensors);
   console.log("Image: Images From Store", images);
   console.log("Image: Markers", markers);
@@ -137,7 +146,8 @@ function Image(props) {
   }
 
   function doubleClick(event, id, isImage) {
-    deleteDot(id, isImage);
+    setOpenDeleteDialog(true);
+    setDeleteData({ id: id, isImage: isImage });
   }
 
   function clickHandler(event, id, dot_id, isImage) {
@@ -155,7 +165,6 @@ function Image(props) {
       }
     }, 250);
   }
-
   async function deleteDot(id, isImage) {
     console.log("Image: DeleteDot called");
     setIsDeleting(true);
@@ -353,6 +362,45 @@ function Image(props) {
           {snackMSG}
         </Alert>
       </Snackbar>
+      <Dialog
+        open={openDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {`Do you really want to delete this ${
+            deleteData.isImage ? "Image" : "Sensor"
+          } ?`}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            This {deleteData.isImage ? "Image" : "Sensor"} will be permanently
+            deleted.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenDeleteDialog(false);
+              setDeleteData({ id: "", isImage: "" });
+            }}
+            color="secondary"
+          >
+            Disagree
+          </Button>
+          <Button
+            onClick={() => {
+              deleteDot(deleteData.id, deleteData.isImage);
+              setOpenDeleteDialog(false);
+              setDeleteData({ id: "", isImage: "" });
+            }}
+            color="primary"
+            autoFocus
+          >
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
