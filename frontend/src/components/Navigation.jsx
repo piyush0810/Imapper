@@ -341,7 +341,7 @@ function Navigation(props) {
       dispatch(AddCurrUser(res.data));
       setIsFetchingCurrUser(false);
     }
-  });
+  }, []);
   useEffect(async () => {
     setIsFetchingRequests(true);
     if (props.authenticated) {
