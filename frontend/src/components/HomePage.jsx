@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import { Form } from "reactstrap";
-const HomePage = ({ registration_message }) => {
+const HomePage = ({ registration_message, authenticated }) => {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
   /*********************************************************** States ********************************************************* */
@@ -56,21 +56,23 @@ const HomePage = ({ registration_message }) => {
     }
   }, [refresh, currUser]);
   useEffect(async () => {
-    let url = `http://localhost:8000/user/name/`;
-    const res = await axios.get(url, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      },
-    });
-    // console.log("UserData", res.data);
-    setcurrUser({
-      username: res.data.username,
-      parent_name: res.data.parent_name,
-      is_admin: res.data.is_admin,
-      is_staff: res.data.is_staff,
-      is_approved: res.data.is_approved,
-    });
-    //dispatch(AddCurrUser(res.data));
+    if (authenticated) {
+      let url = `http://localhost:8000/user/name/`;
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      // console.log("UserData", res.data);
+      setcurrUser({
+        username: res.data.username,
+        parent_name: res.data.parent_name,
+        is_admin: res.data.is_admin,
+        is_staff: res.data.is_staff,
+        is_approved: res.data.is_approved,
+      });
+      //dispatch(AddCurrUser(res.data));
+    }
   }, [refresh]);
 
   /*********************************************************** Functions ********************************************************* */

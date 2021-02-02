@@ -52,20 +52,20 @@ const useStyles = makeStyles({
 });
 
 function Navigation(props) {
+  /********************************************************* Hooks ************************************************** */
   const classes = useStyles();
+  var history = useHistory();
   const bull = <span className={classes.bullet}>•</span>;
   const currUser = useSelector((state) => state.curr_user, shallowEqual);
   const dispatch = useDispatch();
+  /********************************************************* States ************************************************** */
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [requests, setRequests] = useState([]);
   const [refresh, setRefresh] = useState(0);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const [isOpen, setIsOpen] = useState(false);
+  // const [toggle, setToggle] = useState()
+  /********************************************************* Body ************************************************** */
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   var AddSitesBool = false;
   var ViewSitesBool = false;
   var EditSitesBool = false;
@@ -84,10 +84,18 @@ function Navigation(props) {
       }
     }
   }
-  console.log("Navigation Data:", currUser);
-  var history = useHistory();
-  const [isOpen, setIsOpen] = useState(false);
-  // const [toggle, setToggle] = useState()
+  /********************************************************* Console Statements ************************************************** */
+  console.log("Navigation CurrUser Data:", currUser);
+  console.log("Navigation Requests:", requests);
+  /********************************************************* Functions ************************************************** */
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const toggle = () => {
     setIsOpen(!isOpen);
   };
@@ -111,11 +119,12 @@ function Navigation(props) {
               Account
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu">
-              <DropdownItem
-                className="inverse-dropdown"
-                style={{ color: "#CECECE", textAlign: "center" }}
-              >
-                <span>{currUser.username}</span>
+              <DropdownItem className="inverse-dropdown">
+                <span key="home">
+                  <NavLink tag={Link} to="/" onClick={toggleNavbarOnClick}>
+                    {currUser.username}
+                  </NavLink>
+                </span>
               </DropdownItem>
               <DropdownItem className="inverse-dropdown">
                 <span key="signout" onClick={props.logoutAction}>
@@ -203,25 +212,35 @@ function Navigation(props) {
       .catch((err) => console.log(err));
     setRefresh(refresh + 1);
   };
+
+  /********************************************************* useEffects ************************************************** */
   useEffect(async () => {
-    let url = `http://localhost:8000/user/name/`;
-    const res = await axios.get(url, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      },
-    });
-    dispatch(AddCurrUser(res.data));
+    if (props.authenticated) {
+      let url = `http://localhost:8000/user/name/`;
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      dispatch(AddCurrUser(res.data));
+    }
   });
   useEffect(async () => {
-    let url = "http://localhost:8000/user/approval/";
-    const res = await axios.get(url, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      },
-    });
-    setRequests([...res.data]);
-    console.log("Fetching Requests:", res.data);
-  }, [refresh]);
+    if (props.authenticated) {
+      console.log("Getting Requests for Staff Approval");
+      let url = "http://localhost:8000/user/approval/";
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      console.log("Got Requests for Staff Approval");
+      setRequests([...res.data]);
+      console.log("Fetching Requests:", res.data);
+    }
+  }, [refresh, props.authenticated]);
+
+  /********************************************************* RenderFunction ************************************************** */
   return (
     <>
       <div>
