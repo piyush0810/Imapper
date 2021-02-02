@@ -70,8 +70,7 @@ const HomePage = ({ registration_message }) => {
       is_staff: res.data.is_staff,
       is_approved: res.data.is_approved,
     });
-
-    dispatch(AddCurrUser(res.data));
+    //dispatch(AddCurrUser(res.data));
   }, [refresh]);
 
   /*********************************************************** Functions ********************************************************* */
