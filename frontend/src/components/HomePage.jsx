@@ -19,8 +19,10 @@ import { Form } from "reactstrap";
 const HomePage = ({ registration_message }) => {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
+  const authenticated = useSelector((state) => state.auth.authenticated);
+
   /*********************************************************** States ********************************************************* */
-  const [staffUsername, setStaffUsername] = useState("");
+  const [siteAdminUsername, setSiteAdminUsername] = useState("");
   const [currUser, setcurrUser] = useState({
     username: "",
     parent_name: "",
@@ -36,12 +38,16 @@ const HomePage = ({ registration_message }) => {
     is_staff: false,
     is_viewer: false,
   });
+  const [isFetchingData, setIsFetchingData] = useState(true);
   /*********************************************************** Body ********************************************************* */
-
+  console.log("HomePage: RefreshValue:", refresh);
+  console.log("HomePage: Fetching Data:", isFetchingData);
   console.log("HomePage: CurrUser:", currUser);
+  console.log("HomePage: Authenticated Bool", authenticated);
   /*********************************************************** UseEffects ********************************************************* */
 
   useEffect(() => {
+    console.log("CalledFunction");
     if (!currUser.is_approved) {
       if (!currUser.is_admin && !currUser.is_staff) {
         setNeedToSendReq(true);
@@ -54,25 +60,30 @@ const HomePage = ({ registration_message }) => {
       setNeedToSendReq(false);
       setSentRequestNotAccepted(false);
     }
-  }, [refresh, currUser]);
+  }, [isFetchingData]);
   useEffect(async () => {
-    let url = `http://localhost:8000/user/name/`;
-    const res = await axios.get(url, {
-      headers: {
-        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-      },
-    });
-    // console.log("UserData", res.data);
-    setcurrUser({
-      username: res.data.username,
-      parent_name: res.data.parent_name,
-      is_admin: res.data.is_admin,
-      is_staff: res.data.is_staff,
-      is_approved: res.data.is_approved,
-    });
-
-    dispatch(AddCurrUser(res.data));
-  }, [refresh]);
+    console.log("Fetching Effect called");
+    setIsFetchingData(true);
+    if (authenticated) {
+      console.log("Inside");
+      let url = `http://localhost:8000/user/name/`;
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+        },
+      });
+      console.log("UserData", res.data);
+      setcurrUser({
+        username: res.data.username,
+        parent_name: res.data.parent_name,
+        is_admin: res.data.is_admin,
+        is_staff: res.data.is_staff,
+        is_approved: res.data.is_approved,
+      });
+      //dispatch(AddCurrUser(res.data));
+      setIsFetchingData(false);
+    }
+  }, [refresh, authenticated]);
 
   /*********************************************************** Functions ********************************************************* */
 
@@ -89,12 +100,13 @@ const HomePage = ({ registration_message }) => {
   };
   const submitRequest = async (e) => {
     e.preventDefault();
-    console.log("StaffUsername", staffUsername);
+    console.log("StaffUsername", siteAdminUsername);
+    console.log("RefreshvalueInside Fun", refresh);
     let url = `http://localhost:8000/user/name/`;
     const formDotData = new FormData();
     if (value.is_admin || value.is_viewer || value.is_staff) {
       formDotData.append("username", currUser.username);
-      formDotData.append("parent_name", staffUsername);
+      formDotData.append("parent_name", siteAdminUsername);
       formDotData.append("is_admin", value.is_admin ? 1 : 0);
       formDotData.append("is_staff", value.is_staff ? 1 : 0);
       formDotData.append("is_approved", value.is_viewer ? 1 : 0);
@@ -119,7 +131,7 @@ const HomePage = ({ registration_message }) => {
           <strong>{registration_message}</strong>
         </div>
       )}
-      {currUser.username && (
+      {!isFetchingData && (
         <Container fixed style={{ maxWidth: "480px", marginTop: "10px" }}>
           {sentRequestNotAccepted && (
             <Alert severity="info">Request For Approval Sent</Alert>
@@ -134,7 +146,7 @@ const HomePage = ({ registration_message }) => {
                   <NativeSelect onChange={handleChange}>
                     <option value="">None</option>
                     <option value={"admin"}>Admin Access</option>
-                    <option value={"staff"}>Staff Access</option>
+                    <option value={"staff"}>Site Admin Access</option>
                     <option value={"viewer"}>Viewer Access</option>
                   </NativeSelect>
                 </FormControl>
@@ -145,7 +157,7 @@ const HomePage = ({ registration_message }) => {
                       required
                       placeholder="Enter Staff username"
                       onChange={(e) => {
-                        setStaffUsername(e.target.value);
+                        setSiteAdminUsername(e.target.value);
                       }}
                     />
                   </FormControl>
@@ -156,7 +168,9 @@ const HomePage = ({ registration_message }) => {
                     variant="contained"
                     color="primary"
                     endIcon={<SendIcon />}
-                    onClick={submitRequest}
+                    onClick={(e) => {
+                      submitRequest(e);
+                    }}
                   >
                     Send
                   </Button>
