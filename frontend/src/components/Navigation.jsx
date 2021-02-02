@@ -188,6 +188,7 @@ function Navigation(props) {
                               startIcon={<SaveIcon />}
                               onClick={() => {
                                 handleReq(req.username, "True");
+                                handleClose();
                               }}
                             >
                               Accept
@@ -200,6 +201,7 @@ function Navigation(props) {
                               startIcon={<DeleteIcon />}
                               onClick={() => {
                                 handleReq(req.username, "False");
+                                handleClose();
                               }}
                             >
                               Reject
