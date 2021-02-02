@@ -219,3 +219,39 @@ class deleteall(APIView):
         Sensor.objects.all().delete()
 
         return Response("congratulations,all mall tall deleted")
+
+
+@permission_classes((AllowAny, ))
+class imagedel(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def deleteim(self, id):
+        dots = Dot.objects.filter(parent_id=id)
+        for dot in dots:
+            self.deletedot(dot.dot_id)
+        image = Image.objects.filter(image_id=id)
+        image.delete()
+
+    def deletedot(self, id):
+        dot = Dot.objects.filter(dot_id=id)
+        if dot[0]:
+            dot = dot[0]
+            if dot.is_sensor:
+                sensor_id = dot.child_id
+                dot.delete()
+                sensor = Sensor.objects.filter(sensor_id=sensor_id)
+                sensor.delete()
+            elif dot.is_image:
+                image_id = dot.child_id
+                self.deleteim(image_id)
+                dot.delete()
+
+    def delete(self, request, *args, **kwargs):
+
+        image_id = self.kwargs['image_id']
+        image = Image.objects.filter(image_id=image_id)
+        if image:
+            self.deleteim(image_id)
+
+            return JsonResponse({"status": "ok"}, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
