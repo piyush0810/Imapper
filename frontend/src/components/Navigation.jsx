@@ -26,6 +26,8 @@ import {
   Card,
   CardActions,
   CardContent,
+  Chip,
+  Avatar,
   IconButton,
   Menu,
   MenuItem,
@@ -34,6 +36,7 @@ import {
 } from "@material-ui/core";
 import { func } from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
+import { Col, Row } from "react-bootstrap";
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
@@ -85,8 +88,8 @@ function Navigation(props) {
     }
   }
   /********************************************************* Console Statements ************************************************** */
-  console.log("Navigation CurrUser Data:", currUser);
-  console.log("Navigation Requests:", requests);
+  // console.log("Navigation CurrUser Data:", currUser);
+  // console.log("Navigation Requests:", requests);
   /********************************************************* Functions ************************************************** */
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -105,7 +108,36 @@ function Navigation(props) {
       return toggle();
     }
   };
-
+  const getChip = () => {
+    if (currUser.is_approved) {
+      if (currUser.is_admin) {
+        return (
+          <Chip label="Admin" style={{ marginLeft: "5px" }} color="secondary" />
+        );
+      } else if (currUser.is_staff) {
+        return (
+          <Chip
+            label="Site Admin"
+            style={{
+              marginLeft: "5px",
+              backgroundColor: "#008000",
+              color: "#FFFFFF",
+            }}
+          />
+        );
+      } else {
+        if (!currUser.is_admin && !currUser.is_admin) {
+          return (
+            <Chip
+              label="Viewer"
+              style={{ marginLeft: "5px" }}
+              color="primary"
+            />
+          );
+        }
+      }
+    }
+  };
   const userIsAuthenticatedEmail = () => {
     if (props.authenticated) {
       return (
@@ -121,8 +153,9 @@ function Navigation(props) {
             <DropdownMenu className="dropdown-menu">
               <DropdownItem className="inverse-dropdown">
                 <span key="home">
-                  <NavLink tag={Link} to="/" onClick={toggleNavbarOnClick}>
+                  <NavLink onClick={toggleNavbarOnClick}>
                     {currUser.username}
+                    {getChip()}
                   </NavLink>
                 </span>
               </DropdownItem>
@@ -227,16 +260,16 @@ function Navigation(props) {
   });
   useEffect(async () => {
     if (props.authenticated) {
-      console.log("Getting Requests for Staff Approval");
+      // console.log("Getting Requests for Staff Approval");
       let url = "http://localhost:8000/user/approval/";
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      console.log("Got Requests for Staff Approval");
+      // console.log("Got Requests for Staff Approval");
       setRequests([...res.data]);
-      console.log("Fetching Requests:", res.data);
+      // console.log("Fetching Requests:", res.data);
     }
   }, [refresh, props.authenticated]);
 

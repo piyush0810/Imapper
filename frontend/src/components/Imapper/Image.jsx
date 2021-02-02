@@ -355,7 +355,7 @@ function Image(props) {
       )}
       <Snackbar
         open={open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
       >
         <Alert onClose={handleCloseSnackbar} severity="success">
@@ -384,7 +384,7 @@ function Image(props) {
               setOpenDeleteDialog(false);
               setDeleteData({ id: "", isImage: "" });
             }}
-            color="secondary"
+            variant="danger"
           >
             Disagree
           </Button>
@@ -394,8 +394,7 @@ function Image(props) {
               setOpenDeleteDialog(false);
               setDeleteData({ id: "", isImage: "" });
             }}
-            color="primary"
-            autoFocus
+            variant="outline-success"
           >
             Agree
           </Button>

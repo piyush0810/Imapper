@@ -16,11 +16,13 @@ import {
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import { Form } from "reactstrap";
-const HomePage = ({ registration_message, authenticated }) => {
+const HomePage = ({ registration_message }) => {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
+  const authenticated = useSelector((state) => state.auth.authenticated);
+
   /*********************************************************** States ********************************************************* */
-  const [staffUsername, setStaffUsername] = useState("");
+  const [siteAdminUsername, setSiteAdminUsername] = useState("");
   const [currUser, setcurrUser] = useState({
     username: "",
     parent_name: "",
@@ -39,9 +41,11 @@ const HomePage = ({ registration_message, authenticated }) => {
   /*********************************************************** Body ********************************************************* */
 
   console.log("HomePage: CurrUser:", currUser);
+  console.log("HomePage: Authenticated Bool", authenticated);
   /*********************************************************** UseEffects ********************************************************* */
 
   useEffect(() => {
+    console.log("CalledFunction");
     if (!currUser.is_approved) {
       if (!currUser.is_admin && !currUser.is_staff) {
         setNeedToSendReq(true);
@@ -54,7 +58,7 @@ const HomePage = ({ registration_message, authenticated }) => {
       setNeedToSendReq(false);
       setSentRequestNotAccepted(false);
     }
-  }, [refresh, currUser]);
+  }, [refresh, currUser.username, authenticated]);
   useEffect(async () => {
     if (authenticated) {
       let url = `http://localhost:8000/user/name/`;
@@ -63,7 +67,7 @@ const HomePage = ({ registration_message, authenticated }) => {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      // console.log("UserData", res.data);
+      console.log("UserData", res.data);
       setcurrUser({
         username: res.data.username,
         parent_name: res.data.parent_name,
@@ -90,12 +94,12 @@ const HomePage = ({ registration_message, authenticated }) => {
   };
   const submitRequest = async (e) => {
     e.preventDefault();
-    console.log("StaffUsername", staffUsername);
+    console.log("StaffUsername", siteAdminUsername);
     let url = `http://localhost:8000/user/name/`;
     const formDotData = new FormData();
     if (value.is_admin || value.is_viewer || value.is_staff) {
       formDotData.append("username", currUser.username);
-      formDotData.append("parent_name", staffUsername);
+      formDotData.append("parent_name", siteAdminUsername);
       formDotData.append("is_admin", value.is_admin ? 1 : 0);
       formDotData.append("is_staff", value.is_staff ? 1 : 0);
       formDotData.append("is_approved", value.is_viewer ? 1 : 0);
@@ -135,7 +139,7 @@ const HomePage = ({ registration_message, authenticated }) => {
                   <NativeSelect onChange={handleChange}>
                     <option value="">None</option>
                     <option value={"admin"}>Admin Access</option>
-                    <option value={"staff"}>Staff Access</option>
+                    <option value={"staff"}>Site Admin Access</option>
                     <option value={"viewer"}>Viewer Access</option>
                   </NativeSelect>
                 </FormControl>
@@ -146,7 +150,7 @@ const HomePage = ({ registration_message, authenticated }) => {
                       required
                       placeholder="Enter Staff username"
                       onChange={(e) => {
-                        setStaffUsername(e.target.value);
+                        setSiteAdminUsername(e.target.value);
                       }}
                     />
                   </FormControl>

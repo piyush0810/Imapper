@@ -512,6 +512,14 @@ function ViewImage() {
 export default ViewImage;
 
 function MyVerticallyCenteredModal(props) {
+  const [open, setOpen] = useState(false);
+  const [snackMSG, setsnackMSG] = useState("");
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  }
   const mergeS = props.mergeS;
   console.log("Modal loaded", mergeS);
   console.log("Array", mergeS.currSensor.values);
@@ -550,30 +558,53 @@ function MyVerticallyCenteredModal(props) {
     },
   };
   return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {mergeS.currSensor.sensor_name == "pressure"
-            ? "Pressure Sensor"
-            : "Temperature Sensor"}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <MDBContainer>
-          <h3 className="mt-5"></h3>
-          <Line data={data.dataLine} options={{ responsive: true }} />
-        </MDBContainer>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide} variant="outline-danger">
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <>
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            {mergeS.currSensor.sensor_name == "pressure"
+              ? "Pressure Sensor"
+              : "Temperature Sensor"}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Button
+            onClick={() => {
+              setOpen(true);
+              navigator.clipboard.writeText(
+                `localhost:8000/sensor/value/${mergeS.currSensor.sensor_id}/`
+              );
+              setsnackMSG("Address Copied");
+            }}
+          >
+            Get End Point
+          </Button>
+
+          <MDBContainer>
+            <h3 className="mt-5"></h3>
+            <Line data={data.dataLine} options={{ responsive: true }} />
+          </MDBContainer>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide} variant="outline-danger">
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Snackbar
+        open={open}
+        autoHideDuration={1000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="info">
+          {snackMSG}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
