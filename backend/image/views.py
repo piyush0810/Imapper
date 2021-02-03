@@ -2,7 +2,7 @@ from django.shortcuts import render
 from custom_user.models import User
 from .serializers import PostSerializer, DotSerializer
 from .models import Image, Dot
-from sensor.models import Sensor, Value
+from sensor.models import Sensor, Value, custom_sensor
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -190,13 +190,23 @@ class aggregator(APIView):
 
     def get(self, request, *args, **kwargs):
 
-        iid = self.kwargs['image_id']
-        k = [0, 0, 0]
-        j = 0
-        t = self.kwargs['sensor_name']
-        x, y = self.funct(j, iid, k, t)
+        types = custom_sensor.objects.all()
+        res = []
+        for stype in types:
+            iid = self.kwargs['image_id']
+            k = [0, 0, 0]
+            j = 0
+            t = stype.sensor_type
+            tunits = stype.units
+            x, y = self.funct(j, iid, k, t)
+            a = {
+                "values": x,
+                "units": tunits,
+                "name": t
+            }
+            res.append(a)
 
-        return Response(x)
+        return Response(res)
 
     def post(self, request, *args, **kwargs):
 

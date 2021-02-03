@@ -42,18 +42,7 @@ function AddModal(props) {
     sensor_type: "",
     units: "",
   });
-  const [sensors, setSensors] = useState([
-    {
-      sensor_type: "Temperature",
-      units: "C",
-      icon: null,
-    },
-    {
-      sensor_type: "Pressure",
-      units: "Atm",
-      icon: null,
-    },
-  ]);
+  const [sensors, setSensors] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
@@ -69,6 +58,7 @@ function AddModal(props) {
   });
   const [isFetchingSensors, setIsFetchingSensors] = useState(true);
   // console.log("AddModal: isFetchingSensor", isFetchingSensors);
+  console.log("Rerender", currSensor);
   /************************************************ useEffect ***************************************************** */
   useEffect(async () => {
     setIsFetchingSensors(true);
@@ -79,19 +69,7 @@ function AddModal(props) {
       },
     });
     // console.log("AddModal Data Reieved:", resp.data);
-    setSensors([
-      {
-        sensor_type: "Temperature",
-        units: "C",
-        icon: null,
-      },
-      {
-        sensor_type: "Pressure",
-        units: "Atm",
-        icon: null,
-      },
-      ...resp.data,
-    ]);
+    setSensors([...resp.data]);
     setIsFetchingSensors(false);
   }, [selectedValue]);
   /************************************************ Functions ***************************************************** */
@@ -125,7 +103,7 @@ function AddModal(props) {
         })
         .catch((err) => console.log(err));
       const formData = new FormData();
-      // console.log("Inside Submint Function", currSensor);
+      console.log("Inside Submint Function", currSensor);
       formData.append("pid", pid);
       formData.append("sensor_id", gid);
       formData.append("sensor_name", currSensor.sensor_type);
@@ -250,9 +228,11 @@ function AddModal(props) {
                         break;
                       }
                     }
+                    console.log("Valus", unit, name);
                     setCurrSensor({ sensor_type: name, units: unit });
                   }}
                 >
+                  <option value="">None</option>
                   {sensors.map((sensor, i) => {
                     return (
                       <>
