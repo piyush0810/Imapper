@@ -170,11 +170,14 @@ class aggregator(APIView):
         print("HIII")
         image = Image.objects.filter(image_id=id)
         dots = Dot.objects.filter(parent_id=id)
+        print(dots, image)
         for dot in dots:
             if dot.is_sensor:
+                print("vvv")
                 values = Value.objects.filter(sensor_id=dot.child_id)
+                print("fafaf", dot.child_id)
                 sensor = Sensor.objects.filter(sensor_id=dot.child_id)
-                # print(sensor[0].sensor_name)
+                print(sensor)
                 # print(t)
                 if sensor[0].sensor_name == t:
                     dimen = int(sensor[0].dimensions)

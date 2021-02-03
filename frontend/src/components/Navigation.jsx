@@ -70,16 +70,18 @@ function Navigation(props) {
   const [isFetchingCurrUser, setIsFetchingCurrUser] = useState(true);
   // const [toggle, setToggle] = useState()
   /********************************************************* Body ************************************************** */
-
+  var AddSensorBool = false;
   var AddSitesBool = false;
   var ViewSitesBool = false;
   var EditSitesBool = false;
   if (currUser.is_approved) {
     if (currUser.is_admin) {
+      AddSensorBool = true;
       AddSitesBool = true;
       ViewSitesBool = true;
       EditSitesBool = true;
     } else if (currUser.is_staff) {
+      AddSensorBool = true;
       AddSitesBool = true;
       ViewSitesBool = true;
       EditSitesBool = true;
@@ -401,6 +403,19 @@ function Navigation(props) {
                         onClick={toggleNavbarOnClick}
                       >
                         Add Sites
+                      </NavLink>
+                    </NavItem>
+                  )}
+                  {AddSensorBool && (
+                    <NavItem>
+                      <NavLink
+                        tag={Link}
+                        to="/addsensor"
+                        activeClassName="active"
+                        exact
+                        onClick={toggleNavbarOnClick}
+                      >
+                        Create Sensor
                       </NavLink>
                     </NavItem>
                   )}

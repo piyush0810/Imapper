@@ -58,6 +58,7 @@ function ViewImage() {
     currSensor: "",
   });
   const [isFetching, setIsFetching] = useState(true);
+  const [isFetchingAggData, setIsFetchingAggData] = useState(true);
   const [isFetchingParentImg, setisFetchingParentImg] = useState(true);
   const [isFetchingSensor, setIsFetchingSensor] = useState(true);
   const [parentImg, setparentImg] = useState({
@@ -66,10 +67,10 @@ function ViewImage() {
     image_id: "",
     image_name: "",
     pid: "",
-    aggDataP: "",
-    aggDataT: "",
+    aggData: [],
   });
   const [markers, setMarkers] = useState([]);
+  const [refresh, setRefresh] = useState(0);
   /*********************************************************** Body ********************************************************* */
   let parentId = imageID;
   var parentImgURL = "";
@@ -94,17 +95,19 @@ function ViewImage() {
       }
     }
   }
-  /******************************************************** Console Statements *************************************************** */
-  console.log("ViewImage: All Images From Store", images);
-  console.log("ViewImage: All Sensors From Store", sensors);
-  console.log("ViewImage: Images of parent image:", imgArray);
-  console.log("ViewImage: Sensors of parent image:", senArray);
-  console.log("ViewImage: MergeState State:", mergeState);
-  console.log("ViewImage: Parent Image State:", parentImg);
-  console.log("ViewImage: Dots From DB", parentImg.dots);
+  /******************************************************** //console Statements *************************************************** */
+  console.log("Rerendered", isFetchingAggData);
+  // console.log("ViewImage: All Images From Store", images);
+  // console.log("ViewImage: All Sensors From Store", sensors);
+  // console.log("ViewImage: Images of parent image:", imgArray);
+  // console.log("ViewImage: Sensors of parent image:", senArray);
+  // console.log("ViewImage: MergeState State:", mergeState);
+  console.log("Agg ViewImage: Parent Image State:", parentImg);
+  // console.log("ViewImage: Dots From DB", parentImg.dots);
   /*********************************************************** Use Effects ********************************************** */
 
   useEffect(async () => {
+    //console.log("Fetching All useEffect called");
     // Fetching all Sensors and Images
     setIsFetching(true);
     let url = "http://localhost:8000/sensor/sensors/";
@@ -127,11 +130,14 @@ function ViewImage() {
       type: "FETCH_IMAGES",
       payload: res.data,
     });
+    //console.log(":::::::::::::: Fetched All Images and SensorData");
     setIsFetching(false);
+    //console.log("Fetching All useEffect called");
   }, []);
 
   useEffect(async () => {
     //Fetching parent image Data
+    // console.log("Fetching Parent Img useEffect called");
     if (parentId) {
       setisFetchingParentImg(true);
       let url = `http://localhost:8000/image/dot/${parentId}/`;
@@ -146,92 +152,8 @@ function ViewImage() {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      const ressP = await axios.get(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-        },
-      });
-      url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      const ressT = await axios.get(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-        },
-      });
-      console.log("ViewImage: Agg DataP", ressP.data);
-      console.log("ViewImage: Agg DataT", ressT.data);
-      var sizeP = ressP.data.length;
-      var tempP = [];
-      var unitP = "atm";
-      var sizeT = ressT.data.length;
-      var tempT = [];
-      var unitT = "Celsius";
-      for (let index = 0; index < sizeP; index++) {
-        tempP.push(index.toString());
-      }
-      for (let index = 0; index < sizeT; index++) {
-        tempT.push(index.toString());
-      }
-
-      var dataP = {
-        dataLine: {
-          labels: [...tempP],
-          datasets: [
-            {
-              label: `Unit: ${unitP}`,
-              fill: true,
-              lineTension: 0.3,
-              backgroundColor: "rgba(225, 204,230, .3)",
-              borderColor: "rgb(205, 130, 158)",
-              borderCapStyle: "butt",
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: "miter",
-              pointBorderColor: "rgb(205, 130,1 58)",
-              pointBackgroundColor: "rgb(255, 255, 255)",
-              pointBorderWidth: 10,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: "rgb(0, 0, 0)",
-              pointHoverBorderColor: "rgba(220, 220, 220,1)",
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 10,
-              data: [...ressP.data, 0],
-            },
-          ],
-        },
-      };
-
-      var dataT = {
-        dataLine: {
-          labels: [...tempT],
-          datasets: [
-            {
-              label: `Unit: ${unitT}`,
-              fill: true,
-              lineTension: 0.3,
-              backgroundColor: "rgba(225, 204,230, .3)",
-              borderColor: "rgb(205, 130, 158)",
-              borderCapStyle: "butt",
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: "miter",
-              pointBorderColor: "rgb(205, 130,1 58)",
-              pointBackgroundColor: "rgb(255, 255, 255)",
-              pointBorderWidth: 10,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: "rgb(0, 0, 0)",
-              pointHoverBorderColor: "rgba(220, 220, 220,1)",
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 10,
-              data: [...ressT.data, 0],
-            },
-          ],
-        },
-      };
-
       if (res.data.length) {
+        //console.log(":::::::::::::: Fetched ParentImageData");
         setparentImg({
           ...parentImg,
           dots: resp.data,
@@ -239,8 +161,6 @@ function ViewImage() {
           image: res.data[0].image,
           image_name: res.data[0].image_name,
           image_id: res.data[0].image_id,
-          aggDataP: dataP,
-          aggDataT: dataT,
         });
         var _markers = [];
         resp.data.forEach(function (dot) {
@@ -248,12 +168,88 @@ function ViewImage() {
         });
         setMarkers([..._markers]);
         setisFetchingParentImg(false);
+        //console.log("Fetching All useEffect ended");
       }
     } else {
-      console.log("Parent ID Not Defined");
+      //console.log("Parent ID Not Defined");
+      //console.log("Fetching All useEffet Not defiend");
     }
   }, [parentId]);
 
+  useEffect(async () => {
+    //console.log("Fetching sensor useEffect called");
+    setIsFetchingAggData(true);
+    if (!isFetchingParentImg && !isFetching) {
+      var aggDataArray = [];
+      senArray.map(async (sensor, i) => {
+        var url = `http://localhost:8000/image/value/${parentId}/${sensor.sensor_name}/`;
+
+        const ress = await axios.get(url, {
+          headers: {
+            Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+          },
+        });
+        // console.log("ViewImage: Agg Data", ress.data);
+        var size = ress.data.length;
+        var unit = sensor.unit;
+
+        var temp = [];
+        for (let index = 0; index < size; index++) {
+          temp.push(index.toString());
+        }
+        var data = {
+          dataLine: {
+            labels: [...temp],
+            datasets: [
+              {
+                label: `Unit: ${unit}`,
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgba(225, 204,230, .3)",
+                borderColor: "rgb(205, 130, 158)",
+                borderCapStyle: "butt",
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: "miter",
+                pointBorderColor: "rgb(205, 130,1 58)",
+                pointBackgroundColor: "rgb(255, 255, 255)",
+                pointBorderWidth: 10,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                pointHoverBorderColor: "rgba(220, 220, 220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [...ress.data, 0],
+              },
+            ],
+          },
+          sensorData: {
+            sensor_name: sensor.sensor_name,
+            unit: sensor.unit,
+          },
+        };
+
+        aggDataArray.push(data);
+      });
+      console.log("AGGraph", [...aggDataArray]);
+      console.log(":::::::::::::: Fetched All Agg Data[0]", {
+        ...parentImg,
+        aggData: aggDataArray,
+      });
+      setparentImg({ ...parentImg, aggData: aggDataArray });
+      console.log(":::::::::::::: Fetched All Agg Data[1]", {
+        ...parentImg,
+        aggData: aggDataArray,
+      });
+      setIsFetchingAggData(false);
+    }
+  }, [refresh]);
+  useEffect(() => {
+    if (isFetchingAggData && !isFetching && !isFetchingParentImg) {
+      setRefresh(refresh + 1);
+    }
+  });
   /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
@@ -394,33 +390,39 @@ function ViewImage() {
               }}
             >
               <ImageMarker
-                src={"http://localhost:8000" + parentImgURL}
+                src={"http://localhost:8000" + parentImg.image}
                 markers={markers}
                 markerComponent={addMarker}
               />
             </Card>
           </Row>
           {/* Showing Agg Graphs*/}
-          <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
-            <Col>
-              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
-                <h3 className="mt-5">Aggregate Pressure Graph</h3>
-                <Line
-                  data={parentImg.aggDataP.dataLine}
-                  options={{ responsive: true }}
-                />
-              </MDBContainer>
-            </Col>
-            <Col>
-              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
-                <h3 className="mt-5">Aggregate Temperature Graph</h3>
-                <Line
-                  data={parentImg.aggDataT.dataLine}
-                  options={{ responsive: true }}
-                />
-              </MDBContainer>
-            </Col>
-          </Row>
+          {!isFetchingAggData && (
+            <Row
+              className="justify-content-sm-center"
+              style={{ margin: "15px" }}
+            >
+              {parentImg.aggData.map((aData, i) => {
+                return (
+                  <>
+                    <Col>
+                      <MDBContainer
+                        style={{ maxWidth: "500px", maxHeight: "100%" }}
+                      >
+                        <h3 className="mt-5">
+                          Aggregate {aData.sensorData.sensor_name} Graph
+                        </h3>
+                        <Line
+                          data={aData.dataLine}
+                          options={{ responsive: true }}
+                        />
+                      </MDBContainer>
+                    </Col>
+                  </>
+                );
+              })}
+            </Row>
+          )}
           <Row
             sm={1}
             className="justify-content-sm-center"
@@ -521,14 +523,14 @@ function MyVerticallyCenteredModal(props) {
     setOpen(false);
   }
   const mergeS = props.mergeS;
-  console.log("Modal loaded", mergeS);
-  console.log("Array", mergeS.currSensor.values);
+  //console.log("Modal loaded", mergeS);
+  //console.log("Array", mergeS.currSensor.values);
   var size = mergeS.currSensor.values.length;
   var temp = [];
   for (let index = 0; index < size; index++) {
     temp.push(index);
   }
-  console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
+  //console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
   var data = {
     dataLine: {
       labels: [...temp],
