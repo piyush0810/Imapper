@@ -135,7 +135,7 @@ function Image(props) {
         setisFetchingImage(false);
       }
     }
-  }, [imageID, callRefresh]);
+  }, [imageID, callRefresh, currUser]);
 
   /***************************************************** Functions ***************************************** */
   function singleClick(event, id, isImage) {

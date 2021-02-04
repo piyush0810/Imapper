@@ -1,18 +1,33 @@
 import React, { useState, useRef } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import axios from "axios";
+import { Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 function addCustomSensor() {
   /***************************************************** Hooks ************************************ */
   const imageRef = useRef(null);
+
   /***************************************************** UseStates ************************************ */
   const [sensor, setSensor] = useState({
     sensor_type: "",
     units: "",
     icon: "",
   });
+  const [open, setOpen] = useState(false);
+  const [snackMSG, setsnackMSG] = useState("");
+  const [refresh, setRefresh] = useState(0);
 
   /***************************************************** Functions ************************************ */
-
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  }
   const handleChange = (e) => {
     setSensor({ ...sensor, icon: e.target.files[0] });
   };
@@ -33,7 +48,8 @@ function addCustomSensor() {
           },
         })
         .catch((err) => console.log(err));
-
+      setsnackMSG("Successfully Added Sensor");
+      setOpen(true);
       location.reload();
     }
   };
@@ -74,6 +90,15 @@ function addCustomSensor() {
           </Button>
         </Form>
       </Container>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {snackMSG}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

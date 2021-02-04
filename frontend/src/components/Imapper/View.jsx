@@ -79,15 +79,18 @@ function View(params) {
       )}
       {!isFetchingParentImg && (
         <Container fixed style={{ padding: "50px" }}>
+          {parentImgArray.length == 0 && (
+            <Alert severity="info">No Sites Added</Alert>
+          )}
           <Paper elevation={3}>
             <Grid container style={{ padding: "5px" }}>
               <Grid xs={12} item>
                 {parentImgArray.map((image, i) => {
                   return (
                     <>
-                      <Card className={classes.root}>
+                      <Card className={classes.root} style={{ margin: "20px" }}>
                         <CardActionArea>
-                          <Link to={`/image/${image.image_id}`}>
+                          <Link to={`/viewimage/${image.image_id}`}>
                             <CardMedia
                               component="img"
                               alt="Contemplative Reptile"
