@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-
+require("dotenv").config();
 import {
   Router,
   Route,
@@ -30,7 +30,7 @@ import EditPImage from "./components/Imapper/EditPImage";
 import "./index.css";
 import addCustomSensor from "./components/Imapper/addCustomSensor";
 export const history = createHistory();
-
+// let url = process.env.REACT_APP_DEV_URL || backendUrl;
 ReactDOM.render(
   <Provider store={store}>
     <Router history={history}>

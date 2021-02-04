@@ -19,7 +19,9 @@ import { green } from "@material-ui/core/colors";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { FormControl as Formcontrol } from "@material-ui/core";
+import { backendUrl } from "../../actions/backendUrl";
 
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 const GreenRadio = withStyles({
   root: {
     color: green[400],
@@ -62,7 +64,7 @@ function AddModal(props) {
   /************************************************ useEffect ***************************************************** */
   useEffect(async () => {
     setIsFetchingSensors(true);
-    let url = `http://localhost:8000/sensor/csensors/`;
+    let url = `${backurl}/sensor/csensors/`;
     const resp = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -93,7 +95,7 @@ function AddModal(props) {
       formDotData.append("is_image", false);
       formDotData.append("child_id", gid);
 
-      let url = `http://localhost:8000/image/dot/${pid}/`;
+      let url = `${backurl}/image/dot/${pid}/`;
       const resp = await axios
         .post(url, formDotData, {
           headers: {
@@ -112,7 +114,7 @@ function AddModal(props) {
       formData.append("values", []);
       formData.append("dot_id", dot_id);
 
-      url = "http://localhost:8000/sensor/sensors/";
+      url = `${backurl}/sensor/sensors/`;
       const res = await axios
         .post(url, formData, {
           headers: {
@@ -154,7 +156,7 @@ function AddModal(props) {
       formData.append("image_name", image.image_name);
       formData.append("username", currUser.username);
       // console.log("PId in FromData", image.pid);
-      let url = "http://localhost:8000/image/images/";
+      let url = `${backurl}/image/images/`;
       const resp = await axios
         .post(url, formData, {
           headers: {
@@ -179,7 +181,7 @@ function AddModal(props) {
         formDotData.append("is_sensor", false);
         formDotData.append("is_image", true);
         formDotData.append("child_id", image.image_id);
-        let url = `http://localhost:8000/image/dot/${pid}/`;
+        let url = `${backurl}/image/dot/${pid}/`;
         const resp = await axios
           .post(url, formDotData, {
             headers: {

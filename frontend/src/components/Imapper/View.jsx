@@ -17,6 +17,9 @@ import {
   Snackbar,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
+import { backendUrl } from "../../actions/backendUrl";
+
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -54,7 +57,7 @@ function View(params) {
   useEffect(async () => {
     setIsFetchingParentImg(true);
     console.log("Username:", currUser.username);
-    let url = `http://localhost:8000/image/images/${currUser.username}`;
+    let url = `${backurl}/image/images/${currUser.username}`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -95,7 +98,7 @@ function View(params) {
                               component="img"
                               alt="Contemplative Reptile"
                               height="320"
-                              image={"http://localhost:8000" + image.image}
+                              image={`${backurl}` + image.image}
                               title={image.image_name}
                             />
                           </Link>

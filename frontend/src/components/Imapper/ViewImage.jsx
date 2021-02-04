@@ -22,7 +22,9 @@ import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAnten
 import IconButton from "@material-ui/core/IconButton";
 import PhotoLibrarySharpIcon from "@material-ui/icons/PhotoLibrarySharp";
 import { Breadcrumbs, Typography } from "@material-ui/core";
+import { backendUrl } from "../../actions/backendUrl";
 
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -116,7 +118,7 @@ function ViewImage() {
     //console.log("Fetching All useEffect called");
     // Fetching all Sensors and Images
     setIsFetching(true);
-    let url = "http://localhost:8000/sensor/sensors/";
+    let url = `${backurl}/sensor/sensors/`;
     const resp = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -126,7 +128,7 @@ function ViewImage() {
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
-    let urll = `http://localhost:8000/image/images/${currUser.username}/`;
+    let urll = `${backurl}/image/images/${currUser.username}/`;
     // console.log("Urll", urll);
     const res = await axios.get(urll, {
       headers: {
@@ -151,13 +153,13 @@ function ViewImage() {
     setisFetchingParentImg(true);
 
     if (parentId) {
-      let url = `http://localhost:8000/image/dot/${parentId}/`;
+      let url = `${backurl}/image/dot/${parentId}/`;
       const resp = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      url = `http://localhost:8000/image/${parentId}`;
+      url = `${backurl}/image/${parentId}`;
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -165,7 +167,7 @@ function ViewImage() {
       });
       // console.log("ParentImage Dot Data,", resp.data);
       // console.log("ParentImage Image Data,", res.data);
-      var uurl = `http://localhost:8000/image/value/${parentId}/`;
+      var uurl = `${backurl}/image/value/${parentId}/`;
       const ress = await axios.get(uurl, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -246,7 +248,7 @@ function ViewImage() {
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
     // console.log("Ricieved id", id);
-    let urll = `http://localhost:8000/sensor/${id}/`;
+    let urll = `${backurl}/sensor/${id}/`;
     const resp = await axios.get(urll, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -338,7 +340,7 @@ function ViewImage() {
           <Card.Img
             className="box"
             variant="top"
-            src={"http://localhost:8000" + image.image}
+            src={`${backurl}` + image.image}
             style={{
               maxHeight: "auto",
               maxWidth: "300px",
@@ -386,7 +388,7 @@ function ViewImage() {
               }}
             >
               <ImageMarker
-                src={"http://localhost:8000" + parentImgURL}
+                src={`${backurl}` + parentImgURL}
                 markers={markers}
                 markerComponent={addMarker}
               />
@@ -429,7 +431,7 @@ function ViewImage() {
                       <Card.Img
                         className="box"
                         variant="top"
-                        src={"http://localhost:8000" + image.image}
+                        src={`${backurl}` + image.image}
                         style={{
                           maxHeight: "auto",
                           maxWidth: "300px",
@@ -570,7 +572,7 @@ function MyVerticallyCenteredModal(props) {
             onClick={() => {
               setOpen(true);
               navigator.clipboard.writeText(
-                `localhost:8000/sensor/value/${mergeS.currSensor.sensor_id}/`
+                `${backurl}/sensor/value/${mergeS.currSensor.sensor_id}/`
               );
               setsnackMSG("Address Copied");
             }}

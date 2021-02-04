@@ -13,7 +13,9 @@ import {
   Button,
   Modal,
 } from "react-bootstrap";
+import { backendUrl } from "../../actions/backendUrl";
 
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 function AddPImage(params) {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
@@ -23,7 +25,7 @@ function AddPImage(params) {
 
   /*********************************************************** UseEffects ********************************************************* */
   useEffect(async () => {
-    let url = `http://localhost:8000/user/name/`;
+    let url = `${backurl}/user/name/`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,

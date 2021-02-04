@@ -16,6 +16,9 @@ import {
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import { Form } from "reactstrap";
+import { backendUrl } from "../actions/backendUrl";
+
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 const HomePage = ({ registration_message }) => {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
@@ -66,7 +69,7 @@ const HomePage = ({ registration_message }) => {
     setIsFetchingData(true);
     if (authenticated) {
       console.log("Inside");
-      let url = `http://localhost:8000/user/name/`;
+      let url = `${backurl}/user/name/`;
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -102,7 +105,7 @@ const HomePage = ({ registration_message }) => {
     e.preventDefault();
     console.log("StaffUsername", siteAdminUsername);
     console.log("RefreshvalueInside Fun", refresh);
-    let url = `http://localhost:8000/user/name/`;
+    let url = `${backurl}/user/name/`;
     const formDotData = new FormData();
     if (value.is_admin || value.is_viewer || value.is_staff) {
       formDotData.append("username", currUser.username);

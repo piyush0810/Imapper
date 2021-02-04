@@ -37,6 +37,9 @@ import {
 import { func } from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
 import { Col, Row } from "react-bootstrap";
+import { backendUrl } from "../actions/backendUrl";
+
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
@@ -317,7 +320,7 @@ function Navigation(props) {
     }
   };
   const handleReq = async (username, paylaod) => {
-    let url = `http://localhost:8000/user/approval/${username}/`;
+    let url = `${backurl}/user/approval/${username}/`;
 
     const formData = new FormData();
     formData.append("key", paylaod);
@@ -336,7 +339,7 @@ function Navigation(props) {
   useEffect(async () => {
     setIsFetchingCurrUser(true);
     if (props.authenticated) {
-      let url = `http://localhost:8000/user/name/`;
+      let url = `${backurl}/user/name/`;
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -350,7 +353,7 @@ function Navigation(props) {
     setIsFetchingRequests(true);
     if (props.authenticated) {
       // console.log("Getting Requests for Staff Approval");
-      let url = "http://localhost:8000/user/approval/";
+      let url = `${backurl}/user/approval/`;
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,

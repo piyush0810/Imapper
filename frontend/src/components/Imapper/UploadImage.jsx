@@ -14,6 +14,9 @@ import {
 } from "react-bootstrap";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import { backendUrl } from "../../actions/backendUrl";
+
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -62,7 +65,7 @@ function UploadImage(props) {
       formData.append("username", image.username);
 
       // console.log("PId in FromData", image.pid);
-      let url = "http://localhost:8000/image/images/";
+      let url = `${backurl}/image/images/`;
       const resp = await axios
         .post(url, formData, {
           headers: {

@@ -6,7 +6,9 @@ import MuiAlert from "@material-ui/lab/Alert";
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
+import { backendUrl } from "../../actions/backendUrl";
 
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 function addCustomSensor() {
   /***************************************************** Hooks ************************************ */
   const imageRef = useRef(null);
@@ -39,7 +41,7 @@ function addCustomSensor() {
       formData.append("units", sensor.units);
       formData.append("icon", sensor.icon);
 
-      let url = "http://localhost:8000/sensor/csensors/";
+      let url = `${backurl}/sensor/csensors/`;
       const resp = await axios
         .post(url, formData, {
           headers: {

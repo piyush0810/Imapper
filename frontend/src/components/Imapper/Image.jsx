@@ -27,7 +27,9 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
+import { backendUrl } from "../../actions/backendUrl";
 
+let backurl = process.env.REACT_APP_DEV_URL || backendUrl;
 /************************************************************* Global Functions ************************* */
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -85,13 +87,13 @@ function Image(props) {
   useEffect(async () => {
     setisFetchingImage(true);
     if (imageID) {
-      let urll = `http://localhost:8000/image/dot/${imageID}/`;
+      let urll = `${backurl}/image/dot/${imageID}/`;
       const resp = await axios.get(urll, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      let url = `http://localhost:8000/image/${imageID}`;
+      let url = `${backurl}/image/${imageID}`;
       const res = await axios.get(url, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -110,7 +112,7 @@ function Image(props) {
           _markers.push({ top: dot.x, left: dot.y });
         });
 
-        url = "http://localhost:8000/sensor/sensors/";
+        url = `${backurl}/sensor/sensors/`;
         const respp = await axios.get(url, {
           headers: {
             Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -121,7 +123,7 @@ function Image(props) {
           payload: respp.data,
         });
 
-        url = `http://localhost:8000/image/images/${currUser.username}`;
+        url = `${backurl}/image/images/${currUser.username}`;
         const resppp = await axios.get(url, {
           headers: {
             Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
@@ -169,7 +171,7 @@ function Image(props) {
     console.log("Image: DeleteDot called");
     setIsDeleting(true);
 
-    let url = `http://localhost:8000/image/dotdel/${id}/`;
+    let url = `${backurl}/image/dotdel/${id}/`;
     console.log("Image: Database Dot called");
     await axios.delete(url);
     console.log("Image: Refreshcalled");
@@ -266,7 +268,7 @@ function Image(props) {
             <Card.Img
               className="box"
               variant="top"
-              src={"http://localhost:8000" + image.image}
+              src={`${backurl}` + image.image}
               style={{
                 maxHeight: "auto",
                 maxWidth: "300px",
@@ -324,7 +326,7 @@ function Image(props) {
                 }}
               >
                 <ImageMarker
-                  src={"http://localhost:8000" + image.image}
+                  src={`${backurl}` + image.image}
                   markers={markers}
                   onAddMarker={handleAddMarker}
                   markerComponent={addMarker}
