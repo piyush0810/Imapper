@@ -8,11 +8,15 @@ import {
   Row,
   Col,
   Card,
-  Alert,
   Button,
   Modal,
   Form,
 } from "react-bootstrap";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function UploadImage(props) {
   console.log("UplaodImage: Component Rendered");
@@ -22,7 +26,8 @@ function UploadImage(props) {
   const pid = props.pid;
   const index = props.index;
   const imageRef = useRef(null);
-
+  const [open, setOpen] = useState(false);
+  const [snackMSG, setsnackMSG] = useState("");
   const [image, setImage] = useState({
     dots: null,
     image: null,
@@ -68,6 +73,8 @@ function UploadImage(props) {
         .catch((err) => console.log(err));
       console.log("UploadImage: Sent Post Request");
       props.onHide();
+      setsnackMSG("Successfully Added Site");
+      setOpen(true);
       props.refresh((p) => {
         return p + 1;
       });
@@ -75,53 +82,70 @@ function UploadImage(props) {
       ("No Image Selected");
     }
   };
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  }
   return (
-    <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Upload Image
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Container>
-          <Form>
-            <Form.Group>
-              <Form.Control
-                type="text"
-                placeholder="Add Project Name"
-                required
-                onChange={(e) => {
-                  setImage({
-                    ...image,
-                    image_name: e.target.value,
-                  });
-                }}
-              />
-              <Form.File
-                label="JPEG/JPG"
-                onChange={handleChange}
-                ref={imageRef}
-              />
-              <br />
-              <Button onClick={handleDelete} variant="danger">
-                Delete
-              </Button>
-              <Button variant="success" type="submit" onClick={handleUpload}>
-                Upload
-              </Button>
-            </Form.Group>
-          </Form>
-        </Container>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+    <>
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Upload Image
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Container>
+            <Form>
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  placeholder="Add Project Name"
+                  required
+                  onChange={(e) => {
+                    setImage({
+                      ...image,
+                      image_name: e.target.value,
+                    });
+                  }}
+                />
+                <Form.File
+                  label="JPEG/JPG"
+                  onChange={handleChange}
+                  ref={imageRef}
+                />
+                <br />
+                <Button onClick={handleDelete} variant="danger">
+                  Delete
+                </Button>
+                <Button variant="success" type="submit" onClick={handleUpload}>
+                  Upload
+                </Button>
+              </Form.Group>
+            </Form>
+          </Container>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {snackMSG}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 export default UploadImage;

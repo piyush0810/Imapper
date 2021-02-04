@@ -135,7 +135,7 @@ function Image(props) {
         setisFetchingImage(false);
       }
     }
-  }, [imageID, callRefresh]);
+  }, [imageID, callRefresh, currUser]);
 
   /***************************************************** Functions ***************************************** */
   function singleClick(event, id, isImage) {
@@ -228,11 +228,7 @@ function Image(props) {
           {!isDeleting && (
             <Card>
               <Card.Body style={{ textAlign: "center" }}>
-                <Card.Title>
-                  {sensor.sensor_name === "temperature"
-                    ? "Temperature"
-                    : "Pressure"}
-                </Card.Title>
+                <Card.Title>{sensor.sensor_name}</Card.Title>
                 <Card.Subtitle
                   className="mb-2 text-muted"
                   style={{ padding: "5px" }}

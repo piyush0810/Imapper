@@ -38,11 +38,16 @@ function AddModal(props) {
   const currUser = useSelector((state) => state.curr_user);
   /********************************************** States ******************************************************** */
   const [selectedValue, setSelectedValue] = useState("s");
+  const [currSensor, setCurrSensor] = useState({
+    sensor_type: "",
+    units: "",
+  });
+  const [sensors, setSensors] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isTemp, setIsTemp] = useState(true); //default Temperature sensor
   const [isPres, setisPres] = useState(false);
   const [volume, setVolume] = useState(0);
-  const [unit, setunit] = useState("C"); //insert default value of unit
+  const [units, setunits] = useState(); //insert default value of units
   const [image, setImage] = useState({
     dots: null,
     image: null,
@@ -51,7 +56,22 @@ function AddModal(props) {
     image_name: "",
     username: currUser.username,
   });
-  console.log(image);
+  const [isFetchingSensors, setIsFetchingSensors] = useState(true);
+  // console.log("AddModal: isFetchingSensor", isFetchingSensors);
+  console.log("Rerender", currSensor);
+  /************************************************ useEffect ***************************************************** */
+  useEffect(async () => {
+    setIsFetchingSensors(true);
+    let url = `http://localhost:8000/sensor/csensors/`;
+    const resp = await axios.get(url, {
+      headers: {
+        Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
+      },
+    });
+    // console.log("AddModal Data Reieved:", resp.data);
+    setSensors([...resp.data]);
+    setIsFetchingSensors(false);
+  }, [selectedValue]);
   /************************************************ Functions ***************************************************** */
   const handleSubmitSensor = async (e) => {
     setIsUploading(true);
@@ -83,16 +103,11 @@ function AddModal(props) {
         })
         .catch((err) => console.log(err));
       const formData = new FormData();
-
-      if (isTemp) {
-        switch (unit) {
-          case "1":
-        }
-      }
+      console.log("Inside Submint Function", currSensor);
       formData.append("pid", pid);
       formData.append("sensor_id", gid);
-      formData.append("sensor_name", isTemp ? "temperature" : "pressure");
-      formData.append("unit", unit);
+      formData.append("sensor_name", currSensor.sensor_type);
+      formData.append("unit", currSensor.units);
       formData.append("dimensions", volume);
       formData.append("values", []);
       formData.append("dot_id", dot_id);
@@ -148,9 +163,9 @@ function AddModal(props) {
           },
         })
         .catch((err) => console.log(err));
-      console.log("UploadImage: Sent Post Request");
+      // console.log("UploadImage: Sent Post Request");
       if (markers.length) {
-        console.log("UploadImage:inside Index if");
+        // console.log("UploadImage:inside Index if");
         const formDotData = new FormData();
         // Making Id's for dot and sensor
         const dot_id = (
@@ -173,8 +188,8 @@ function AddModal(props) {
             },
           })
           .catch((err) => console.log(err));
-        console.log("UploadImage: Response", resp);
-        console.log("UploadImage: Sent Dot POST Req");
+        // console.log("UploadImage: Response", resp);
+        // console.log("UploadImage: Sent Dot POST Req");
       } else {
         console.log("No Markers present");
       }
@@ -189,87 +204,69 @@ function AddModal(props) {
 
   /******************************************************* Forms ***************************************************** */
   const sensorForm = () => {
-    return (
-      <>
-        {isUploading && (
-          <Alert variant="warning">Sensor Data being Uploaded</Alert>
-        )}
-        {!isUploading && (
-          <Form onSubmit={handleSubmitSensor}>
-            <Form.Group>
-              <Form.Label>Select Type of Sensor</Form.Label>
-              <Form.Control
-                required
-                as="select"
-                onChange={(e) => {
-                  // console.log("Value Changed", e.target.value);
-                  if (e.target.value === "1") {
-                    setIsTemp(true);
-                    setisPres(false);
-                  } else if (e.target.value === "2") {
-                    setisPres(true);
-                    setIsTemp(false);
-                    // console.log("Is Pressure Changed", isTemp, isPres);
-                  }
-                }}
-              >
-                <option value="1">Temperature</option>
-                <option value="2">Pressure</option>
-              </Form.Control>
-            </Form.Group>
-            <Form.Group>
-              <FormLabel>Select Units</FormLabel>
-              {isTemp && (
-                <FormControl
+    if (selectedValue == "s" && !isFetchingSensors) {
+      return (
+        <>
+          {isUploading && (
+            <Alert variant="warning">Sensor Data being Uploaded</Alert>
+          )}
+          {!isUploading && (
+            <Form onSubmit={handleSubmitSensor}>
+              <Form.Group>
+                <Form.Label>Select Type of Sensor</Form.Label>
+                <Form.Control
                   required
                   as="select"
                   onChange={(e) => {
-                    // console.log("Temperature Unit Selected", e.target.value);
-                    console.log(e.target.value);
-                    setunit(e.target.value);
-                  }}
-                >
-                  <option value="C">Celsius (C)</option>
-                  <option value="K">Kelvin (K)</option>
-                  <option value="F">Fahrenheit (F)</option>
-                </FormControl>
-              )}
-              {isPres && (
-                <FormControl
-                  required
-                  as="select"
-                  onChange={(e) => {
-                    // console.log("Pressure Unit Selected", e.target.value);
-                    setunit(e.target.value);
-                  }}
-                >
-                  <option value="Pa">Pascal (Pa)</option>
-                  <option value="bar">Bar (bar)</option>
-                  <option value="atm"> Atm (atm)</option>
-                </FormControl>
-              )}
-            </Form.Group>
-            <Form.Group controlId="sensorVolume">
-              <Form.Label>
-                Volume(m<sup>3</sup>)
-              </Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter volume"
-                required
-                onChange={(e) => {
-                  setVolume(e.target.value);
-                }}
-              />
-            </Form.Group>
+                    // console.log("Value Changed", e.target.value);
+                    var name = e.target.value;
+                    var unit = "";
 
-            <Button variant="outline-success" type="submit">
-              Add Sensor
-            </Button>
-          </Form>
-        )}
-      </>
-    );
+                    for (let key in sensors) {
+                      if (sensors[key].sensor_type == name) {
+                        unit = sensors[key].units;
+                        break;
+                      }
+                    }
+                    console.log("Valus", unit, name);
+                    setCurrSensor({ sensor_type: name, units: unit });
+                  }}
+                >
+                  <option value="">None</option>
+                  {sensors.map((sensor, i) => {
+                    return (
+                      <>
+                        <option value={sensor.sensor_type}>
+                          {sensor.sensor_type} Unit: {sensor.units}
+                        </option>
+                      </>
+                    );
+                  })}
+                </Form.Control>
+              </Form.Group>
+
+              <Form.Group controlId="sensorVolume">
+                <Form.Label>
+                  Volume(m<sup>3</sup>)
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Enter volume"
+                  required
+                  onChange={(e) => {
+                    setVolume(e.target.value);
+                  }}
+                />
+              </Form.Group>
+
+              <Button variant="outline-success" type="submit">
+                Add Sensor
+              </Button>
+            </Form>
+          )}
+        </>
+      );
+    }
   };
   const imageForm = () => {
     return (
@@ -352,7 +349,7 @@ function AddModal(props) {
             />
           </RadioGroup>
           {selectedValue == "i" && imageForm()}
-          {selectedValue == "s" && sensorForm()}
+          {sensorForm()}
         </Formcontrol>
       </Modal.Body>
       <Modal.Footer>

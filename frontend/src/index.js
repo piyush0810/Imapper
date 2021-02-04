@@ -28,6 +28,7 @@ import AddPImage from "./components/Imapper/AddPImage";
 import View from "./components/Imapper/View";
 import EditPImage from "./components/Imapper/EditPImage";
 import "./index.css";
+import addCustomSensor from "./components/Imapper/addCustomSensor";
 export const history = createHistory();
 
 ReactDOM.render(
@@ -46,6 +47,7 @@ ReactDOM.render(
           <Route exact path="/image/:imageID" component={Image} />
           <Route exact path="/viewimage/:imageID" component={ViewImage} />
           <Route exact path="/view" component={View} />
+          <Route exact path="/addsensor" component={addCustomSensor} />
         </Switch>
       </div>
     </Router>

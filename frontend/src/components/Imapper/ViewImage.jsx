@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { AddCurrBread } from "../../actions/breads/breadsActions";
 import {
   Container,
   Row,
@@ -17,7 +16,6 @@ import { Line } from "react-chartjs-2";
 import { MDBContainer } from "mdbreact";
 import Tooltip from "@material-ui/core/Tooltip";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 import SettingsInputAntennaSharpIcon from "@material-ui/icons/SettingsInputAntennaSharp";
@@ -58,6 +56,7 @@ function ViewImage() {
     currSensor: "",
   });
   const [isFetching, setIsFetching] = useState(true);
+
   const [isFetchingParentImg, setisFetchingParentImg] = useState(true);
   const [isFetchingSensor, setIsFetchingSensor] = useState(true);
   const [parentImg, setparentImg] = useState({
@@ -66,10 +65,10 @@ function ViewImage() {
     image_id: "",
     image_name: "",
     pid: "",
-    aggDataP: "",
-    aggDataT: "",
+    aggData: [],
   });
   const [markers, setMarkers] = useState([]);
+  const [refresh, setRefresh] = useState(0);
   /*********************************************************** Body ********************************************************* */
   let parentId = imageID;
   var parentImgURL = "";
@@ -94,17 +93,27 @@ function ViewImage() {
       }
     }
   }
-  /******************************************************** Console Statements *************************************************** */
-  console.log("ViewImage: All Images From Store", images);
-  console.log("ViewImage: All Sensors From Store", sensors);
-  console.log("ViewImage: Images of parent image:", imgArray);
-  console.log("ViewImage: Sensors of parent image:", senArray);
-  console.log("ViewImage: MergeState State:", mergeState);
-  console.log("ViewImage: Parent Image State:", parentImg);
-  console.log("ViewImage: Dots From DB", parentImg.dots);
+  // parentImg.aggData.map((aData, i) => {
+  //   console.log("Data:::", aData[0]);
+  // });
+  /******************************************************** //console Statements *************************************************** */
+
+  // console.log("ViewImage: All Images From Store", images);
+  // console.log("ViewImage: All Sensors From Store", sensors);
+  // console.log("ViewImage: Images of parent image:", imgArray);
+  //console.log("ViewImage: Sensors of parent image:", senArray);
+  // console.log("ViewImage: MergeState State:", mergeState);
+  // console.log(
+  //   "Agg ViewImage: Parent Image State:",
+  //   parentImg.dots,
+  //   parentImg.aggData
+  // );
+  // console.log("All Bools", isFetching, isFetchingAggData, isFetchingParentImg);
+  // console.log("ViewImage: Parent Image", parentImg);
   /*********************************************************** Use Effects ********************************************** */
 
   useEffect(async () => {
+    //console.log("Fetching All useEffect called");
     // Fetching all Sensors and Images
     setIsFetching(true);
     let url = "http://localhost:8000/sensor/sensors/";
@@ -117,23 +126,31 @@ function ViewImage() {
       type: "FETCH_SENSORS",
       payload: resp.data,
     });
-    url = `http://localhost:8000/image/images/${currUser.username}`;
-    const res = await axios.get(url, {
+    let urll = `http://localhost:8000/image/images/${currUser.username}/`;
+    // console.log("Urll", urll);
+    const res = await axios.get(urll, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
       },
     });
+
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
     });
+    // console.log(":::::::::::::: Fetched All Images and SensorData");
+    // console.log("Fetched Data Images", res.data);
+    // console.log("Fetched Data Sensors", resp.data);
     setIsFetching(false);
-  }, []);
+    //console.log("Fetching All useEffect called");
+  }, [currUser.username]);
 
   useEffect(async () => {
     //Fetching parent image Data
+    // console.log("Fetching Parent Img useEffect called");
+    setisFetchingParentImg(true);
+
     if (parentId) {
-      setisFetchingParentImg(true);
       let url = `http://localhost:8000/image/dot/${parentId}/`;
       const resp = await axios.get(url, {
         headers: {
@@ -146,92 +163,62 @@ function ViewImage() {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      url = `http://localhost:8000/image/value/${parentId}/pressure`;
-      const ressP = await axios.get(url, {
+      // console.log("ParentImage Dot Data,", resp.data);
+      // console.log("ParentImage Image Data,", res.data);
+      var uurl = `http://localhost:8000/image/value/${parentId}/`;
+      const ress = await axios.get(uurl, {
         headers: {
           Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
         },
       });
-      url = `http://localhost:8000/image/value/${parentId}/temperature`;
-      const ressT = await axios.get(url, {
-        headers: {
-          Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
-        },
-      });
-      console.log("ViewImage: Agg DataP", ressP.data);
-      console.log("ViewImage: Agg DataT", ressT.data);
-      var sizeP = ressP.data.length;
-      var tempP = [];
-      var unitP = "atm";
-      var sizeT = ressT.data.length;
-      var tempT = [];
-      var unitT = "Celsius";
-      for (let index = 0; index < sizeP; index++) {
-        tempP.push(index.toString());
-      }
-      for (let index = 0; index < sizeT; index++) {
-        tempT.push(index.toString());
-      }
-
-      var dataP = {
-        dataLine: {
-          labels: [...tempP],
-          datasets: [
-            {
-              label: `Unit: ${unitP}`,
-              fill: true,
-              lineTension: 0.3,
-              backgroundColor: "rgba(225, 204,230, .3)",
-              borderColor: "rgb(205, 130, 158)",
-              borderCapStyle: "butt",
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: "miter",
-              pointBorderColor: "rgb(205, 130,1 58)",
-              pointBackgroundColor: "rgb(255, 255, 255)",
-              pointBorderWidth: 10,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: "rgb(0, 0, 0)",
-              pointHoverBorderColor: "rgba(220, 220, 220,1)",
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 10,
-              data: [...ressP.data, 0],
-            },
-          ],
-        },
-      };
-
-      var dataT = {
-        dataLine: {
-          labels: [...tempT],
-          datasets: [
-            {
-              label: `Unit: ${unitT}`,
-              fill: true,
-              lineTension: 0.3,
-              backgroundColor: "rgba(225, 204,230, .3)",
-              borderColor: "rgb(205, 130, 158)",
-              borderCapStyle: "butt",
-              borderDash: [],
-              borderDashOffset: 0.0,
-              borderJoinStyle: "miter",
-              pointBorderColor: "rgb(205, 130,1 58)",
-              pointBackgroundColor: "rgb(255, 255, 255)",
-              pointBorderWidth: 10,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: "rgb(0, 0, 0)",
-              pointHoverBorderColor: "rgba(220, 220, 220,1)",
-              pointHoverBorderWidth: 2,
-              pointRadius: 1,
-              pointHitRadius: 10,
-              data: [...ressT.data, 0],
-            },
-          ],
-        },
-      };
-
       if (res.data.length) {
+        var laggData = [];
+        for (let i = 0; i < ress.data.length; i++) {
+          var values = ress.data[i].values;
+          var unit = ress.data[i].units;
+          var name = ress.data[i].name;
+          // return [{ values: [], unit: "", name: "" }];
+
+          var size = values.length;
+          var temp = [];
+          for (let index = 0; index < size; index++) {
+            temp.push(index.toString());
+          }
+          // console.log(temp);
+          var dataLine = {
+            labels: [...temp],
+            datasets: [
+              {
+                label: `Unit: ${unit}`,
+                fill: true,
+                lineTension: 0.3,
+                backgroundColor: "rgba(225, 204,230, .3)",
+                borderColor: "rgb(205, 130, 158)",
+                borderCapStyle: "butt",
+                borderDash: [],
+                borderDashOffset: 0.0,
+                borderJoinStyle: "miter",
+                pointBorderColor: "rgb(205, 130,1 58)",
+                pointBackgroundColor: "rgb(255, 255, 255)",
+                pointBorderWidth: 10,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                pointHoverBorderColor: "rgba(220, 220, 220,1)",
+                pointHoverBorderWidth: 2,
+                pointRadius: 1,
+                pointHitRadius: 10,
+                data: [...values, 0],
+              },
+            ],
+          };
+          var sensorData = {
+            sensor_name: name,
+            unit: unit,
+          };
+          laggData.push([dataLine, sensorData]);
+        }
+        // console.log("inside UseEffect", parentImg);
+
         setparentImg({
           ...parentImg,
           dots: resp.data,
@@ -239,8 +226,7 @@ function ViewImage() {
           image: res.data[0].image,
           image_name: res.data[0].image_name,
           image_id: res.data[0].image_id,
-          aggDataP: dataP,
-          aggDataT: dataT,
+          aggData: [...laggData],
         });
         var _markers = [];
         resp.data.forEach(function (dot) {
@@ -248,15 +234,18 @@ function ViewImage() {
         });
         setMarkers([..._markers]);
         setisFetchingParentImg(false);
+        //console.log("Fetching All useEffect ended");
       }
     } else {
-      console.log("Parent ID Not Defined");
+      console.log("UseEffect: Parent ID Not Defined");
+      //console.log("Fetching All useEffet Not defiend");
     }
   }, [parentId]);
 
   /*********************************************************** Functions ********************************************** */
   async function handleShowGraph(id) {
     setIsFetchingSensor(true);
+    // console.log("Ricieved id", id);
     let urll = `http://localhost:8000/sensor/${id}/`;
     const resp = await axios.get(urll, {
       headers: {
@@ -274,6 +263,9 @@ function ViewImage() {
     var isImage = false;
     var id = "";
     var dot_id = "";
+    console.log("Dots", dots);
+    console.log("Sensors", sensors);
+    console.log("Images", images);
     dots.forEach(function (dot) {
       if (dot.x == x && dot.y == y) {
         id = dot.child_id;
@@ -286,11 +278,13 @@ function ViewImage() {
     return isImage ? PhotoMarker(id, dot_id) : SensorMarker(id, dot_id);
   }
   function getSensorByID(id) {
+    console.log("Id-", id);
     for (var key in sensors) {
       if (sensors[key].sensor_id == id) {
         return sensors[key];
       }
     }
+
     return "";
   }
   function getImageByID(id) {
@@ -309,11 +303,7 @@ function ViewImage() {
         <>
           <Card>
             <Card.Body style={{ textAlign: "center" }}>
-              <Card.Title>
-                {sensor.sensor_name === "temperature"
-                  ? "Temperature"
-                  : "Pressure"}
-              </Card.Title>
+              <Card.Title>{sensor.sensor_name}</Card.Title>
               <Card.Subtitle
                 className="mb-2 text-muted"
                 style={{ padding: "5px" }}
@@ -342,6 +332,7 @@ function ViewImage() {
     var title = "Image";
     if (id) {
       var image = getImageByID(id);
+      console.log("Image", image);
       title = (
         <>
           <Card.Img
@@ -382,9 +373,10 @@ function ViewImage() {
           Fetching Parent Image Data or check the Image ID
         </alert>
       )}
-      {!isFetchingParentImg && (
-        <Container>
-          {/* Showing Parent Image */}
+
+      <Container>
+        {/* Showing Parent Image */}
+        {!isFetchingParentImg && (
           <Row className="justify-content-sm-center">
             <Card
               style={{
@@ -400,33 +392,35 @@ function ViewImage() {
               />
             </Card>
           </Row>
-          {/* Showing Agg Graphs*/}
+        )}
+        {/* Showing Agg Graphs*/}
+        {!isFetchingParentImg && (
           <Row className="justify-content-sm-center" style={{ margin: "15px" }}>
-            <Col>
-              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
-                <h3 className="mt-5">Aggregate Pressure Graph</h3>
-                <Line
-                  data={parentImg.aggDataP.dataLine}
-                  options={{ responsive: true }}
-                />
-              </MDBContainer>
-            </Col>
-            <Col>
-              <MDBContainer style={{ maxWidth: "500px", maxHeight: "100%" }}>
-                <h3 className="mt-5">Aggregate Temperature Graph</h3>
-                <Line
-                  data={parentImg.aggDataT.dataLine}
-                  options={{ responsive: true }}
-                />
-              </MDBContainer>
-            </Col>
+            {parentImg.aggData.map((aData, i) => {
+              return (
+                <>
+                  <Col>
+                    <MDBContainer
+                      style={{ maxWidth: "500px", maxHeight: "100%" }}
+                    >
+                      <h3 className="mt-5">
+                        Aggregate {aData[1].sensor_name} Graph
+                      </h3>
+                      <Line data={aData[0]} options={{ responsive: true }} />
+                    </MDBContainer>
+                  </Col>
+                </>
+              );
+            })}
           </Row>
+        )}
+        {/* Printing Child Images */}
+        {!isFetching && (
           <Row
             sm={1}
             className="justify-content-sm-center"
             style={{ margin: "15px" }}
           >
-            {/* Printing Child Images */}
             {imgArray.map((image, i) => {
               return (
                 <>
@@ -448,7 +442,9 @@ function ViewImage() {
               );
             })}
           </Row>
-          {/* Showing Sensors */}
+        )}
+        {/* Showing Sensors */}
+        {!isFetching && (
           <Row style={{ marginBottom: "200px" }}>
             {senArray.map((sensor, i) => {
               return (
@@ -464,11 +460,7 @@ function ViewImage() {
                       }}
                     >
                       <Card.Body style={{ textAlign: "center" }}>
-                        <Card.Title>
-                          {sensor.sensor_name === "temperature"
-                            ? "Temperature"
-                            : "Pressure"}
-                        </Card.Title>
+                        <Card.Title>{sensor.sensor_name}</Card.Title>
                         <Card.Subtitle
                           className="mb-2 text-muted"
                           style={{ padding: "5px" }}
@@ -491,8 +483,9 @@ function ViewImage() {
               );
             })}
           </Row>
-        </Container>
-      )}
+        )}
+      </Container>
+
       {isFetching && <alert variant="warning">Fetching Data</alert>}
       {!isFetchingSensor && (
         <MyVerticallyCenteredModal
@@ -521,14 +514,14 @@ function MyVerticallyCenteredModal(props) {
     setOpen(false);
   }
   const mergeS = props.mergeS;
-  console.log("Modal loaded", mergeS);
-  console.log("Array", mergeS.currSensor.values);
+  //console.log("Modal loaded", mergeS);
+  //console.log("Array", mergeS.currSensor.values);
   var size = mergeS.currSensor.values.length;
   var temp = [];
   for (let index = 0; index < size; index++) {
     temp.push(index);
   }
-  console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
+  //console.log("Values to be displayed", typeof mergeS.currSensor.values, size);
   var data = {
     dataLine: {
       labels: [...temp],

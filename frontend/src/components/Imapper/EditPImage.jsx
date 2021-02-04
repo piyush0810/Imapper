@@ -2,26 +2,42 @@ import { useState, useEffect, useRef, shallowEqual } from "react";
 import { useHistory, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-
 import {
   Container,
-  Row,
-  Col,
   Card,
-  Alert,
+  CardActionArea,
+  CardActions,
+  CardContent,
+  CardMedia,
   Button,
-  Modal,
-} from "react-bootstrap";
-
+  Typography,
+  makeStyles,
+  Grid,
+  Paper,
+  Snackbar,
+} from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+const useStyles = makeStyles({
+  root: {
+    maxWidth: "auto",
+  },
+});
 function EditImage(params) {
   /*********************************************************** Hooks ********************************************************* */
   const dispatch = useDispatch();
-  const images = useSelector((state) => state.img);
+  // const images = useSelector((state) => state.img);
   const currUser = useSelector((state) => state.curr_user);
+  const classes = useStyles();
 
   /*********************************************************** States ********************************************************* */
   const [isFetchingParentImg, setIsFetchingParentImg] = useState(true);
   const [refresh, setRefresh] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [snackMSG, setsnackMSG] = useState("");
+  const [images, setImages] = useState([]);
 
   /*********************************************************** Body ********************************************************* */
   var parentImgArray = [];
@@ -35,14 +51,25 @@ function EditImage(params) {
     }
   }
   /*********************************************************** Console Statements ********************************************** */
-
+  console.log("Home: Bools", isFetchingParentImg);
   console.log("Home: Images from Store", images);
   console.log("Home: Parent Images:", parentImgArray);
 
   /*********************************************************** Functions ********************************************** **********/
-
-  function handleDelete(id) {
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  }
+  async function handleDelete(id) {
     // console.log("Home: Req For Delete parent Image: ", id);
+
+    let url = `http://localhost:8000/image/imagedel/${id}/`;
+    console.log("Image: Delete called");
+    await axios.get(url);
+    setsnackMSG("Successfully Deleted Site");
+    setOpen(true);
     setRefresh((p) => {
       return p + 1;
     });
@@ -50,62 +77,90 @@ function EditImage(params) {
   /*********************************************************** Use Effects ******************************************************** */
   useEffect(async () => {
     setIsFetchingParentImg(true);
+    console.log("Username:", currUser.username);
     let url = `http://localhost:8000/image/images/${currUser.username}`;
     const res = await axios.get(url, {
       headers: {
         Authorization: `JWT ${localStorage.getItem("ecom_token")}`,
       },
     });
+    console.log("res data", res.data);
+    setImages([...res.data]);
     dispatch({
       type: "FETCH_IMAGES",
       payload: res.data,
     });
     console.log("Done Dispatching Images");
     setIsFetchingParentImg(false);
-  }, [refresh]);
+  }, [refresh, currUser]);
   /*********************************************************** Render Function ********************************************** */
   return (
     <>
       {isFetchingParentImg && (
-        <Alert variant="warning">Fetching Data from Server</Alert>
+        <Alert severity="info">Fetching Data from Server</Alert>
       )}
+
       {!isFetchingParentImg && (
-        <Container fluid="sm" style={{ padding: "50px" }}>
-          <Row className="justify-content-sm-center">
-            {parentImgArray.map((image, i) => {
-              return (
-                <>
-                  <Col xs={10} md="auto" lg="auto" style={{ margin: "100px" }}>
-                    <Card xl>
-                      {image.image_name}
-                      <Link to={`/image/${image.image_id}`}>
-                        <Card.Img
-                          src={"http://localhost:8000" + image.image}
-                          style={{
-                            maxHeight: "480px",
-                            maxWidth: "100%",
-                            padding: "5px",
-                          }}
-                        />
-                      </Link>
-                    </Card>
-                  </Col>
-                  <Col xs={2} md="auto" lg="auto">
-                    <Button
-                      variant="outline-danger"
-                      onClick={() => {
-                        handleDelete(image.image_id);
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Col>
-                </>
-              );
-            })}
-          </Row>
+        <Container fixed style={{ padding: "50px" }}>
+          {parentImgArray.length == 0 && (
+            <Alert severity="info">No Sites Added</Alert>
+          )}
+          <Paper elevation={3}>
+            <Grid container style={{ padding: "5px" }}>
+              <Grid xs={12} item>
+                {parentImgArray.map((image, i) => {
+                  return (
+                    <>
+                      <Card className={classes.root} style={{ margin: "20px" }}>
+                        <CardActionArea>
+                          <Link to={`/image/${image.image_id}`}>
+                            <CardMedia
+                              component="img"
+                              alt="Contemplative Reptile"
+                              height="320"
+                              image={"http://localhost:8000" + image.image}
+                              title={image.image_name}
+                            />
+                          </Link>
+                          <CardContent>
+                            <Typography
+                              gutterBottom
+                              variant="h5"
+                              component="h2"
+                            >
+                              {image.image_name}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions>
+                          <Button
+                            size="small"
+                            color="secondary"
+                            onClick={() => {
+                              handleDelete(image.image_id);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </>
+                  );
+                })}
+              </Grid>
+            </Grid>
+          </Paper>
         </Container>
       )}
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {snackMSG}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
