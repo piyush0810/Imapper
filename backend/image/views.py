@@ -259,7 +259,7 @@ class imagedel(APIView):
                 self.deleteim(image_id)
                 dot.delete()
 
-    def delete(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
 
         image_id = self.kwargs['image_id']
         image = Image.objects.filter(image_id=image_id)
