@@ -36,7 +36,6 @@ import {
 } from "@material-ui/core";
 import { func } from "prop-types";
 import { makeStyles } from "@material-ui/core/styles";
-import { Col, Row } from "react-bootstrap";
 import { backendUrl } from "../actions/backendUrl";
 
 let backurl = process.env.REACT_APP_DEV_URL || backendUrl;

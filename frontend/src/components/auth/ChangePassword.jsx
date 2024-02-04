@@ -2,10 +2,8 @@ import React, { Component } from "react";
 import { withFormik } from "formik";
 import Yup from "yup";
 
-import { withStyles } from "material-ui/styles";
-import TextField from "material-ui/TextField";
-import Button from "material-ui/Button";
-
+import { withStyles } from "@material-ui/styles";
+import { TextField, Button } from "@material-ui/core";
 import { styles } from "./customStylesMui";
 
 class InnerPwForm extends Component {
@@ -21,7 +19,7 @@ class InnerPwForm extends Component {
       handleSubmit,
       handleReset,
       classes,
-      change_password
+      change_password,
     } = this.props;
 
     return (
@@ -113,7 +111,7 @@ const EnhancedForm = withFormik({
   mapPropsToValues: () => ({
     current_password: "",
     new_password: "",
-    re_new_password: ""
+    re_new_password: "",
   }),
   validationSchema: Yup.object().shape({
     current_password: Yup.string()
@@ -124,7 +122,7 @@ const EnhancedForm = withFormik({
       .required("New Password is required"),
     re_new_password: Yup.string()
       .oneOf([Yup.ref("new_password"), null], "Passwords don't match.")
-      .required("Password confirm is required")
+      .required("Password confirm is required"),
   }),
   handleSubmit: (
     { current_password, new_password, re_new_password },
@@ -136,7 +134,7 @@ const EnhancedForm = withFormik({
       .then(() => resetForm());
     setSubmitting(false);
   },
-  displayName: "ChangePasswordForm" //hlps with react devtools
+  displayName: "ChangePasswordForm", //hlps with react devtools
 })(InnerPwForm);
 
 export const ChangePassword = withStyles(styles)(EnhancedForm);

@@ -3,9 +3,9 @@ import { withFormik } from "formik";
 import Yup from "yup";
 import { Link } from "react-router-dom";
 
-import { withStyles } from "material-ui/styles";
-import TextField from "material-ui/TextField";
-import Button from "material-ui/Button";
+import { withStyles } from "@material-ui/styles";
+
+import { TextField, Button } from "@material-ui/core";
 
 import { styles } from "./customStylesMui";
 

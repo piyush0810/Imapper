@@ -3,10 +3,8 @@ import { withFormik } from "formik";
 import Yup from "yup";
 import { Link } from "react-router-dom";
 
-import { withStyles } from "material-ui/styles";
-import TextField from "material-ui/TextField";
-import Button from "material-ui/Button";
-
+import { withStyles } from "@material-ui/styles";
+import { TextField, Button } from "@material-ui/core";
 import { styles } from "./customStylesMui";
 
 class InnerRegistrationForm extends Component {
@@ -21,7 +19,7 @@ class InnerRegistrationForm extends Component {
       handleBlur,
       handleSubmit,
       handleReset,
-      classes
+      classes,
     } = this.props;
 
     return (
@@ -121,7 +119,7 @@ const EnhancedForm = withFormik({
     username: "",
     email: "",
     password1: "",
-    password2: ""
+    password2: "",
   }),
   validationSchema: Yup.object().shape({
     username: Yup.string().required("Username is required"),
@@ -133,7 +131,7 @@ const EnhancedForm = withFormik({
       .required("Password confirm is required"),
     email: Yup.string()
       .email("Invalid Email Address")
-      .required("Email is required")
+      .required("Email is required"),
   }),
   handleSubmit: (
     { username, email, password1 },
@@ -141,7 +139,7 @@ const EnhancedForm = withFormik({
   ) => {
     props
       .registerAction({ username, email, password: password1 })
-      .then(resp => {
+      .then((resp) => {
         if (
           resp.non_field_errors ||
           Array.isArray(resp.username) ||
@@ -156,7 +154,7 @@ const EnhancedForm = withFormik({
       });
     setSubmitting(false);
   },
-  displayName: "RegistrationForm" //hlps with react devtools
+  displayName: "RegistrationForm", //hlps with react devtools
 })(InnerRegistrationForm);
 
 export const Register = withStyles(styles)(EnhancedForm);
