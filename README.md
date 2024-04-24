@@ -1,5 +1,7 @@
-## A React + Redux / Django Rest Framework authentication example
+## IOT DATA MONITORING PLATFORM FOR Multipurpose
 
+### Description
+This project focuses on creating an easy-to-use dashboard for monitoring and analyzing data collected by IoT devices. It features a scalable platform designed to accommodate various IoT devices in engineering and medical sectors. The system includes a three-step authentication model with user hierarchies for different access levels, distinguishing between viewing and editing privileges.
 ### Functionality:
 
 - [x] Login with JWT
